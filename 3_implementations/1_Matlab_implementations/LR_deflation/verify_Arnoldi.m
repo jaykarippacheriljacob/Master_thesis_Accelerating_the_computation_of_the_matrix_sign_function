@@ -26,15 +26,15 @@ function verify_Arnoldi(A, Vm, Hm, hm1m, qm1)
     rhs = hm1m * qm1 * em.';
     %disp(rhs);
     
-    % Compute the residual
-    residual = norm(lhs - rhs, 'fro')/norm(lhs,'fro');
-    disp(residual)
+    % Compute the relative error
+    rel_error = norm(lhs - rhs, 'fro')/norm(lhs,'fro');
+    disp(['Relative error = ', num2str(rel_error)]);
     
     % Set tolerance level
     tol = 1e-10;
     
-    % Check if the residual is sufficiently small
-    if residual < tol
+    % Check if the relative error is sufficiently small
+    if rel_error < tol
         disp('Arnoldi relation verified.');
     else
         disp('Arnoldi relation not verified.');
