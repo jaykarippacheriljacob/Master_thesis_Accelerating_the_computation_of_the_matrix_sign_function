@@ -1,4 +1,3 @@
-
 function f_Dm = compute_sign_function_diag(Dm)
     % Inputs: 
     %       Dm: Input matrix

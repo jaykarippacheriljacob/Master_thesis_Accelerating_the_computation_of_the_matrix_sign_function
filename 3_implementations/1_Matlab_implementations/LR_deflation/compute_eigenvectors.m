@@ -7,6 +7,8 @@ function [Vm, Wm, D1] = compute_eigenvectors(A, m)
     %       Wm: Left eigenvectors of A.
     %       D1: Eigenvalues corresponding to the right eigenvectors.
 
+    A = A / norm(A);
+
     % Compute Right eigenvalues and eigenvectors for A
     [Vm, D1] = eigs(A, m, 'smallestabs');
     

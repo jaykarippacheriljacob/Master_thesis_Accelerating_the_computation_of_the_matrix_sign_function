@@ -1,4 +1,10 @@
 function Y = lr_deflation_scheme(A, x, m, k)
+    % Input:
+    %      A - n x n matrix
+    %      x - n x 1 vector
+    %      m - No. of critical values for which defation has to be undergone.
+    %      k - no. of iterations for the krylov's subspace, m < n
+
     % Step 1: Compute left and right eigenvectors
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);
 
@@ -12,7 +18,7 @@ function Y = lr_deflation_scheme(A, x, m, k)
 
     % Step 4: Construct an orthonormal basis for the Krylov subspace using
     % the arnoldi process
-    [~, H, V] = Arnoldi_method(A, x_ominus, zeros(size(x_ominus, 1),1), k);
+    [H, V] = Arnoldi_method(A, x_ominus, k);
     
     % Compute Hessenberg matrix
     %Hk = Vk' * A * Vk;

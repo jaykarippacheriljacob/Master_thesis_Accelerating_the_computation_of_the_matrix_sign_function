@@ -1,14 +1,9 @@
-function [resvec, H, V] = Arnoldi_method(A, b, x0, k)
-    % GMRES_METHOD Solves a linear system using the GMRES method.
+function [H, V] = Arnoldi_method(A, b, k)
     % Inputs:
     %       A: The coefficient matrix (n x n)
     %       b: The right-hand side vector (n x 1)
-    %       x0: The initial guess for the solution (n x 1)
     %       k: Maximum number of iterations
-    %       tol: Tolerance for convergence xxxxxxxx
     % Outputs:
-    %       x: The approximate solution vector (n x 1) xxxxxxxx
-    %       resvec: Residual norms at each iteration xxxxxxxxx
     %       H: Upper Hessenberg matrix from Arnoldi process
     %       V: Arnoldi vector matrix
     
@@ -17,13 +12,9 @@ function [resvec, H, V] = Arnoldi_method(A, b, x0, k)
     V = zeros(n, m + 1);
     H = zeros(m + 1, m);
 
-    % Initialize residual vector
-    % the initial vector should always be zero, pass zero vector for x0
-    r0 = b - A * x0;
-    beta = norm(r0);
-    V(:, 1) = r0 / beta;
-
-    resvec = zeros(m, 1);
+    % Initial residual vector
+    beta = norm(b);
+    V(:, 1) = b / beta;
 
     for j = 1:m
         % Apply matrix A to the last basis vector

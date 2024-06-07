@@ -5,17 +5,16 @@ close all;
 % check what are the possibilities of having zeros in the sign function
 % calucation.
 
-% Set the seed to a specific value, for example, 42
-%rng(49);
-% n = 20;
-% A = rand(n) + 10.0 * eye(n);
-% d = eig(A);
-% plot(real(d), imag(d), '*');
+% Define test parameters
 
-A = read_matrix('4x4x4x4b6.0000id3n1.mat');
-n = size(A, 2);
-d = eigs(A);
-plot(real(d), imag(d), '*');
+%rng(49); % Set the seed to a specific value, for example, 42
+n = 20; % Size of the matrix
+A = rand(n) + 10.0 * eye(n); % Generate a random N x N matrix
+d = eig(A); % Compute the eigen values of the generated matrix
+% A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
+% n = size(A, 2); % Size of the matrix
+% d = eigs(A); % Compute the eigen values of the generated matrix
+% plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
 % Define vector x
 %x = [1; 2; 3];
@@ -28,7 +27,7 @@ m = 10;
 k = 10;
 
 % Verify compute_eigenvectors function of a matrix.
-% verify_compute_eigenvectors(A, m, 1);
+verify_compute_eigenvectors(A, m, 1);
 
 start = cputime;
 
@@ -41,12 +40,12 @@ disp(['Time taken by lr deflation scheme = ', num2str(finish - start), ' s']);
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-result_direct_1 = (A*(inv(sqrtm(full(A * A)))))*x;
+exact_result = (A*(inv(sqrtm(full(A * A))))) * x;
 
 finish = cputime;
 disp(['Time taken without deflation scheme = ', num2str(finish - start), ' s']);
 
-rel_err = norm(result_direct_1 - result_lr)/norm(result_lr);
+rel_err = norm(exact_result - result_lr)/norm(result_lr);
 disp(['Relative error = ', num2str(rel_err)])
 
 % Set tolerance level

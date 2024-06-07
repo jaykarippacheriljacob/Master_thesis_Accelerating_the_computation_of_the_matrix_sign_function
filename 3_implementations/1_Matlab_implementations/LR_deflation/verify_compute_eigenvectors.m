@@ -16,7 +16,6 @@ function verify_compute_eigenvectors(B, m, symm_type)
         A = (B * B');
     else
         A = (B + B');
-        %A = B;
     end
 
     % Compute eigenvectors using compute_eigenvectors
