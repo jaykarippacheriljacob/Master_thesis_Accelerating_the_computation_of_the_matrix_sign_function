@@ -1,0 +1,27 @@
+Given the definitions:
+
+\[
+c_1 = \frac{\pi}{\ell_1} \mathbf{1}_{\ell_1}
+\]
+
+where \(\mathbf{1}_{\ell_1}\) is a vector of ones with length \(\ell_1\),
+
+and 
+
+\[
+z_1 = \cos\left( \frac{(2j-1)\pi}{2\ell_1} \right) \quad \text{for} \quad j = 1, 2, \ldots, \ell_1,
+\]
+
+the expression for \( h_1 \) can be rewritten as:
+
+\[
+h_1 = h_1 + \sum_{j=1}^{\ell_1} \left( \frac{\pi}{\ell_1} \right) \left( \left( \mathbf{SV}^T \left( - (1 - \cos\left( \frac{(2j-1)\pi}{2\ell_1} \right)) \mathbf{SV} - (1 + \cos\left( \frac{(2j-1)\pi}{2\ell_1} \right)) \mathbf{SAV} \right) \right)^{-1} \mathbf{SV}^T \mathbf{Sv} \right)
+\]
+
+Simplifying the constant factor \(\frac{\pi}{\ell_1}\) out of the summation, we get:
+
+\[
+h_1 = h_1 + \frac{\pi}{\ell_1} \sum_{j=1}^{\ell_1} \left( \left( \mathbf{SV}^T \left( - (1 - \cos\left( \frac{(2j-1)\pi}{2\ell_1} \right)) \mathbf{SV} - (1 + \cos\left( \frac{(2j-1)\pi}{2\ell_1} \right)) \mathbf{SAV} \right) \right)^{-1} \mathbf{SV}^T \mathbf{Sv} \right)
+\]
+
+This is the mathematical representation of the given code using the specified definitions for \( c_1 \) and \( z_1 \).
