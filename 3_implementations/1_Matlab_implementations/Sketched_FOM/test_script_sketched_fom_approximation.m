@@ -3,17 +3,20 @@ clc;
 close all;
 
 % Define test parameters
-N = 50; % Size of the matrix
-A = rand(N) + 10.0 * eye(N); % Generate a random N x N matrix
-d = eig(A); % Compute the eigen values of the generated matrix
-% A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
-% N = size(A, 2); % Size of the matrix
-% d = eigs(A); % Compute the eigen values of the generated matrix
+%N = 50; % Size of the matrix
+% A = rand(N) + 10.0 * eye(N); % Generate a random N x N matrix
+% A = gallery('poisson', 50);
+%d = eig(A); % Compute the eigen values of the generated matrix
+A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
+N = size(A, 2); % Size of the matrix
+% A = A - 0.8 *speye(N);
+% d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
-m = 10; % No. of iterations for the krylov's subspace
+% b = ones(N, 1);
+m = 19; % No. of iterations for the krylov's subspace
 s = 20; % Sketch matrix row dimension
 
-plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+% plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
 start = cputime;
 

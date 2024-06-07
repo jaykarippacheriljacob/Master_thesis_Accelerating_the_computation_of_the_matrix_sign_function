@@ -4,6 +4,8 @@ function result = sketched_fom(A, b, m, s)
     %      b - N x 1 vector
     %      m - no. of iterations for the krylov's subspace, m < min(N, s)
     %      s - sketch matrix row dimension
+    % Output: 
+    %      result - f(A)b
 
     % Step 1: Draw sketching matrix S € C(s*N)
     N = size(b,1);
@@ -59,7 +61,7 @@ function result = sketched_fom(A, b, m, s)
     V = V(:, 1:m);
 
     % Step 5: Compute thin QR decomposition SVm = Qm * Rm
-    [Qm, Rm] = qr(SV(:,1:j), 0);
+    [Qm, Rm] = qr(SV(:,1:m), 0);
 
     % Step 4: Compute the approximation to f(A)x
     f = compute_sign_function(Qm' * (SAV * inv(Rm)));
