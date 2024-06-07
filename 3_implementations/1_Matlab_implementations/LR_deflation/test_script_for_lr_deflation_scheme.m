@@ -1,13 +1,13 @@
-clear
-clc
+clear;
+clc;
 
 % check what are the possibilities of having zeros in the sign function
 % calucation.
 
 % Set the seed to a specific value, for example, 42
-rng(49);
+%rng(49);
 n = 50;
-A = rand(n) + 10.0 * eye(n);
+A = rand(n) + 3.0 * eye(n);
 d = eig(A);
 plot(real(d), imag(d), '*');
 
@@ -38,20 +38,12 @@ result_direct_1 = (A*(inv(sqrtm(A * A))))*x;
 rel_err = norm(result_direct_1 - result_lr)/norm(result_lr);
 disp(rel_err)
 
-% % disp(A*((A^2)^(-1/2)))
-% % Display results
-% disp("Approximation using LR_deflation_scheme:");
-% disp(result_lr);
-% 
-% %disp("Direct computation of f(A)x (1):");
-% %disp(result_direct_1);
-% 
-% disp("Direct computation of f(A)x (2):");
-% disp(result_direct_2);
-% 
-% % Compare results
-% if isequal(round(result_lr, 6), round(result_direct_2, 6))
-%     disp("Results match.");
-% else
-%     disp("Results do not match.");
-% end
+% Set tolerance level
+tol = 1e-10;
+    
+% Check if the residual is sufficiently small
+if rel_err < tol
+    disp('LR deflation method verified.');
+else
+    disp('LR deflation not verified.');
+end

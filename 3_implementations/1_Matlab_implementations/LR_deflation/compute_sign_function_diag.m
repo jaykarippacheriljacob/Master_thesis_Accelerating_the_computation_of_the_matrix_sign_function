@@ -12,16 +12,3 @@ function f_Dm = compute_sign_function_diag(Dm)
         f_Dm(i, i) = z * ((sqrt(z * z))^(-1));
     end
 end
-
-% function f_Dm = compute_sign_function_diag(Dm)
-%     % Inputs: 
-%     % Dm: Input matrix
-%     % Outputs:
-%     % f_Dm: Resultant sign function applied to the diagonal elements
-% 
-%     % Extract diagonal elements
-%     z = diag(Dm);
-%     % Apply vectorized operation
-%     f_Dm = diag(z .* sqrt(z.^2));
-% end
-

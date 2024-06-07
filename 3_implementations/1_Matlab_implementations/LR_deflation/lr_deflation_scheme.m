@@ -12,7 +12,7 @@ function Y = lr_deflation_scheme(A, x, m, k)
 
     % Step 4: Construct an orthonormal basis for the Krylov subspace using
     % the arnoldi process
-    [~, H, V] = Arnoldi_method(A, x_ominus, zeros(size(x_ominus, 1),1), k, 0);
+    [~, H, V] = Arnoldi_method(A, x_ominus, zeros(size(x_ominus, 1),1), k);
     
     % Compute Hessenberg matrix
     %Hk = Vk' * A * Vk;
