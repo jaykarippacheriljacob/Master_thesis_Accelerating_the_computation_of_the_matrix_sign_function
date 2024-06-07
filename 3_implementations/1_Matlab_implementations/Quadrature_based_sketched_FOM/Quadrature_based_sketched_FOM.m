@@ -1,4 +1,4 @@
-function result = sketched_GMRES(A, b, m, s)
+function result = Quadrature_based_sketched_FOM(A, b, m, s)
     % Input: 
     %      A - N x N matrix
     %      b - N x 1 vector
