@@ -7,7 +7,7 @@ m = 1;
 
 % Call the function
 try
-  [critical_left_eigenvectors, critical_right_eigenvectors,critical_eigenvalues] = compute_eigenvectors(A, m);
+  [critical_right_eigenvectors, critical_left_eigenvectors, critical_eigenvalues] = compute_eigenvectors(A, m);
   disp('Test Passed: Function executed without errors.');
   display(critical_right_eigenvectors);
   display(critical_left_eigenvectors);
@@ -23,7 +23,7 @@ m = 2;
 
 % Call the function
 try
-  [critical_left_eigenvectors, critical_right_eigenvectors,critical_eigenvalues] = compute_eigenvectors(A, m);
+  [critical_right_eigenvectors, critical_left_eigenvectors, critical_eigenvalues] = compute_eigenvectors(A, m);
   disp('Test Passed: Function executed without errors.');
   display(critical_right_eigenvectors);
   display(critical_left_eigenvectors);
@@ -52,7 +52,7 @@ end
 disp('--- Testing with different m ---');
 m = 2;
 try
-  [critical_left_eigenvectors, critical_right_eigenvectors,critical_eigenvalues] = compute_eigenvectors(A, m);
+  [critical_right_eigenvectors, critical_left_eigenvectors, critical_eigenvalues] = compute_eigenvectors(A, m);
   disp('Test Passed: Function extracts specified number of critical eigenvalues.');
   disp(['Extracted critical eigenvalues:', num2str(critical_eigenvalues)]);
 catch ME

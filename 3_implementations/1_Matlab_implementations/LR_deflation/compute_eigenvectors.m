@@ -1,40 +1,62 @@
-function [critical_left_eigenvectors, critical_right_eigenvectors, critical_eigenvalues] = compute_eigenvectors(A, m)
+function [Vm, Wm, D1] = compute_eigenvectors(A, m)
+    % Inputs:
+    %       A: The matrix for which eigenvalues and eigenvectors are computed.
+    %       m: The number of eigenvalues and eigenvectors to compute.
+    % Outputs:
+    %       Vm: Right eigenvectors of A.
+    %       Wm: Left eigenvectors of A.
+    %       D1: Eigenvalues corresponding to the right eigenvectors.
 
-  % Compute eigenvalues and eigenvectors
-  %[Vm, D, Wm] = eig(A);
+    % Compute Right eigenvalues and eigenvectors for A
+    [Vm, D1] = eigs(A, m, 'smallestabs');
+    
+    % Compute Left eigenvalues and eigenvectors for A
+    if min(size(A,1), m+1) == m+1
+        [Wm, D2] = eigs(A', m+1, 'smallestabs');
+    else
+        [Wm, D2] = eigs(A', m, 'smallestabs');
+    end
 
-  % A * Vm = Vm * Dm (eigen values) -> A * vi = vi * di
-  % Wm' * A = Dm * Wm' -> A' * Wm = Wm * Dm' -> A' * wi = wi * conj(di)
+    % disp(D1);
+    % disp(D2);
 
-  % (v1)0.4376 + 0.0000i, (v2)-0.4524 + 0.0000i, (v3)-0.4655 - 0.2961i
-  % (w1)0.4376 + 0.0000i, (w2)-0.4524 + 0.0000i, (w3)-0.4655 - 0.2961i
+    % Evaluation of the eigen values to see if the left and right
+    % eigenvectors are ordered in pairs
+    tol = 1e-8; % Tolerance for comparing floating point values
+    for i = 1:size(D1, 1)
+        
+        % Check if D2m(i,i) is the conjugate of D1m(i,i)
+        if abs(conj(D1(i,i)) - D2(i,i)) > tol
+            %disp(['Conjugate eigenvalue correction needed for eigenvalue ' num2str(i)]);
+            
+            % Find the conjugate of D1m(i,i) from the elements inside D2m
+            for j = i+1:size(D2, 1)
+                if abs(conj(D1(i, i)) - D2(j,j)) < tol
+                    
+                    % Swap places
+                    %D2(i, i) = D2(i, i) + D2(j, j);
+                    %D2(j, j) = D2(i, i) - D2(j, j);
+                    %D2(i, i) = D2(i, i) - D2(j, j);
+                    temp = D2(i, i);
+                    D2(i, i) = D2(j, j);
+                    D2(j, j) = temp;
 
-   % (v1)0.3285 + 0.0000i, (v2)-0.5582 - 0.1525i, (v3)-0.5582 + 0.1525i
-   % (w1)0.3285 + 0.0000i, (w2)-0.5582 - 0.1525i, (w3)-0.5582 + 0.1525i
+                    
+                    % Swap places for corresponding eigenvectors
+                    temp = Wm(:, j);
+                    Wm(:, j) = Wm(:, i);
+                    Wm(:, i) = temp;
+                    %Wm(:, [i, j]) = Wm(:, [j, i]);
+                    break;
+                end
+            end
+        end
+    end
 
-  [Vm, D1] = eigs(A,m,'smallestabs');
-  display(diag(D1))
-
-  [Wm, D2] = eigs(A',m,'smallestabs');
-  display(diag(D2))
-
-  % Task: To keep Vm as it is but to reorder Wm to match Vm, via D2'
-
-  % A = X * D * inv(X) -> A.' = inv(X).' * D.' * X.' -> inv(X).' * X.' = I
-  % because inv(X).' = inv(X.')
-  % the eigen values does not change but the eigen vectors iinterchange for transpose of a matrix 
-
-  % Ensure matrix is square (error handling)
-  if size(A, 1) ~= size(A, 2)
-      error('Input matrix A must be square.');
-  end
-
-  % Sort eigenvalues (absolute values) in ascending order
-  %[eigenvalues_abs, sorted_indices] = sort(abs(diag(D)), 'ascend');
-
-  % Extract critical eigenvalues and corresponding eigenvectors
-  %critical_eigenvalues = diag(eigenvalues_abs(1:m)); % Make critical eigenvalues a diagonal matrix
-  %critical_right_eigenvectors = V(:, sorted_indices(1:m));
-  %critical_left_eigenvectors = W(:, sorted_indices(1:m))';
-
+    % Remove the last column of Wm
+    Wm = Wm(:, 1:m);
+    %Wm = Wm(:, 1:end-1);
+    % disp(D1);
+    % disp(D2);
+    % disp(Wm);
 end
