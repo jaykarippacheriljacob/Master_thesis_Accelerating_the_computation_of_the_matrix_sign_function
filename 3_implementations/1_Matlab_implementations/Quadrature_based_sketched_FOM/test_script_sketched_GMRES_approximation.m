@@ -13,15 +13,19 @@ N = size(A, 2); % Size of the matrix
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 % b = ones(N, 1);
-m = 20; % No. of iterations for the krylov's subspace
-s = 40; % Sketch matrix row dimension
+m = 100; % No. of iterations for the krylov's subspace
+s = 101; % Sketch matrix row dimension
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+
+AA = A * A;
+Ab = A * b;
 
 start = cputime;
 
 % Call the Sketched GMRES approximation function
-gmres_approximation = sketched_GMRES(A, b, m, s);
+gmres_approximation = sketched_GMRES(AA, Ab, m, s);
+% gmres_approximation = sketched_GMRES(A, b, m, s);
 
 finish = cputime;
 disp(['Time taken by Sketched GMRES scheme = ', num2str(finish - start), ' s']);
@@ -29,8 +33,8 @@ disp(['Time taken by Sketched GMRES scheme = ', num2str(finish - start), ' s']);
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
-exact_result = sqrtm(inv(full(A)))*b;
+exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% exact_result = sqrtm(inv(full(A)))*b;
 
 finish = cputime;
 disp(['Time taken without Sketched GMRES scheme = ', num2str(finish - start), ' s']);
@@ -51,9 +55,13 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 start = cputime;
-[x, ~, ~, ~, ~] = sketched_gmres_invsqrtm(A, b, m, s);
+
+[x, ~, ~, ~, ~] = sketched_gmres_invsqrtm(AA, Ab, m, s);
+% [x, ~, ~, ~, ~] = sketched_gmres_invsqrtm(A, b, m, s);
+
 finish = cputime;
 disp(['Time taken by Sketched GMRES scheme = ', num2str(finish - start), ' s']);
+
 % Display the relative error
 rel_err1 = norm(exact_result - x) / norm(exact_result);
 disp(['Relative Error: ' num2str(rel_err1)]);
