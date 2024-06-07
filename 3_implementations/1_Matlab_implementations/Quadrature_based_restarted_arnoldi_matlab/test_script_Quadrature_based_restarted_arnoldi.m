@@ -1,6 +1,6 @@
-% clear;
-% clc;
-% close all;
+clear;
+clc;
+close all;
 
 % Define test parameters
 % N = 50; % Size of the matrix
@@ -15,8 +15,8 @@ N = size(A, 2); % Size of the matrix
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 % b = ones(N, 1);
-m = 10; % No. of iterations for the krylov's subspace
-max_iter = 100; % Maximum no.of iterations for the restart of the Arnoldi decomposition
+m = 200; % No. of iterations for the krylov's subspace
+max_iter = 1000; % Maximum no.of iterations for the restart of the Arnoldi decomposition
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 

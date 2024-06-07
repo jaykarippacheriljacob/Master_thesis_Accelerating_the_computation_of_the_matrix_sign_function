@@ -1,61 +1,100 @@
-function [c, z, l, coeffs] = Quadrature_rule_invsqrt(V, AV, v, tol)
+function [h2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H, tol)
     % Input: 
-    %      V - N x m, m arnoldi vectors
-    %      AV - N x m,  Matrix
-    %      v - N x 1, m+1 arnoldi vector
+    %      A - N x N, matrix
+    %      active_nodes - m x 1, eigenvalues of hessenberg matrix
+    %      subdiag - subdiagonal elements of Hessenberg matrix
+    %      H - m x m, Hessenberg matrix
     %      tol - tollerance for the error computed to be.
     % Output: 
-    %      c - quadrature nodes
-    %      z - quadrature weights
-    %      l - no.of quadrature nodes
-    %      coeffs - coefficients calculated based on the quadrature rule
+    %     h2 - coefficients calculated based on the quadrature rule
+    
+    % For f(z) = 1/sqrt(z), using Gauss-Jacobi quadrature
+    % This implementation is for non - implicit non-Hermitian matrices.
     
     % Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
-    l1 = 8;
-    l2 = floor(sqrt(2) * l1);
+    N1 = 8;
+    N2 = floor(sqrt(2) * N1);
+    m = size(H, 2);
+
     % Step 2: Set accurate := false and refined := false
     quad_err = inf; % Initial error set to infinity for the while loop condition
     first = true; % Flag to indicate the first iteration
-
-    while quad_err > tol && l2 < 1000
+    beta_transform = trace(A) / size(A, 1);
+    % beta_transform = 1;
+    
+    % Run the loop till convergence
+    while quad_err > tol && N2 < 1000
         % Step 3: Choose sets (ti~, wi) i = 1,...,l~ and (ti, wi) i =
         %         1,...,l of quadrature nodes / weights
-
-        c1 = pi / l1 * ones(1, l1); % quadrature nodes for l~
-        c2 = pi / l2 * ones(1, l2); % quadrature nodes for l
-        z1 = cos((2 * (1:l1) - 1)/(2 * l1) * pi); % quadrature weights for l~
-        z2 = cos((2 * (1:l2) - 1)/(2 * l2) * pi); % quadrature weights for l
-        
+        % and
         % Step 4: Compute hm~ and hm by quadrature of order l~ and l
         %         respectively
         if first
-            h1 = 0;
-            for j = 1:l1
-                h1 = h1 + c1(j) * ((V' * (-(1 - z1(j)) * V - (1 + z1(j)) * AV))\(V' * v));
+
+            weights1 = pi / N1 * ones(1, N1);
+            t1 = zeros(1, N1);
+            
+            for ii = 1:N1
+                t1(ii) = cos((2 * ii - 1) / (2 * N1) * pi);
             end
-            h1 = -2/pi * h1;
-            first = false;
+            
+            % Evaluate the reciprocal of the nodal polynomial at the
+            % quadrature points
+            tt = -beta_transform * (1 - t1) ./ (1 + t1);
+
+            % Find rho_v - nodal evaluation
+            rho_vec = 0 * tt + 1;
+            for j = 1:length(active_nodes)
+                rho_vec = rho_vec * subdiag(j) ./ (tt - active_nodes(j));
+            end
+
+            ee = zeros(m, 1);
+            ee(1) = 1;
+            h1 = zeros(size(ee));
+
+            for j = 1:length(t1)
+                h1 = h1 + weights1(j) * rho_vec(j) * ((-beta_transform * (1 - t1(j)) * eye(m) - H * (1 + t1(j))) \ ee);
+            end
+            h1 = -2 * sqrt(beta_transform) / pi * h1;
+
+            first = false; % Flag to indicate the first iteration to be set false
         end
-    
-        h2 = 0;
-        for j = 1:l2
-            h2 = h2 + c2(j) * ((V' * (-(1 - z2(j)) * V - (1 + z2(j)) * AV))\(V' * v));
+
+        weights2 = pi / N2 * ones(1, N2);
+        t2 = zeros(1, N2);
+
+        for ii = 1:N2
+            t2(ii) = cos((2 * ii - 1) / (2 * N2) * pi);
         end
-        h2 = -2/pi*h2;
-        
+
+        % Evaluate the reciprocal of the nodal polynomial at the
+        % quadrature points
+        tt = -beta_transform * (1 - t2) ./ (1 + t2);
+
+        % Find rho_v - nodal evaluation
+        rho_vec = 0 * tt + 1;
+        for j = 1:length(active_nodes)
+            rho_vec = rho_vec * subdiag(j) ./ (tt - active_nodes(j));
+        end
+
+        ee = zeros(m, 1);
+        ee(1) = 1;
+        h2 = zeros(size(ee));
+
+        for j = 1:length(t2)
+            h2 = h2 + weights2(j) * rho_vec(j) * ((-beta_transform * (1 - t2(j)) * eye(m) - H * (1 + t2(j))) \ ee);
+        end
+        h2 = -2 * sqrt(beta_transform) / pi * h2;
+
         % Step 5: Check the quadrature error w.r.t tot the set tolerance.
+        % quad_err = norm(h1 - h2) / norm(f);
         quad_err = norm(h1 - h2);
-        if quad_err <= tol || floor(sqrt(2) * l2) >= 1000
-            l = l2;
-            c = c2;
-            z = z2;
-            coeffs  = h2;
-            disp(['Number of quadrature nodes: ', num2str(l)]);
-            break;
-        else
-            l1 = l2;
-            l2 = floor(sqrt(2) * l2);
+        if quad_err > tol
+            N1 = N2;
+            N2 = floor(sqrt(2) * N1);
             h1 = h2;
+        else
+            break;
         end
     end
 end
