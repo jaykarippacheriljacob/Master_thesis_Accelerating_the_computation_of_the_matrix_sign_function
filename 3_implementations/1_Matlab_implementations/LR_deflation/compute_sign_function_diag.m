@@ -10,9 +10,14 @@
 %     % Extract the upper triangular part of S_m
 %     f_Tm = triu(S);
 % end
-function f_Hm = compute_sign_function(Hm)
-    
-    f_Hm = Hm *sqrtm(Hm * Hm);
+function f_Dm = compute_sign_function_diag(Dm)
+    % sign(A) = A(A^{2})^{-1/2}
+    f_Dm = speye(size(Dm, 1));
+    for i = 1:size(Dm, 1)
+        z = Dm(i,i);
+        f_Dm(i, i) = z * sqrt(z * z);
+    end
+    % % sign(A) = A(A^{2})^{-1/2}
     % % Use the given diagonal matrix as the initial matrix S0
     % 
     % % Iterate the recurrence relation

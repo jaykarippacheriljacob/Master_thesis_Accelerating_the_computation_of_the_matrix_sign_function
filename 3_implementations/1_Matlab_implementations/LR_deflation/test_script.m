@@ -1,14 +1,17 @@
 % Define matrix A
-A = [4 1 2; 2 5 3; 1 1 3];
+%A = [4 1 2; 2 5 3; 1 1 3];
+n = 50;
+A = rand(n);
 
 % Define vector x
-x = [1; 2; 3];
+%x = [1; 2; 3];
+x = rand(n,1);
 
 % Define the number of critical eigenvalues
 m = 3;
 
 % Define the Krylov subspace dimension
-k = 5;
+k = 10;
 
 % Compute f(A)x using LR_deflation_scheme
 result_lr = lr_deflation_scheme(A, x, m, k);
