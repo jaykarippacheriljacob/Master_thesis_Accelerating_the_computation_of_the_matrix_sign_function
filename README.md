@@ -10,11 +10,11 @@ The Arnoldi Kroylv subspace approximation is the basis method to approximate sig
   4. Sketching. This is a randomized approach where we save orthogonalizations and sketch the Arnoldi matrix. The relevant paper is by Güttel and Schweitzer.
 
 The purpose of the thesis is to consider the following combination of the above approaches:
-  a. 2 + 1 (as is already done in funmat)
-  b. 2 + 3 (building on existing work and code of Gustavo)
-  c. 2 + 4 (this is new, but Stefan Güttel just gave a talk on it at a conference in Paris)
+  1. 2 + 1 (as is already done in funmat)
+  2. 2 + 3 (building on existing work and code of Gustavo)
+  3. 2 + 4 (this is new, but Stefan Güttel just gave a talk on it at a conference in Paris)
 
-Tasks: 
-  . Understand and describe the individual methods (1-4)
-  . Describe, formulate algorithmically and discuss the combined methods (2+1, 2+3, 2+4)
-  . Test the combined methods, both in Matlab on small configurations and in C on large configurations and in            parallel (using existing code)
+Tasks:
+  1. Understand and describe the individual methods (1-4)
+  2. Describe, formulate algorithmically and discuss the combined methods (2+1, 2+3, 2+4)
+  3. Test the combined methods, both in Matlab on small configurations and in C on large configurations and in            parallel (using existing code)
