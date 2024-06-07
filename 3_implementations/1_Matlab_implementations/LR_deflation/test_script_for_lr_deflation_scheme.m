@@ -7,8 +7,8 @@ close all;
 
 % Set the seed to a specific value, for example, 42
 %rng(49);
-% n = 50;
-% A = rand(n) + 3.0 * eye(n);
+% n = 20;
+% A = rand(n) + 10.0 * eye(n);
 % d = eig(A);
 % plot(real(d), imag(d), '*');
 
@@ -22,10 +22,13 @@ plot(real(d), imag(d), '*');
 x = rand(n,1);
 
 % Define the number of critical eigenvalues
-m = 5;
+m = 10;
 
 % Define the Krylov subspace dimension
 k = 10;
+
+% Verify compute_eigenvectors function of a matrix.
+% verify_compute_eigenvectors(A, m, 1);
 
 start = cputime;
 
