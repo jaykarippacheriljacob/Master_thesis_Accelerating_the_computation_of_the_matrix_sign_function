@@ -9,16 +9,19 @@
 % A = gallery('poisson', 50);
 A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
 N = size(A, 2); % Size of the matrix
-% A = A - 0.8 *speye(N);
+% A = A - 0.9 *speye(N);
 
 % d = eigs(A);
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 % b = ones(N, 1);
-m = 2; % No. of iterations for the krylov's subspace
+m = 10; % No. of iterations for the krylov's subspace
 max_iter = 100; % Maximum no.of iterations for the restart of the Arnoldi decomposition
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+
+% A_sqr = A * A;
+% Ab = A * b;
 
 start = cputime;
 
@@ -31,7 +34,8 @@ disp(['Time taken by Quadrature based restarted arnoldi = ', num2str(finish - st
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+%exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+exact_result = inv(sqrtm(full(A))) * b;
 
 finish = cputime;
 disp(['Time taken without Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);

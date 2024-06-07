@@ -1,4 +1,4 @@
-function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
+function [c, z, l, coeffs] = Quadrature_rule_invsqrt(V, AV, v, tol)
     % Input: 
     %      V - N x m, m arnoldi vectors
     %      AV - N x m,  Matrix
@@ -8,7 +8,7 @@ function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
     %      c - quadrature nodes
     %      z - quadrature weights
     %      l - no.of quadrature nodes
-    %      h - hm calculated based on the quadrature rule
+    %      coeffs - coefficients calculated based on the quadrature rule
     
     % Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
     l1 = 8;
@@ -49,7 +49,7 @@ function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
             l = l2;
             c = c2;
             z = z2;
-            h = h2;
+            coeffs  = h2;
             disp(['Number of quadrature nodes: ', num2str(l)]);
             break;
         else
