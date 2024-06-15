@@ -9,7 +9,12 @@ close all;
 %d = eig(A); % Compute the eigen values of the generated matrix
 A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
 N = size(A, 2); % Size of the matrix
+gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
+Gamma5 = kron(speye(N/12),gamma5hat);
+A = Gamma5*A;
+
 % A = A - 0.8 *speye(N);
+
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 % b = ones(N, 1);
@@ -30,10 +35,15 @@ disp(['Time taken by Sketched FOM scheme = ', num2str(finish - start), ' s']);
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% Save the value to exact_result.mat file
+% save('exact_result.mat', 'exact_result');
+% Load the value from the file
+loadedData = load('exact_result.mat', 'exact_result');
+exact_result = loadedData.exact_result;  % Extract the value from the structure
 
 finish = cputime;
-disp(['Time taken without Sketched FOM scheme = ', num2str(finish - start), ' s']);
+disp(['Time taken by Sketched FOM scheme with s "', num2str(s), '" & m "', num2str(m), '" and trunc "', num2str(trunc),'" = ', num2str(finish - start), ' s']);
 
 % Display the relative error
 rel_err = norm(exact_result - fom_approximation) / norm(exact_result);
