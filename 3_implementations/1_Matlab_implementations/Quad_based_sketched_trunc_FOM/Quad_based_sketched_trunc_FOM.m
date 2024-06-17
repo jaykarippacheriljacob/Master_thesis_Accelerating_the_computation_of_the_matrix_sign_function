@@ -1,9 +1,10 @@
-function result = Quadrature_based_sketched_FOM(A, b, m, s)
+function result = Quad_based_sketched_trunc_FOM(A, b, m, s, trunc)
     % Input: 
     %      A - N x N matrix
     %      b - N x 1 vector
     %      m - no. of iterations for the krylov's subspace, m < min(N, s)
     %      s - sketch matrix row dimension
+    %      trunc - Truncate orthogonalization to the last 'trunc' vector
     % Output: 
     %      result - f(A)b
 
@@ -45,7 +46,7 @@ function result = Quadrature_based_sketched_FOM(A, b, m, s)
         SAV(:,j) = S(v);
 
         % Arnoldi process: Orthogonalization
-        for i = 1:j
+        for i = max(1, j - trunc + 1):j
             % Compute the coefficient for orthogonalization
             H(i, j) = V(:, i)' * v;
 
