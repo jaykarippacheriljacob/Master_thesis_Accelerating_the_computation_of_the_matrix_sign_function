@@ -3,7 +3,8 @@ clc;
 close all;
 
 % Define test parameters
-%N = 50; % Size of the matrix
+rng(2130);
+% N = 50; % Size of the matrix
 % A = rand(N) + 10.0 * eye(N); % Generate a random N x N matrix
 % A = gallery('poisson', 50);
 %d = eig(A); % Compute the eigen values of the generated matrix
