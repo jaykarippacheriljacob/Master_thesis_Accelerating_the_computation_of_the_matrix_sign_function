@@ -24,11 +24,11 @@ trunc = 3; % Truncate orthogonalization to the last '3' vector
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
-A_sqr = full(A) * full(A);
-d = eig(full(A_sqr)); % Compute the eigen values of the generated matrix
-figure;
-plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
-Ab = full(A) * b;
+% A_sqr = full(A) * full(A);
+% d = eig(full(A_sqr)); % Compute the eigen values of the generated matrix
+% figure;
+% plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+% Ab = full(A) * b;
 
 start = cputime;
 
