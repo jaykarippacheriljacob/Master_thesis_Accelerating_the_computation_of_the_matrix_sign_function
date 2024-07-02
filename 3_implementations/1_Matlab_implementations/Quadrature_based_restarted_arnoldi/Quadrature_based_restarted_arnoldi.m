@@ -1,4 +1,4 @@
-function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol)
+function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
     % Quadrature-based restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A - N x N matrix
@@ -6,6 +6,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     %      m - no. of iterations for the kryl ov's subspace
     %      max_iter - Maximum no.of iterations for the restart of the Arnoldi decomposition
     %      tol - Set tolerance for stopping criteria
+    %      min_decay - the decay rate of error after each iteration.
     % Output: 
     %      fm_k - f(A)b
     %      No.of restarts done
@@ -29,7 +30,6 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     f_Hm = inv(sqrtm(Hm(1:m, 1:m)));
     fm_1 = b_norm * Vm(:, 1:m) * f_Hm * e1;
     f = [f, fm_1];
-    min_decay = 0.90;
     
     % Step 3: Restart cycles untill convergence
     for k = 2:max_iter
@@ -55,19 +55,21 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
         err_new = b_norm * h_new;
         f = [ f, fm_k];
         % if (norm_update(k-1) / norm(f)) < tol
+        if k ~= 2
+            if err_new / err_old > min_decay
+                disp(['Number of restarts done: ', num2str(k - 1)]);
+                break;
+            end
+        end
         if (err_new / norm(f)) < tol
             % disp(rel_err);
             disp(['Number of restarts done: ', num2str(k - 1)]);
             break;
-        % elseif (err_new / err_old > min_decay) && k ~= 2
-        %         disp(['Number of restarts done: ', num2str(k - 1)]);
-        %         break;
-        %     end
         elseif k == max_iter
             disp(['Number of restarts done: ', num2str(k - 1)]);
         else
             fm_1 = fm_k;
-            % err_old = err_new;
+            err_old = err_new;
         end
     end
     iter = k;

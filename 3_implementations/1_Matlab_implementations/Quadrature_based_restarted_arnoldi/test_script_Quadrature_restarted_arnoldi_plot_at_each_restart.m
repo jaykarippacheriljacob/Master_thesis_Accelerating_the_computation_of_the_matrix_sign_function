@@ -37,17 +37,19 @@ max_iter = 50; % Maximum no.of iterations for the restart of the Arnoldi decompo
 
 % Set tolerance level
 tol = 1e-10;
+% Set Error minimum decay rate for convergence
+min_decay = 0.95;
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
-% A_sqr = A * A;
-% Ab = A * b;
+A_sqr = A * A;
+Ab = A * b;
 
 % start = cputime;
 
 % Compute f(A)x directly using the sign function
-% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
-exact_result = inv(sqrtm(full(A))) * b;
+exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% exact_result = inv(sqrtm(full(A))) * b;
 % Save the value to exact_result.mat file
 % save('exact_result.mat', 'exact_result');
 % Load the value from the file
@@ -74,7 +76,8 @@ for m = 10:10:100
     start = cputime;
     
     % Call the Quadrature based restarted arnoldi function
-    [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol);
+    % [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay);
+    [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay);
     
     finish = cputime;
     disp(['Time taken by Quadrature based restarted arnoldi with " m " - ', num2str(m), ' = ', num2str(finish - start), ' s']);
