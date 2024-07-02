@@ -10,9 +10,9 @@ rng(2130); % setting random seed generator for reproductibility
 % A = gallery('poisson', 50);
 A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
 N = size(A, 2); % Size of the matrix
-gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
-Gamma5 = kron(speye(N/12),gamma5hat);
-A = Gamma5*A; 
+% gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
+% Gamma5 = kron(speye(N/12),gamma5hat);
+% A = Gamma5*A; 
 
 % A = A - 0.8 *speye(N);
 
@@ -20,8 +20,18 @@ A = Gamma5*A;
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 
-
 % b = ones(N, 1);
+
+% Initialize 2D Laplacian
+% N = 100;
+% e = ones(N,1);
+% A = (N+1)^2*gallery('poisson',N);
+% s = eigs(A,1,'SM');
+% A = A/s;
+% b = kron(e,e);
+% b = b/norm(b);
+
+
 % m = 70; % No. of iterations for the krylov's subspace
 max_iter = 50; % Maximum no.of iterations for the restart of the Arnoldi decomposition
 
@@ -37,12 +47,12 @@ tol = 1e-10;
 
 % Compute f(A)x directly using the sign function
 % exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
-% exact_result = inv(sqrtm(full(A))) * b;
+exact_result = inv(sqrtm(full(A))) * b;
 % Save the value to exact_result.mat file
 % save('exact_result.mat', 'exact_result');
 % Load the value from the file
-loadedData = load('exact_result.mat', 'exact_result');
-exact_result = loadedData.exact_result;  % Extract the value from the structure
+% loadedData = load('exact_result.mat', 'exact_result');
+% exact_result = loadedData.exact_result;  % Extract the value from the structure
 
 % finish = cputime;
 % disp(['Time taken without Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
@@ -56,11 +66,11 @@ title('log(Relative Error) vs. Iteration for various m');
 grid on;
 
 % Store the colors for different curves
-colors = lines(length(50:2:80)); % Generate distinct colors for each curve
-legendEntries = cell(length(50:2:80), 1);
+colors = lines(length(10:10:100)); % Generate distinct colors for each curve
+legendEntries = cell(length(10:10:100), 1);
 colorIndex = 1;
 
-for m = 50:2:80
+for m = 10:10:100
     start = cputime;
     
     % Call the Quadrature based restarted arnoldi function

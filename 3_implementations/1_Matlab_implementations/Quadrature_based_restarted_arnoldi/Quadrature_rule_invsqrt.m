@@ -87,8 +87,8 @@ function [h2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H, tol)
         h2 = -2 * sqrt(beta_transform) / pi * h2;
 
         % Step 5: Check the quadrature error w.r.t tot the set tolerance.
-        % quad_err = norm(h1 - h2) / norm(f);
-        quad_err = norm(h1 - h2);
+        quad_err = norm(h1 - h2) / norm(h1);
+        % quad_err = norm(h1 - h2);
         if quad_err > tol
             N1 = N2;
             N2 = floor(sqrt(2) * N1);

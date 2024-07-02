@@ -14,10 +14,13 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing
                   % the norm of v_{m+1})
     f = [];
+    active_nodes = []; % Interpolation nodes (Ritz values) from each
+                         % restart cycle
 
     % Step 1: Compute arnoldi decomposition wrt A and b.
     [Hm, Vm] = Arnoldi_method(A, b, m);
-    subdiag = [ subdiag ; Hm(m+1, m) ];
+    active_nodes = [active_nodes; sort(eig(Hm(1:m, 1:m)))];
+    subdiag = [subdiag; diag(Hm(1:m, 1:m), -1); Hm(m+1, m)];
 
     % Step 2: Set fm_1 := norm(b)*Vm_1*f(Hm_1)*e1
     b_norm = norm(b);
@@ -26,7 +29,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     f_Hm = inv(sqrtm(Hm(1:m, 1:m)));
     fm_1 = b_norm * Vm(:, 1:m) * f_Hm * e1;
     f = [f, fm_1];
-    norm_update = [];
+    min_decay = 0.90;
     
     % Step 3: Restart cycles untill convergence
     for k = 2:max_iter
@@ -36,10 +39,10 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
 
         % Step 5: Compute h1m_k = em_k-1(Hm_k)e1 by quadrature of order l1
         %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
-        %         l2.
-        active_nodes = eig(Hm(1:m, 1:m));
+        %         l2
         subdiag = [subdiag; diag(Hm(1:m, 1:m), -1); Hm(m+1, m)];
         h2 = Quadrature_rule_invsqrt(A, active_nodes, subdiag, Hm(1:m, 1:m), tol);
+        active_nodes = [active_nodes; sort(eig(Hm(1:m, 1:m)))];
 
         % Step 6: Compute fm_k = fm_k-1 + norm(b) * Vm_k * hm_k
         h_new = b_norm * h2;
@@ -48,16 +51,23 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
         % Step 7: Check the stopping criteria necessary for further restart.
         %         { decay for norm of updates are checked to see if it's
         %           below the stopping accuracy }
-        norm_update = [norm_update, b_norm * h_new];
+        % norm_update = [norm_update, b_norm * h_new];
+        err_new = b_norm * h_new;
         f = [ f, fm_k];
-        if (norm_update(k-1) / norm(f)) < tol
+        % if (norm_update(k-1) / norm(f)) < tol
+        if (err_new / norm(f)) < tol
             % disp(rel_err);
             disp(['Number of restarts done: ', num2str(k - 1)]);
             break;
+        % elseif (err_new / err_old > min_decay) && k ~= 2
+        %         disp(['Number of restarts done: ', num2str(k - 1)]);
+        %         break;
+        %     end
         elseif k == max_iter
             disp(['Number of restarts done: ', num2str(k - 1)]);
         else
             fm_1 = fm_k;
+            % err_old = err_new;
         end
     end
     iter = k;
