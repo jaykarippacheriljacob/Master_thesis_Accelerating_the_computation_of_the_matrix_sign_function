@@ -4,7 +4,7 @@ function A = generateSparseMatrix(N)
         diag_values = [1:N/2, -(N/2):-1];
     else
         mid = (N+1)/2;
-        diag_values = [1:mid-1, 0, -mid+1:-1];
+        diag_values = [1:mid-1, 1, -mid+1:-1];
     end
 
     % Create the sparse matrix with the central diagonal
