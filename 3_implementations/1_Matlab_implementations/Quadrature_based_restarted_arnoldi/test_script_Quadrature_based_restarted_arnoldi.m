@@ -10,9 +10,9 @@ rng(2130);
 % A = gallery('poisson', 50);
 A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
 N = size(A, 2); % Size of the matrix
-% gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
-% Gamma5 = kron(speye(N/12),gamma5hat);
-% A = Gamma5*A;
+gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
+Gamma5 = kron(speye(N/12),gamma5hat);
+A = Gamma5*A;
 
 % A = A - 0.8 *speye(N);
 
@@ -30,14 +30,14 @@ min_decay = 0.95;
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
-% A_sqr = A * A;
-% Ab = A * b;
+A_sqr = A * A;
+Ab = A * b;
 
 start = cputime;
 
 % Call the Quadrature based restarted arnoldi function
-[quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay);
-% [quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay);
+% [quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay);
+[quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay);
 
 finish = cputime;
 disp(['Time taken by Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
@@ -45,10 +45,10 @@ disp(['Time taken by Quadrature based restarted arnoldi = ', num2str(finish - st
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-%exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
-exact_result = inv(sqrtm(full(A))) * b;
+exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% exact_result = inv(sqrtm(full(A))) * b;
 % Save the value to exact_result.mat file
-% save('exact_result.mat', 'exact_result');
+save('exact_result.mat', 'exact_result');
 % Load the value from the file
 % loadedData = load('exact_result.mat', 'exact_result');
 % exact_result = loadedData.exact_result;  % Extract the value from the structure

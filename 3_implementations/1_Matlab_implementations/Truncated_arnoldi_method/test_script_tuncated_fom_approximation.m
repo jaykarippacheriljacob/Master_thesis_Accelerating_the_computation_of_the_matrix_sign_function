@@ -19,15 +19,19 @@ A = Gamma5*A;
 % d = eig(full(A)); % Compute the eigen values of the generated matrix
 b = randn(N, 1); % Generate a random N x 1 vector
 % b = ones(N, 1);
-m = 2000; % No. of iterations for the krylov's subspace
+m = 170; % No. of iterations for the krylov's subspace
 trunc = 3; % Truncate orthogonalization to the last '3' vector
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
+A_sqr = A * A;
+Ab = A * b;
+
 start = cputime;
 
 % Call the FOM approximation function
-fom_approximation = truncated_fom(A, b, m, trunc);
+% fom_approximation = truncated_fom(A, b, m, trunc);
+fom_approximation = truncated_fom(A_sqr, Ab, m, trunc);
 
 finish = cputime;
 disp(['Time taken by truncated FOM scheme = ', num2str(finish - start), ' s']);

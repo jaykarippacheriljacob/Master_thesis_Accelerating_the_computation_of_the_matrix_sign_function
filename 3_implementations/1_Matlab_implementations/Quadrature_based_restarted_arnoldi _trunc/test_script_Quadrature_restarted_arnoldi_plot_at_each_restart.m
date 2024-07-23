@@ -9,11 +9,11 @@ rng(2130); % setting random seed generator for reproductibility
 
 % A = gallery('poisson', 50);
 
-% A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
-% N = size(A, 2); % Size of the matrix
-% gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
-% Gamma5 = kron(speye(N/12),gamma5hat);
-% A = Gamma5*A; 
+A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
+N = size(A, 2); % Size of the matrix
+gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
+Gamma5 = kron(speye(N/12),gamma5hat);
+A = Gamma5*A; 
 
 % A = A - 0.8 *speye(N);
 
@@ -24,7 +24,7 @@ rng(2130); % setting random seed generator for reproductibility
 % b = ones(N, 1);
 
 % Initialize 2D Laplacian
-N = 100;
+% N = 100;
 % e = ones(N,1);
 % A = (N+1)^2*gallery('poisson',N);
 % s = eigs(A,1,'SM');
@@ -32,7 +32,7 @@ N = 100;
 % b = kron(e,e);
 % b = b/norm(b);
 
-A = generateSparseMatrix(N);
+% A = generateSparseMatrix(N);
 b = randn(N, 1); % Generate a random N x 1 vector
 
 
@@ -54,13 +54,13 @@ Ab = A * b;
 % start = cputime;
 
 % Compute f(A)x directly using the sign function
-exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
 % exact_result = inv(sqrtm(full(A))) * b;
 % Save the value to exact_result.mat file
 % save('exact_result.mat', 'exact_result');
 % Load the value from the file
-% loadedData = load('exact_result.mat', 'exact_result');
-% exact_result = loadedData.exact_result;  % Extract the value from the structure
+loadedData = load('exact_result.mat', 'exact_result');
+exact_result = loadedData.exact_result;  % Extract the value from the structure
 
 % finish = cputime;
 % disp(['Time taken without Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
@@ -82,8 +82,8 @@ for m = 10:10:100
     start = cputime;
     
     % Call the Quadrature based restarted arnoldi function
-    % [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay, trunc);
-    [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay, trunc);
+    % [quadrature_approximation, iter, f] = Quad_based_restarted_arnoldi_trunc(A, b, m, max_iter, tol, min_decay, trunc);
+    [quadrature_approximation, iter, f] = Quad_based_restarted_arnoldi_trunc(A_sqr, Ab, m, max_iter, tol, min_decay, trunc);
     
     finish = cputime;
     disp(['Time taken by Quadrature based restarted arnoldi with " m " - ', num2str(m), ' = ', num2str(finish - start), ' s']);

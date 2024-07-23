@@ -25,8 +25,8 @@ s = 200; % Sketch matrix row dimension
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
-% A_sqr = A * A;
-% Ab = A * b;
+A_sqr = A * A;
+Ab = A * b;
 
 start = cputime;
 
@@ -54,8 +54,8 @@ for trunc = 1:25:199
     start = cputime;
     
     % Call the Sketched FOM approximation function
-    % fom_approximation = sketched_truncated_fom(A_sqr, Ab, m, s, trunc);
-    fom_approximation = sketched_truncated_fom(A, b, m, s, trunc);
+    fom_approximation = sketched_truncated_fom(A_sqr, Ab, m, s, trunc);
+    % fom_approximation = sketched_truncated_fom(A, b, m, s, trunc);
     
     finish = cputime;
     disp(['Time taken by Sketched FOM scheme with s "', num2str(s), '" & m "', num2str(m), '" and trunc "', num2str(trunc),'" = ', num2str(finish - start), ' s']);

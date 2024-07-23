@@ -1,4 +1,4 @@
-function [H, V] = Arnoldi_method(A, b, k)
+function [H, V] = Arnoldi_method(A, b, k, trunc)
     % Inputs:
     %       A: The coefficient matrix (n x n)
     %       b: The right-hand side vector (n x 1)

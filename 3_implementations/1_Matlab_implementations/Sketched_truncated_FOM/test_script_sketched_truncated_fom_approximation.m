@@ -25,10 +25,14 @@ trunc = 3; % Truncate orthogonalization to the last '3' vector
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
+A_sqr = A * A;
+Ab = A * b;
+
 start = cputime;
 
 % Call the Sketched FOM approximation function
-fom_approximation = sketched_truncated_fom(A, b, m, s, trunc);
+% fom_approximation = sketched_truncated_fom(A, b, m, s, trunc);
+fom_approximation = sketched_truncated_fom(A_sqr, Ab, m, s, trunc);
 
 finish = cputime;
 disp(['Time taken by Sketched FOM scheme = ', num2str(finish - start), ' s']);

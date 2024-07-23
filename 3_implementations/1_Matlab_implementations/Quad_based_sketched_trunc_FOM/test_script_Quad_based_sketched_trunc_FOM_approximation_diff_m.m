@@ -24,22 +24,22 @@ trunc = 3; % Truncate orthogonalization to the last '3' vector
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
-% A_sqr = full(A) * full(A);
+A_sqr = full(A) * full(A);
 % d = eig(full(A_sqr)); % Compute the eigen values of the generated matrix
 % figure;
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
-% Ab = full(A) * b;
+Ab = full(A) * b;
 
 start = cputime;
 
 % Compute f(A)x directly using the sign function
-% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
 % exact_result = sqrtm(inv(full(A)))*b;
 % Save the value to exact_result.mat file
-% save('exact_result.mat', 'exact_result');
+save('exact_result.mat', 'exact_result');
 % Load the value from the file
-loadedData = load('exact_result.mat', 'exact_result');
-exact_result = loadedData.exact_result;  % Extract the value from the structure
+% loadedData = load('exact_result.mat', 'exact_result');
+% exact_result = loadedData.exact_result;  % Extract the value from the structure
 
 finish = cputime;
 disp(['Time taken without Quadrature based sketched FOM scheme = ', num2str(finish - start), ' s']);
