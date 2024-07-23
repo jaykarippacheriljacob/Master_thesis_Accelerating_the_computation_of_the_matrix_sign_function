@@ -2,7 +2,7 @@ clear;
 clc;
 close all;
 %% Define test parameters
-rng(2130800);
+rng(2130); % setting random seed generator for reproductibility
 % N = 50; % Size of the matrix
 % A = rand(N) + 10.0 * eye(N); % Generate a random N x N matrix
 % A = gallery('poisson', 50);
