@@ -43,6 +43,8 @@ max_iter = 50; % Maximum no.of iterations for the restart of the Arnoldi decompo
 tol = 1e-10;
 % Set Error minimum decay rate for convergence
 min_decay = 0.95;
+% Truncate orthogonalization to the last 'trunc' vector
+trunc = 5;
 
 % plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
 
@@ -80,8 +82,8 @@ for m = 10:10:100
     start = cputime;
     
     % Call the Quadrature based restarted arnoldi function
-    % [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay);
-    [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay);
+    % [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay, trunc);
+    [quadrature_approximation, iter, f] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, tol, min_decay, trunc);
     
     finish = cputime;
     disp(['Time taken by Quadrature based restarted arnoldi with " m " - ', num2str(m), ' = ', num2str(finish - start), ' s']);

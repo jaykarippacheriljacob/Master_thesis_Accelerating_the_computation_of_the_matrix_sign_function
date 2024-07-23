@@ -168,7 +168,7 @@ for k = 1:param.max_restarts,
     
     % interpolation nodes currently active in f:
     %    k = 1 -> []
-    %    k = 2 -> [ out1.thick_interpol{1} ; out1.thick_replaced{1} ]
+    %    k = 2 -> [ out1. {1} ; out1.thick_replaced{1} ]
     %    k = 3 -> [ out1.thick_interpol{1} ; out1.thick_interpol{2} ; out1.thick_replaced{2} ]
     %    ...
     % (note that the "replaced nodes" are going to be replaced in the next

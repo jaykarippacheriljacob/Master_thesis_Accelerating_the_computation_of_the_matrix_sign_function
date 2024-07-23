@@ -1,4 +1,4 @@
-function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
+function [fm_k, iter, f] = Quad_based_restarted_arnoldi_trunc(A, b, m, max_iter, tol, min_decay, trunc)
     % Quadrature-based restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A - N x N matrix
@@ -7,6 +7,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     %      max_iter - Maximum no.of iterations for the restart of the Arnoldi decomposition
     %      tol - Set tolerance for stopping criteria
     %      min_decay - the decay rate of error after each iteration.
+    %      trunc - Truncate orthogonalization to the last 'trunc' vector
     % Output: 
     %      fm_k - f(A)b
     %      No.of restarts done
@@ -19,7 +20,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
                          % restart cycle
 
     % Step 1: Compute arnoldi decomposition wrt A and b.
-    [Hm, Vm] = Arnoldi_method(A, b, m);
+    [Hm, Vm] = Arnoldi_method(A, b, m, trunc);
     active_nodes = [active_nodes; sort(eig(Hm(1:m, 1:m)))];
     subdiag = [subdiag; diag(Hm(1:m, 1:m), -1); Hm(m+1, m)];
 
@@ -35,7 +36,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     for k = 2:max_iter
         
         % Step 4: Compute Arnoldi decomposition wrt A and vm+1_k-1
-        [Hm, Vm] = Arnoldi_method(A, Vm(:, m+1), m);
+        [Hm, Vm] = Arnoldi_method(A, Vm(:, m+1), m, trunc);
 
         % Step 5: Compute h1m_k = em_k-1(Hm_k)e1 by quadrature of order l1
         %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order

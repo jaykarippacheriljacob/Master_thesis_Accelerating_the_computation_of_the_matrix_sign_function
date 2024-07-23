@@ -1,0 +1,110 @@
+\babel@toc {ngerman}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\babel@toc {english}{}\relax 
+\babel@toc {ngerman}{}\relax 
+\contentsline {chapter}{\numberline {1}Einleitung}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problemstellung \& Ziele}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Aufbau der Thesis}{1}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Notation}{2}{section.1.4}%
+\contentsline {chapter}{\numberline {2}Grundlagen}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Verwendete Protokolle}{3}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}I³C}{3}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}B$^\text {U}_\text {W}$ 4.0}{3}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}HTML}{4}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Elektrotechnik}{4}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Richtungsabhängigkeit von passiven Bauteilen}{4}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Neulingsche \glqq Geht ohne Kondensator\grqq -Vermutung}{4}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Liquid Crystal LCD-Displays}{5}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Mathematik}{5}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Numerische Evaluation der Division durch Null}{5}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Die ganzverwurschtelte Invers-Transformation}{5}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}V\o {}\v {r}w\ae {}r\v {s}\'{e} \c {K}\"{\i }\~{n}\k {e}m\r a{}\c {t}i\c {k}}{6}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Wirtschaft}{6}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Die Erwerbsregeln der Ferengi-Allianz}{6}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Toilettenpapier -- Krisensichere Geldanlage?}{6}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Kostenevaluation ausführlich schwafelnder und aus dem soeben genannten Grunde völlig übertrieben langer Abschnittsüberschriften in Textdokumenten}{7}{subsection.2.4.3}%
+\contentsline {chapter}{\numberline {3}Entwurf}{8}{chapter.3}%
+\contentsline {section}{\numberline {3.1}title}{8}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}title}{8}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}title}{9}{subsection.3.1.2}%
+\contentsline {section}{\numberline {3.2}title}{9}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}title}{9}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}title}{10}{subsection.3.2.2}%
+\contentsline {chapter}{\numberline {4}Realisierung}{11}{chapter.4}%
+\contentsline {section}{\numberline {4.1}title}{11}{section.4.1}%
+\contentsline {section}{\numberline {4.2}title}{11}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}title}{12}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}title}{13}{subsection.4.2.2}%
+\contentsline {chapter}{\numberline {5}Analyse}{14}{chapter.5}%
+\contentsline {section}{\numberline {5.1}title}{14}{section.5.1}%
+\contentsline {section}{\numberline {5.2}title}{14}{section.5.2}%
+\contentsline {chapter}{\numberline {6}Schlussbetrachtungen}{15}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Fazit}{15}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Ausblick}{15}{section.6.2}%
+\contentsline {chapter}{Abbildungsverzeichnis}{17}{section*.15}%
+\contentsline {chapter}{Quellcodeverzeichnis}{17}{section*.17}%
+\contentsline {chapter}{Tabellenverzeichnis}{17}{section*.19}%
+\contentsline {chapter}{Symbole}{17}{section*.21}%
+\contentsline {chapter}{Abkürzungen}{17}{section*.24}%
+\contentsline {chapter}{Akronyme}{17}{section*.27}%
+\contentsline {chapter}{Glossar}{17}{section*.30}%
+\contentsline {chapter}{Literatur}{17}{section*.33}%
+\contentsline {chapter}{Weiterführende Literatur}{17}{section*.34}%
+\contentsline {chapter}{\numberline {A}Sourcecode}{18}{appendix.A}%
+\contentsline {chapter}{\numberline {B}Fragen und Antworten (FAQs)}{19}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Zu dieser Vorlage}{19}{section.B.1}%
+\contentsline {subsection}{\numberline {B.1.1}Was brauche ich?}{19}{subsection.B.1.1}%
+\contentsline {subsubsection}{\numberline {B.1.1.1}Diese Vorlage}{19}{subsubsection.B.1.1.1}%
+\contentsline {subsubsection}{\numberline {B.1.1.2}Eine LaTeX-Distribution}{19}{subsubsection.B.1.1.2}%
+\contentsline {paragraph}{TeX Live}{19}{paragraph*.35}%
+\contentsline {paragraph}{MiKTeX}{19}{paragraph*.36}%
+\contentsline {subsubsection}{\numberline {B.1.1.3}Einen (LaTeX-) Editor}{20}{subsubsection.B.1.1.3}%
+\contentsline {subsubsection}{\numberline {B.1.1.4}Eine Literaturverwaltung (optional)}{20}{subsubsection.B.1.1.4}%
+\contentsline {subsection}{\numberline {B.1.2}Titelblatt und Einstellungen ändern}{20}{subsection.B.1.2}%
+\contentsline {subsection}{\numberline {B.1.3}Literatur/Quellen}{21}{subsection.B.1.3}%
+\contentsline {subsection}{\numberline {B.1.4}Glossareinträge, Abkürzungen, Akronyme}{21}{subsection.B.1.4}%
+\contentsline {subsection}{\numberline {B.1.5}Im PDF sind am Anfang mehrere leere Seiten}{21}{subsection.B.1.5}%
+\contentsline {subsection}{\numberline {B.1.6}Seitenränder springen hin und her}{21}{subsection.B.1.6}%
+\contentsline {subsection}{\numberline {B.1.7}Seitenzahlen springen hin und her}{21}{subsection.B.1.7}%
+\contentsline {subsection}{\numberline {B.1.8}Die Druckerei zählt S/W-Seiten als Farbseiten}{22}{subsection.B.1.8}%
+\contentsline {section}{\numberline {B.2}Zu \LaTeX {} allgemein}{23}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}Aus \LaTeX {} wird ein PDF}{23}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}\LaTeX {} kompilieren}{23}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Literaturverzeichnis kompilieren}{23}{subsection.B.2.3}%
+\contentsline {subsection}{\numberline {B.2.4}Zwei mal kompilieren (und warum)}{24}{subsection.B.2.4}%
+\contentsline {subsection}{\numberline {B.2.5}Floating-Umgebungen}{24}{subsection.B.2.5}%
+\contentsline {subsection}{\numberline {B.2.6}Leerzeichen nach einem Befehl fehlt}{25}{subsection.B.2.6}%
+\contentsline {chapter}{\numberline {C}\LaTeX -Beispiele}{26}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Kapitel, Abschnitte, Paragraphen}{26}{section.C.1}%
+\contentsline {subsection}{\numberline {C.1.1}Subsection}{26}{subsection.C.1.1}%
+\contentsline {subsubsection}{\numberline {C.1.1.1}Subsubsection}{26}{subsubsection.C.1.1.1}%
+\contentsline {paragraph}{Paragraph}{26}{paragraph*.37}%
+\contentsline {section}{\numberline {C.2}Textauszeichnung}{26}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Fußnoten}{27}{section.C.3}%
+\contentsline {section}{\numberline {C.4}Zitate \& Literaturangaben}{27}{section.C.4}%
+\contentsline {subsection}{\numberline {C.4.1}Zitieren}{27}{subsection.C.4.1}%
+\contentsline {paragraph}{Keine Panik...}{27}{paragraph*.38}%
+\contentsline {paragraph}{...aber bitte eigene Leistung zeigen}{27}{paragraph*.39}%
+\contentsline {subsection}{\numberline {C.4.2}Literaturverzeichnis}{28}{subsection.C.4.2}%
+\contentsline {subsection}{\numberline {C.4.3}Zitate in \LaTeX }{28}{subsection.C.4.3}%
+\contentsline {section}{\numberline {C.5}Zahlen und Formeln}{29}{section.C.5}%
+\contentsline {subsection}{\numberline {C.5.1}Zahlen-/Einheitendarstellung}{29}{subsection.C.5.1}%
+\contentsline {subsubsection}{\numberline {C.5.1.1}Zahlen}{29}{subsubsection.C.5.1.1}%
+\contentsline {subsubsection}{\numberline {C.5.1.2}Einheiten}{30}{subsubsection.C.5.1.2}%
+\contentsline {subsubsection}{\numberline {C.5.1.3}Zahlen mit Einheiten}{30}{subsubsection.C.5.1.3}%
+\contentsline {subsection}{\numberline {C.5.2}Formeln}{30}{subsection.C.5.2}%
+\contentsline {paragraph}{Formeln im Text}{30}{paragraph*.40}%
+\contentsline {paragraph}{Abgesetzte Formeln}{31}{paragraph*.41}%
+\contentsline {subsection}{\numberline {C.5.3}Griechisches Alphabet}{32}{subsection.C.5.3}%
+\contentsline {subsection}{\numberline {C.5.4}Sonstige}{33}{subsection.C.5.4}%
+\contentsline {section}{\numberline {C.6}Abbildungen}{34}{section.C.6}%
+\contentsline {section}{\numberline {C.7}Tabellen}{35}{section.C.7}%
+\contentsline {section}{\numberline {C.8}Quellcode}{35}{section.C.8}%
+\contentsline {section}{\numberline {C.9}Labels \& Referenzen}{36}{section.C.9}%
+\contentsline {section}{\numberline {C.10}URLs}{37}{section.C.10}%
+\contentsline {section}{\numberline {C.11}Glossareinträge \& Symbole}{37}{section.C.11}%
+\contentsline {subsection}{\numberline {C.11.1}Glossar}{37}{subsection.C.11.1}%
+\contentsline {subsection}{\numberline {C.11.2}Symbole}{37}{subsection.C.11.2}%
+\contentsline {section}{\numberline {C.12}Todos}{38}{section.C.12}%
