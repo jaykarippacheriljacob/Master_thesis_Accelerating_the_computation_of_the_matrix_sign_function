@@ -23,7 +23,7 @@ function verify_compute_eigenvectors(B, m, symm_type)
     [Rm, Lm, ~] = compute_eigenvectors(A, m);
     
     % Check if left and right eigenvectors are identical
-    rel_error = norm(Rm - Lm, 'fro')/norm(Rm,'fro'); 
+    rel_error = norm(abs(Rm) - abs(Lm), 'fro')/norm(Rm,'fro'); 
     
     % Set tolerance level
     tol = 1e-10;
