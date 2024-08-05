@@ -14,8 +14,8 @@ b = randn(N, 1); % Generate a random N x 1 vector
 
 m = 5; % Define the number of critical eigenvalues
 
-k = 80; % No. of iterations for the krylov's subspace
-s = 100; % Sketch matrix row dimension
+k = 130; % No. of iterations for the krylov's subspace
+s = 500; % Sketch matrix row dimension
 
 %% Verification of the result with exact calculation of inverse square root
 
@@ -31,7 +31,7 @@ exact_result = loadedData.exact_result;  % Extract the value from the structure
 finish = cputime;
 disp(['Time taken for direct calculation of f(A)b = ', num2str(finish - start), ' s']);
 
-%% Calculation of f(A)b using combination of LR deflation and left polynomially preconditioned arnoldi process
+%% Calculation of f(A)b using combination of LR deflation and Quadrature based sketched FOM process
 
 start = cputime;
 

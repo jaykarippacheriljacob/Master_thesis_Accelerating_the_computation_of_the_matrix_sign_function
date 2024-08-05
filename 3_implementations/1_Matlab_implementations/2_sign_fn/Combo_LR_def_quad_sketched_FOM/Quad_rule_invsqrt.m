@@ -1,4 +1,4 @@
-function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
+function [c, z, l, h] = Quad_rule_invsqrt(V, AV, v, tol)
     % Input: 
     %      V - N x m, m arnoldi vectors
     %      AV - N x m,  Matrix

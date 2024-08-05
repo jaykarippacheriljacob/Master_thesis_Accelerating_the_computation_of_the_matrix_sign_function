@@ -36,14 +36,14 @@ exact_result = loadedData.exact_result;  % Extract the value from the structure
 finish = cputime;
 disp(['Time taken for direct calculation of f(A)b = ', num2str(finish - start), ' s']);
 
-%% Calculation of f(A)b using combination of LR deflation and left polynomially preconditioned arnoldi process
+%% Calculation of f(A)b using combination of LR deflation and Quadrature based restarted arnoldi process
 
 start = cputime;
 
 fA_b = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
 
 finish = cputime;
-disp(['Time taken by combination of LR deflation and Quadrature based based restarted arnoldi = ', num2str(finish - start), ' s']);
+disp(['Time taken by combination of LR deflation and Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
 
 % Display the relative error
 rel_err = norm(exact_result - fA_b) / norm(exact_result);

@@ -8,6 +8,8 @@ function Y = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, min_deca
     %      tol - Set tolerance for stopping criteria
     %      min_decay - the decay rate of error after each iteration.
 
+    addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\combo_LR_def_quad_restarted_arnoldi");
+
     %% Step 1: Compute left and right eigenvectors
 
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);

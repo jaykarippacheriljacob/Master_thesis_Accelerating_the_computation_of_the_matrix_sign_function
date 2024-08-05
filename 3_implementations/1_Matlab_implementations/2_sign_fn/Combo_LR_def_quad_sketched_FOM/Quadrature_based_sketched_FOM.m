@@ -71,7 +71,7 @@ function result = Quadrature_based_sketched_FOM(A, b, m, s)
     V = V / Rm;
 
     % Step 5: Compute the quadrature rules ql1(S, A, Vm, b) and ql2(S, A, Vm, b)
-    [~, ~, ~, h] = Quadrature_rule_invsqrt(SV, SAV, Sb, tol);
+    [~, ~, ~, h] = Quad_rule_invsqrt(SV, SAV, Sb, tol);
 
     % Step 6: Compute the approximation to f(A)x = Vm*ql2(S, A, Vm, b)
     result = V * h;
