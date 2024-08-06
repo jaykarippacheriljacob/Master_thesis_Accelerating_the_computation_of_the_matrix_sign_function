@@ -8,7 +8,7 @@ function Y = lr_deflation_scheme(A, x, m, k)
     % Step 1: Compute left and right eigenvectors
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);
 
-    % Step 2: Compute triangular matrix for critical eigenvalues
+    % Step 2: Compute f(A) for critical eigenvalues
     f_Tm = compute_sign_function_diag(Dm);
 
     % Step 3: Compute x_ominus = (1 − Rm * Lm' ) * x 
