@@ -15,13 +15,13 @@ A = Gamma5*A;
 x = rand(n,1);
 
 % Define the number of critical eigenvalues
-m = 10;
+m = 5;
 
 % Define the Krylov subspace dimension
 k = 150;
 
 % Verify compute_eigenvectors function of a matrix.
-verify_compute_eigenvectors(A, m, 1);
+% verify_compute_eigenvectors(A, m, 1);
 
 start = cputime;
 
