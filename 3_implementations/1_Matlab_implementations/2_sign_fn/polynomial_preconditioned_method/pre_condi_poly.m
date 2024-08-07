@@ -7,14 +7,17 @@ function p_A = pre_condi_poly(A, b, m)
     %      p_A - preconditioned polynomial based on Newton interpolation of
     %            divided differences.
     
+    rng(213); % setting random seed generator for reproductibility
+
     %% Arnoldi process to obtain ritz values
     
     N = size(A, 1);
     V = zeros(N, m+1); % m+1 arnoldi vectors
     
     % Generate basis Vm of Km(A, b)
-    beta = norm(b);
-    V(:, 1) = b / beta;
+    r0 = randn(N, 1); % Generate a random N x 1 vector
+    beta = norm(r0);
+    V(:, 1) = r0 / beta;
     
     H = zeros(N, m+1);
     
