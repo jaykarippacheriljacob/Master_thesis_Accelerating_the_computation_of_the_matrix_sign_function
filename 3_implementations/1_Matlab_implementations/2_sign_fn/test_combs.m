@@ -23,6 +23,8 @@ s = 500; % Sketch matrix row dimension
 
 k1 = 3; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
+trunc = 10; % Truncate orthogonalization to the last 'trunc' vector
+
 max_iter = 50; % Maximum no. of iterations for the restart of the Arnoldi decomposition
 % Set tolerance level
 tol = 1e-10;
