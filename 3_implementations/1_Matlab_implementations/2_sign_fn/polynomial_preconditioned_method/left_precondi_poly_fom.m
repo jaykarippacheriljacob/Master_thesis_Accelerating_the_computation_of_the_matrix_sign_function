@@ -17,7 +17,7 @@ function fA_b = left_precondi_poly_fom(A, b, m, m1)
     
     theta = ritz_value(A, m1);
     % Generate basis Vm of Km(A, b)
-    c = eval_pre_condi_poly(A, b, theta, m1);
+    c = eval_pre_condi_poly(A, A*b, theta, m1);
     beta = norm(c);
     V(:, 1) = c / beta;
     
@@ -25,7 +25,7 @@ function fA_b = left_precondi_poly_fom(A, b, m, m1)
     
     for j = 1:m
         % Apply matrix A to the last basis vector
-        u = A * V(:, j);
+        u = A * (A * V(:, j));
         y = eval_pre_condi_poly(A, u, theta, m1);
         w = eval_pre_condi_poly(A, y, theta, m1);
     

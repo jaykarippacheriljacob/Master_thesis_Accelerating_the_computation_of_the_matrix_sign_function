@@ -1,15 +1,12 @@
 function fA_b = left_precondi_poly_fom(A, b, m, m1)
-    % Input:
+    % Input: 
+    %      p_A - preconditioned polynomial based on Newton interpolation of
+    %            divided differences.
     %      A - N x N matrix
     %      b - N x 1 vector
     %      m - no. of iterations for the krylov's subspace
-    %      m1 - No. of iterations for the krylov's subspace to be used in pre-conditioning polynomial
     % Output: 
     %      fA_b - f(A)b
-
-    %% Finding the Preconditioned polynomial using Newton's interpolation using divided differences
-
-    p_A = pre_condi_poly(A, b, m1);
 
     %% implementation of left polynomially preconditioned arnoldi process for A^{-1/2}
 
@@ -18,8 +15,9 @@ function fA_b = left_precondi_poly_fom(A, b, m, m1)
     e1 = zeros(m, 1);
     e1(1) = 1;
     
+    theta = ritz_value(A, m1);
     % Generate basis Vm of Km(A, b)
-    c = p_A * (A * b);
+    c = eval_pre_condi_poly(A, A*b, theta, m1);
     beta = norm(c);
     V(:, 1) = c / beta;
     
@@ -27,9 +25,9 @@ function fA_b = left_precondi_poly_fom(A, b, m, m1)
     
     for j = 1:m
         % Apply matrix A to the last basis vector
-        u = A * (A* V(:, j));
-        y = p_A * u;
-        w = p_A * y;
+        u = A * (A * V(:, j));
+        y = eval_pre_condi_poly(A, u, theta, m1);
+        w = eval_pre_condi_poly(A, y, theta, m1);
     
         % Arnoldi process: Orthogonalization
         for i = 1:j

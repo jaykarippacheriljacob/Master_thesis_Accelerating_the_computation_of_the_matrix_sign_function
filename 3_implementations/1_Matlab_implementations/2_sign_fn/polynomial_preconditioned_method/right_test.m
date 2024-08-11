@@ -21,17 +21,14 @@ start = cputime;
 %% Finding the Preconditioned polynomial using Newton's interpolation using divided differences
 m1 = 4;
 % p_A = pre_condi_poly(A, b, m1);
-% p_A = pre_condi_poly(A_sqr, m1);
-% theta = ritz_value(A_sqr, m1);
-% p_A = eval_pre_condi_poly(A_sqr, theta, m1);
+% p_A = pre_condi_poly(A_sqr, Ab, m1);
 
-%% Calculation of left polynomially preconditioned arnoldi process for A^{-1/2}
-% fA_b = left_precondi_poly_fom(p_A, A, b, m);
-% fA_b = left_precondi_poly_fom(p_A, A_sqr, Ab, m);
-fA_b = left_precondi_poly_fom(A, b, m, m1);
+%% Calculation of right polynomially preconditioned arnoldi process for A^{-1/2}
+% fA_b = right_precondi_poly_fom(p_A, A, b, m);
+fA_b = right_precondi_poly_fom(A, b, m, m1);
 
 finish = cputime;
-disp(['Time taken by left polynomially preconditioned arnoldi process = ', num2str(finish - start), ' s']);
+disp(['Time taken by right polynomially preconditioned arnoldi process = ', num2str(finish - start), ' s']);
 %% Verification of the result with exact calculation of inverse square root
 start = cputime;
 
@@ -47,4 +44,4 @@ disp(['Time taken for direct calculation of f(A)b = ', num2str(finish - start), 
 
 %% Display the relative error
 rel_err = norm(exact_result - fA_b) / norm(exact_result);
-disp(['Relative Error between exact and left polynomially preconditioned arnoldi f(A)b: ' num2str(rel_err)]);
+disp(['Relative Error between exact and right polynomially preconditioned arnoldi f(A)b: ' num2str(rel_err)]);
