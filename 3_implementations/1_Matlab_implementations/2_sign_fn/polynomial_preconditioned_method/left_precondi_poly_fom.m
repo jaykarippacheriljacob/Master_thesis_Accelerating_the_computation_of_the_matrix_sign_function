@@ -1,4 +1,4 @@
-function fA_b = left_precondi_poly_fom(p_A, A, b, m)
+function fA_b = left_precondi_poly_fom(A, b, m, m1)
     % Input: 
     %      p_A - preconditioned polynomial based on Newton interpolation of
     %            divided differences.
@@ -15,8 +15,9 @@ function fA_b = left_precondi_poly_fom(p_A, A, b, m)
     e1 = zeros(m, 1);
     e1(1) = 1;
     
+    theta = ritz_value(A, m1);
     % Generate basis Vm of Km(A, b)
-    c = p_A * b;
+    c = eval_pre_condi_poly(A, b, theta, m1);
     beta = norm(c);
     V(:, 1) = c / beta;
     
@@ -25,8 +26,8 @@ function fA_b = left_precondi_poly_fom(p_A, A, b, m)
     for j = 1:m
         % Apply matrix A to the last basis vector
         u = A * V(:, j);
-        y = p_A * u;
-        w = p_A * y;
+        y = eval_pre_condi_poly(A, u, theta, m1);
+        w = eval_pre_condi_poly(A, y, theta, m1);
     
         % Arnoldi process: Orthogonalization
         for i = 1:j
