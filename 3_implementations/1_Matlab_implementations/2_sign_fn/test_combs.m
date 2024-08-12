@@ -4,6 +4,7 @@ close all;
 %% Adding paths for accessing the functions
 addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_precond");
 addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_quad_sketched_FOM");
+addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_quad_trunc_sketched_FOM");
 addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\combo_LR_def_quad_restarted_arnoldi");
 
 %% Define test parameters
@@ -40,6 +41,7 @@ k_values = 10:10:150;
 
 % Initialize arrays to store relative errors
 rel_err_quad_sketchFOM = zeros(length(k_values), 1);
+rel_err_quad_truncsketchFOM = zeros(length(k_values), 1);
 rel_err_precond_polyleft = zeros(length(k_values), 1);
 rel_err_precond_polyright = zeros(length(k_values), 1);
 rel_err_quad_restarted_arnoldi = zeros(length(k_values), 1);
@@ -63,6 +65,10 @@ for i = 1:length(k_values)
     %% Calculation of f(A)b using combination of LR deflation and Quadrature based restarted Arnoldi process
     fA_b = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
     rel_err_quad_restarted_arnoldi(i) = norm(exact_result - fA_b) / norm(exact_result);
+
+    %% Calculation of f(A)b using combination of LR deflation and Quadrature based truncated sketched FOM scheme process
+    fA_b = combo_lr_quad_truncsketchFOM(A, b, m, k, s, trunc);
+    rel_err_quad_truncsketchFOM(i) = norm(exact_result - fA_b) / norm(exact_result);
 end
 
 %% Plotting the relative errors
@@ -72,6 +78,7 @@ hold on;
 semilogy(k_values, rel_err_precond_polyleft, 'g-*', 'DisplayName', 'Left precond. Arnoldi');
 semilogy(k_values, rel_err_precond_polyright, 'b-^', 'DisplayName', 'Right precond. Arnoldi');
 semilogy(k_values, rel_err_quad_restarted_arnoldi, 'k-s', 'DisplayName', 'Quad. based restarted Arnoldi');
+semilogy(k_values, rel_err_quad_truncsketchFOM, 'y-o', 'DisplayName', 'Quad. based trun.sketched FOM');
 hold off;
 
 xlabel('k values');
