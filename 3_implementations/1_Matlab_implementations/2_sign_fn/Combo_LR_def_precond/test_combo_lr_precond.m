@@ -1,6 +1,6 @@
-clear;
-clc;
-close all;
+% clear;
+% clc;
+% close all;
 %% Define test parameters
 rng(2130); % setting random seed generator for reproductibility
 
@@ -13,10 +13,11 @@ A = Gamma5*A;
 b = randn(N, 1); % Generate a random N x 1 vector
 
 m = 5; % Define the number of critical eigenvalues
-k = 25; % No. of iterations for the krylov's subspace
-k1 = 5; % No. of iterations for the krylov's subspace to be used in pre-conditioning polynomial
 
 start = cputime;
+
+k = 50; % No. of iterations for the krylov's subspace
+k1 = 3; % No. of iterations for the krylov's subspace to be used in pre-conditioning polynomial
 
 %% Verification of the result with exact calculation of inverse square root
 

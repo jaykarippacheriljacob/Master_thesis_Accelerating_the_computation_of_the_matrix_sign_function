@@ -12,20 +12,20 @@ A = Gamma5*A;
 
 b = randn(N, 1); % Generate a random N x 1 vector
 
-m = 23; % No. of iterations for the krylov's subspace
+m = 25; % No. of iterations for the krylov's subspace
 
-% A_sqr = A * A;
-% Ab = A * b;
+A_sqr = A * A;
+Ab = A * b;
 
 start = cputime;
 %% Finding the Preconditioned polynomial using Newton's interpolation using divided differences
-m1 = 4;
+m1 = 5;
 % p_A = pre_condi_poly(A, b, m1);
-% p_A = pre_condi_poly(A_sqr, Ab, m1);
+p_A = pre_condi_poly(A_sqr, Ab, m1);
 
 %% Calculation of right polynomially preconditioned arnoldi process for A^{-1/2}
 % fA_b = right_precondi_poly_fom(p_A, A, b, m);
-fA_b = right_precondi_poly_fom(A, b, m, m1);
+fA_b = right_precondi_poly_fom(p_A, A_sqr, Ab, m);
 
 finish = cputime;
 disp(['Time taken by right polynomially preconditioned arnoldi process = ', num2str(finish - start), ' s']);
