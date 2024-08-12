@@ -12,7 +12,7 @@ function Y = combo_lr_def_precond_polyleft(A, x, m, k, k1)
 
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);
 
-    %% Step 2: Compute f(A) for critical eigenvalues
+    %% Step 2: Compute triangular matrix for critical eigenvalues
 
     f_Tm = compute_sign_function_diag(Dm);
 

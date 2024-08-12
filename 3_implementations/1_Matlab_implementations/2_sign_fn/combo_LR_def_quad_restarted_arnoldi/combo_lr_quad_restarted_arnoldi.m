@@ -14,7 +14,7 @@ function Y = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, min_deca
 
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);
 
-    %% Step 2: Compute f(A) for critical eigenvalues
+    %% Step 2: Compute triangular matrix for critical eigenvalues
 
     f_Tm = compute_sign_function_diag(Dm);
 
