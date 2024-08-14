@@ -40,7 +40,9 @@ disp(['Time taken for direct calculation of f(A)b = ', num2str(finish - start), 
 
 start = cputime;
 
-fA_b = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
+[iter, fA_b] = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
+cost_quad_restarted_arnoldi = 18 + 4 * k + m^2 + 3 * iter + 4 * m * iter + m^2 * iter;
+display(cost_quad_restarted_arnoldi);
 
 finish = cputime;
 disp(['Time taken by combination of LR deflation and Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);

@@ -1,12 +1,16 @@
-function Y = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, min_decay)
+function [iter, Y] = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, min_decay)
+
     % Input:
     %      A - n x n matrix
     %      x - n x 1 vector
     %      m - No. of critical values for which defation has to be undergone.
-    %      k - no. of iterations for the kryl ov's subspace
+    %      k - no. of iterations for the krylov's subspace
     %      max_iter - Maximum no.of iterations for the restart of the Arnoldi decomposition
     %      tol - Set tolerance for stopping criteria
     %      min_decay - the decay rate of error after each iteration.
+    % Output:
+    %      iter - no.of restarts completed by the function
+    %      Y - The final result f(A)b
 
     addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\combo_LR_def_quad_restarted_arnoldi");
 
@@ -26,7 +30,7 @@ function Y = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, min_deca
 
     %% Step 4: Construct an orthonormal basis for the Krylov subspace using the arnoldi process
 
-    fA_x_ominus = Quadrature_based_restarted_arnoldi(A, x_ominus, k, max_iter, tol, min_decay);
+    [fA_x_ominus, iter, ~] = Quadrature_based_restarted_arnoldi(A, x_ominus, k, max_iter, tol, min_decay);
 
     %% Step 6: Compute the approximation to f(A)x
 
