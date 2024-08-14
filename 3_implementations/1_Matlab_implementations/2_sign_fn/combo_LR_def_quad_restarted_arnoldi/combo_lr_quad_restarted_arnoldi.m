@@ -12,7 +12,8 @@ function [iter, Y] = combo_lr_quad_restarted_arnoldi(A, x, m, k, max_iter, tol, 
     %      iter - no.of restarts completed by the function
     %      Y - The final result f(A)b
 
-    addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\combo_LR_def_quad_restarted_arnoldi");
+    
+    addpath(fullfile(pwd, 'Combo_LR_def_quad_restarted_arnoldi'));
 
     %% Step 1: Compute left and right eigenvectors
 

@@ -1,12 +1,12 @@
 clear;
 clc;
 close all;
- 
+
 %% Adding paths for accessing the functions
-addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_precond");
-addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_quad_sketched_FOM");
-addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_quad_trunc_sketched_FOM");
-addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\combo_LR_def_quad_restarted_arnoldi");
+addpath(fullfile(pwd, 'Combo_LR_def_precond'));
+addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
+addpath(fullfile(pwd, 'Combo_LR_def_quad_trunc_sketched_FOM'));
+addpath(fullfile(pwd, 'Combo_LR_def_quad_restarted_arnoldi'));
 
 %% Define test parameters
 rng(2130); % setting random seed generator for reproducibility
@@ -49,29 +49,69 @@ rel_err_quad_restarted_arnoldi = zeros(length(k_values), 1);
 
 % Initializing array to store the cost
 cost_quad_restarted_arnoldi = zeros(length(k_values), 1);
+cost_quad_sketchFOM = zeros(length(k_values), 1);
+cost_precond_polyleft = zeros(length(k_values), 1);
+cost_precond_polyright = zeros(length(k_values), 1);
+cost_quad_truncsketchFOM = zeros(length(k_values), 1);
 
 % Loop over the range of k values
 for i = 1:length(k_values)
     k = k_values(i);
 
     %% Calculation of f(A)b using combination of LR deflation and Quadrature based restarted Arnoldi process
-    fA_b = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
+    [iter, fA_b] = combo_lr_quad_restarted_arnoldi(A, b, m, k, max_iter, tol, min_decay);
     rel_err_quad_restarted_arnoldi(i) = norm(exact_result - fA_b) / norm(exact_result);
-    cost_quad_restarted_arnoldi(i) = 20;
+    cost_quad_restarted_arnoldi(i) = 1 + iter*2*k;
+
+    %% Calculation of f(A)b using combination of LR deflation and Quadrature based sketched FOM scheme process
+    fA_b = combo_lr_quad_sketchFOM(A, b, m, k, s);
+    rel_err_quad_sketchFOM(i) = norm(exact_result - fA_b) / norm(exact_result);
+    cost_quad_sketchFOM(i) = 1 + 2*k;
+
+    %% Calculation of f(A)b using combination of LR deflation and Quadrature based truncated sketched FOM scheme process
+    fA_b = combo_lr_quad_truncsketchFOM(A, b, m, k, s, trunc);
+    rel_err_quad_truncsketchFOM(i) = norm(exact_result - fA_b) / norm(exact_result);
+    cost_quad_truncsketchFOM(i) = 1 + 2*k;
+
+    %% Calculation of f(A)b using combination of LR deflation and left polynomially preconditioned Arnoldi process
+    fA_b = combo_lr_def_precond_polyleft(A, b, m, k, k1);
+    rel_err_precond_polyleft(i) = norm(exact_result - fA_b) / norm(exact_result);
+    cost_precond_polyleft(i) = 2*k1 + 1 + 2*k1 + k * (2 + 2*k1 + 2*k1);
+
+    %% Calculation of f(A)b using combination of LR deflation and right polynomially preconditioned Arnoldi process
+    fA_b = combo_lr_def_precond_polyright(A, b, m, k, k1);
+    rel_err_precond_polyright(i) = norm(exact_result - fA_b) / norm(exact_result);
+    cost_precond_polyright(i) = 2*k1 + 1 + 2*k1 + k * (2 + 2*k1 + 2*k1);
 end
 
 %% Plotting the relative errors
 figure;
-%semilogy(k_values, rel_err_quad_sketchFOM, 'r-o', 'DisplayName', 'Quad. based sketched FOM');
-%hold on;
-%semilogy(k_values, rel_err_precond_polyleft, 'g-*', 'DisplayName', 'Left precond. Arnoldi');
-%semilogy(k_values, rel_err_precond_polyright, 'b-^', 'DisplayName', 'Right precond. Arnoldi');
-semilogy(cost_quad_restarted_arnoldi, rel_err_quad_restarted_arnoldi, 'k-s', 'DisplayName', 'Quad. based restarted Arnoldi');
-%semilogy(k_values, rel_err_quad_truncsketchFOM, 'y-o', 'DisplayName', 'Quad. based trun.sketched FOM');
-%hold off;
+semilogy(cost_quad_sketchFOM, rel_err_quad_sketchFOM, 'r o', 'DisplayName', 'Quad. based sketched FOM');
+% for i = 1:length(k_values)
+%     text(cost_quad_sketchFOM(i), rel_err_quad_sketchFOM(i), sprintf('%.1f', k_values(i)), 'Color', 'red', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+% end
+
+hold on;
+semilogy(cost_quad_truncsketchFOM, rel_err_quad_truncsketchFOM, 'y ^', 'DisplayName', 'Quad. based trun.sketched FOM');
+
+semilogy(cost_precond_polyleft, rel_err_precond_polyleft, 'g *', 'DisplayName', 'Left precond. Arnoldi');
+% for i = 1:length(k_values)
+%     text(cost_precond_polyleft(i), rel_err_precond_polyleft(i), sprintf('%.1f', k_values(i)), 'Color', 'red', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+% end
+
+semilogy(cost_precond_polyright, rel_err_precond_polyright, 'b ^', 'DisplayName', 'Right precond. Arnoldi');
+% for i = 1:length(k_values)
+%     text(cost_precond_polyright(i), rel_err_precond_polyright(i), sprintf('%.1f', k_values(i)), 'Color', 'red', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+% end
+
+semilogy(cost_quad_restarted_arnoldi, rel_err_quad_restarted_arnoldi, 'k s', 'DisplayName', 'Quad. based restarted Arnoldi');
+% for i = 1:length(k_values)
+%     text(cost_quad_restarted_arnoldi(i), rel_err_quad_restarted_arnoldi(i), sprintf('%.1f', k_values(i)), 'Color', 'red', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+% end
+hold off;
 
 xlabel('Cost of computation {A*b}');
 ylabel('Relative Error');
-title('Relative Error vs k values');
+title('Relative Error vs Cost of computation');
 legend('show');
 grid on;

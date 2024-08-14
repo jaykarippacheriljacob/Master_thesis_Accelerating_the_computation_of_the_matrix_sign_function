@@ -19,8 +19,8 @@ function [h2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H, tol)
     % Step 2: Set accurate := false and refined := false
     quad_err = inf; % Initial error set to infinity for the while loop condition
     first = true; % Flag to indicate the first iteration
-    beta_transform = trace(A * A) / size(A, 1);
-    % beta_transform = 1;
+    % beta_transform = trace(A * A) / size(A, 1);
+    beta_transform = 1;
     
     % Run the loop till convergence
     while quad_err > tol && N2 < 1000

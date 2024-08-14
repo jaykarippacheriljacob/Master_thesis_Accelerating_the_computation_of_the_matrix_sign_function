@@ -6,8 +6,8 @@ function Y = combo_lr_quad_truncsketchFOM(A, x, m, k, s, trunc)
     %      k - no. of iterations for the krylov's subspace, m < min(N, s)
     %      s - sketch matrix row dimension
     %      trunc - Truncate orthogonalization to the last 'trunc' vector
-    addpath("C:\Users\jkjbt\Documents\GitHub\Master_thesis_Accelerating_the_computation_of_the_matrix_sign_function\3_implementations\1_Matlab_implementations\2_sign_fn\Combo_LR_def_quad_sketched_FOM");
-
+    addpath(fullfile(pwd, 'Combo_LR_def_quad_trunc_sketched_FOM'));
+    
     %% Step 1: Compute left and right eigenvectors
 
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);

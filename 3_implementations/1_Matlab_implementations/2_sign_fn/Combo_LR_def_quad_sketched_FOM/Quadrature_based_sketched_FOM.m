@@ -24,14 +24,16 @@ function result = Quadrature_based_sketched_FOM(A, b, m, s)
     V = zeros(N, m+1);
     SV = zeros(s, m);
     SAV = zeros(s, m);
-
-    Sb = S(A * b);
+    
+    r0 = A * b;
+    % Sb = S(A * b);
+    Sb = S(r0);
 
     tol = 1e-10;
 
     % Step 2: Generate basis Vm of Km(A, b), as well as SVm
     % and SAVm.
-    r0 = A * b;
+    % r0 = A * b;
     beta = norm(r0);
     V(:, 1) = r0 / beta;
 

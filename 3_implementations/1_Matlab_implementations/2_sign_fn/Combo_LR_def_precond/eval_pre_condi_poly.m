@@ -24,7 +24,7 @@ function p_A = eval_pre_condi_poly(A, b, theta, m)
     % Expressing the polynomial using newton basis
     for i=1:m
         if i > 1
-                p_term = (A * (A * p_term) - theta(i-1) * I * p_term);
+                p_term = (A * (A * p_term) - theta(i-1) * p_term);
         else
             % p_term = I;
             p_term = b;
