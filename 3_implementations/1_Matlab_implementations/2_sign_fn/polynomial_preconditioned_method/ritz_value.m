@@ -3,8 +3,9 @@ function theta = ritz_value(A, m)
     %      A - N x N matrix
     %      m - no. of iterations for the krylov's subspace
     % Output: 
-    %      theta - 
+    %      theta - The sorted ritz values in vector form
     
+    rng(2130); % setting random seed generator for reproducibility
     %% Arnoldi process to obtain ritz values
     
     N = size(A, 1);
