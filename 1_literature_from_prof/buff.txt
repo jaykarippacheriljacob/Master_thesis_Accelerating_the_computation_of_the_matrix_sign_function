@@ -1,0 +1,101 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sign(D) = D (  D^{2} )^{-1/2}
+
+
+
+
+f(A) g(A) = g(A) f(A)
+
+
+( A )^{-1/2} = ( p(A) A inv(p(A)) )^{-1/2} =
+
+= (     (p(A))^{2}     A     inv( (p(A))^{2} )     )^{-1/2}
+
+= p(A) ( (p(A))^{2} A )^{-1/2}
+
+(p(A))^{2} A ~ I -> p(A) ~ A^{-1/2}
+
+
+
+
+A V_{m} = V_{m} H_{m} + rest
+
+
+
+
+V_{m}^{H} A V_{m} = H_{m}
+
+
+
+
+
+
+
+
+
+( D^{2} )^{-1/2}
+
+
+p( D^2 ) ~ ( D^{2} )^{-1/2}
+
+
+
+
+- run Arnoldi with D^{2}, with an associated H_{m}
+- compute eigenvalues of H_{m}, i.e. Ritz values, which approximate roughly the eigenvalues of D^{2}
+- from those Ritz values, build the coefficients of the polynomial that approximates p( D^2 ) ~ ( D^{2} )^{-1/2}
+
+
+
+
+
+
+
+
+
+A x = b
+
+r_{i} = b - A x_{i}
+
+x = x_{i} + e
+
+A e = r_{i} 
+
+
+
+
+
+r0 = b - A x0
+
+e ~ p(A) r0
+
+x ~ x0 + e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

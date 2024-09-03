@@ -28,7 +28,7 @@ param.restart_length = 50;              % each restart cycle consists of 50 Arno
 param.max_restarts = 20;                % perform at most 20 restart cycles
 param.tol = 1e-14;                      % tolerance for quadrature rule
 param.transformation_parameter = 1;     % parameter for the integral transformation
-param.hermitian = 1;                    % set 0 if A is not Hermitian
+param.hermitian = 0;                    % set 0 if A is not Hermitian
 param.V_full = 0;                       % set 1 if you need Krylov basis
 param.H_full = 0;                       % do not store all Hessenberg matrices
 param.exact = exact_poisson_invsqrt;    % Exact solution. If not known set to []
@@ -42,16 +42,16 @@ param.truncation_length = inf;          % truncation length for Arnoldi
 param.verbose = 1;                      % print information about progress of algorithm
 
 % Compute A^(-1/2)*b using FUNM_QUAD without implicit deflation
-tic
-[f1,out1] = funm_quad(A,b,param);
-toc
-
-% plot convergence curve and number of quadrature points
-semilogy(out1.err,'g-.s','Color',[0,.85,0])
-hold on
-for k = 2:length(out1.err)
-    text(k+0.1,3*out1.err(k),num2str(out1.num_quadpoints(k)),'Color',[0 .85 0],'FontSize',16,'Rotation',45);
-end
+% tic
+% [f1,out1] = funm_quad(A,b,param);
+% toc
+% 
+% % plot convergence curve and number of quadrature points
+% semilogy(out1.err,'g-.s','Color',[0,.85,0])
+% hold on
+% for k = 2:length(out1.err)
+%     text(k+0.1,3*out1.err(k),num2str(out1.num_quadpoints(k)),'Color',[0 .85 0],'FontSize',16,'Rotation',45);
+% end
 
 
 %% Now with implicit deflation, adapt the FUNM_QUAD parameters
