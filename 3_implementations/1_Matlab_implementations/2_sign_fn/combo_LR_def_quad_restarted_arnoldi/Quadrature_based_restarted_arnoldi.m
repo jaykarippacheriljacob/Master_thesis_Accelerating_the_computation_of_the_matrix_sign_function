@@ -31,6 +31,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     f_Hm = inv(sqrtm(Hm(1:m, 1:m)));
     fm_1 = b_norm * Vm(:, 1:m) * f_Hm * e1;
     f = [f, fm_1];
+    l = 8; % numbers of quadrature nodes
     
     % Step 3: Restart cycles untill convergence
     for k = 2:max_iter
@@ -42,7 +43,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
         %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
         %         l2
         subdiag = [subdiag; diag(Hm(1:m, 1:m), -1); Hm(m+1, m)];
-        h2 = Quadrature_rule_invsqrt(A, active_nodes, subdiag, Hm(1:m, 1:m), tol);
+        [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, Hm(1:m, 1:m), tol, l);
         active_nodes = [active_nodes; sort(eig(Hm(1:m, 1:m)))];
 
         % Step 6: Compute fm_k = fm_k-1 + norm(b) * Vm_k * hm_k

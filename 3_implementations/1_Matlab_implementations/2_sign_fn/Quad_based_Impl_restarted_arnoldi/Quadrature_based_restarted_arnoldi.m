@@ -35,6 +35,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     f_Hm = inv(sqrtm(Hm));
     fm_1 = b_norm * Vm * f_Hm * e1;
     f = [f, fm_1];
+    l = 8; % numbers of quadrature nodes
 
     % Step 3: Setting up thick interpolation for 1^{st} restart
     thick_interpol{1} = eig(Hm);
@@ -103,7 +104,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
         % Step : Compute h1m_k = em_k-1(Hm_k)e1 by quadrature of order l1
         %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
         %         l2
-        h2 = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, Hm, m, tol, ell, k);
+        [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, Hm, m, tol, ell, k, l);
     
         % Step : keep track of subdiagonal entries of Hessenberg matrix
         subdiag = [subdiag; diag(Hm(end-m+1:end, end-m+1:end), -1); h];

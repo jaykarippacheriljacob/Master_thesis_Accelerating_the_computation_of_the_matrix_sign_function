@@ -1,4 +1,4 @@
-function [h2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k)
+function [h2, N2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, N1)
     % Input: %%%%% Need to be revised
     %      A - N x N, matrix
     %      active_nodes - Interpolation nodes currently active in f
@@ -9,14 +9,16 @@ function [h2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced
     %      tol - tollerance for the error computed to be.
     %      ell - thick restart parameter
     %      k - current iteration number of the restarted arnoldi
+    %      N1 - numbers of quadrature nodes
     % Output: 
     %     h2 - coefficients calculated based on the quadrature rule
+    %     N2 - numbers of quadrature nodes
     
     % For f(z) = 1/sqrt(z), using Gauss-Jacobi quadrature
     % This implementation is for non - implicit non-Hermitian matrices.
     
     % Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
-    N1 = 8;
+    % N1 = 8;
     N2 = floor(sqrt(2) * N1);
 
     % Step 2: Set accurate := false and refined := false
