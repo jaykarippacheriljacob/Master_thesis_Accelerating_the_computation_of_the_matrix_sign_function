@@ -1,10 +1,12 @@
-function [Y] = lr_deflation_scheme(A, x, m, k_values)
+function [Y] = lr_deflation(A, x, m, k_values)
     % Input:
     %      A - n x n matrix
     %      x - n x 1 vector
     %      m - No. of critical values for which defation has to be undergone.
     %      k - no. of iterations for the krylov's subspace, m < n
 
+    addpath(fullfile(pwd, 'LR_deflation'));
+    
     %% Step 1: Compute left and right eigenvectors
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);
 

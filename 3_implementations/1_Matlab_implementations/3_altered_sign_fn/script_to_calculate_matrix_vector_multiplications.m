@@ -4,9 +4,12 @@ close all;
 
 %% Select which methods to test
 do_lr_deflation = true;
+do_left_precondi_poly_fom = true;
+do_right_precondi_poly_fom = false;
 
 %% Adding paths for accessing the functions
 addpath(fullfile(pwd, 'LR_deflation'));
+addpath(fullfile(pwd, 'left_polynomial_preconditioned_FOM'));
 
 %% Define test parameters
 rng(2130); % setting random seed generator for reproducibility
@@ -20,8 +23,9 @@ A = Gamma5*A;
 b = randn(N, 1); % Generate a random N x 1 vector
 
 m = 5; % Define the number of critical eigenvalues
+k1 = 3; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
-% Compute f(A)x directly using the sign function
+%% Compute f(A)x directly using the sign function
 % exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
 % Save the value to exact_result.mat file
 % save('exact_result.mat', 'exact_result');
@@ -29,21 +33,22 @@ m = 5; % Define the number of critical eigenvalues
 loadedData = load('exact_result.mat', 'exact_result');
 exact_result = loadedData.exact_result;  % Extract the value from the structure
 
-% Define the range of k values
+%% Define the range of k values
 k_values = 10:10:150;
 
-% Initialize arrays to store relative errors
+%% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
+rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 
-% New way to avoid to loop over k_values
+%% Invoking various functions to compute the product of the sign matrix of A and  b.
 if do_lr_deflation
     start = cputime;
 
     % Compute f(A)x using LR_deflation_scheme
-    fA_b = lr_deflation_scheme(A, b, m, k_values);
+    fA_b = lr_deflation(A, b, m, k_values);
 
     finish = cputime;
-    disp(['Time taken by lr deflation scheme = ', num2str(finish - start), ' s']);
+    disp(['Time taken by lr deflation = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
     for i = 1:length(k_values)
@@ -51,10 +56,29 @@ if do_lr_deflation
     end
 end 
 
-%% Plotting the relative errors
+if do_left_precondi_poly_fom
+    start = cputime;
+
+    % Compute f(A)x using LR_deflation_scheme
+    fA_b = left_precondi_poly_fom(A, b, k_values, k1);
+
+    finish = cputime;
+    disp(['Time taken by Left preconditioned FOM = ', num2str(finish - start), ' s']);
+    
+    % Loop over the range of k values
+    for i = 1:length(k_values)
+        rel_err_left_precondi_poly_fom(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+    end
+end 
+%% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
     semilogy(k_values, rel_err_lr_deflation, 'r-o', 'DisplayName', 'LR Deflation');
+    hold on;
+end
+
+if do_left_precondi_poly_fom
+    semilogy(k_values, rel_err_left_precondi_poly_fom, 'b-o', 'DisplayName', 'Left preconditioned FOM');
     hold on;
 end
 hold off;
