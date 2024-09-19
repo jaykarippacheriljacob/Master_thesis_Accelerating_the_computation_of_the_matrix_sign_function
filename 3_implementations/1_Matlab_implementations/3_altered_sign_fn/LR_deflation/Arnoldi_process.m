@@ -15,7 +15,7 @@ function [H, V, beta] = Arnoldi_process(A, b, k)
     % Initial residual vector
     beta = norm(b);
     V(:, 1) = b / beta;
-    disp(m);
+    % disp(m);
 
     for j = 1:m
         % Apply matrix A to the last basis vector

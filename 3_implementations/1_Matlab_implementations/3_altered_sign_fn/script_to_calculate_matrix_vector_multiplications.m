@@ -5,11 +5,12 @@ close all;
 %% Select which methods to test
 do_lr_deflation = true;
 do_left_precondi_poly_fom = true;
-do_right_precondi_poly_fom = false;
+do_right_precondi_poly_fom = true;
 
 %% Adding paths for accessing the functions
 addpath(fullfile(pwd, 'LR_deflation'));
 addpath(fullfile(pwd, 'left_polynomial_preconditioned_FOM'));
+addpath(fullfile(pwd, 'right_polynomial_preconditioned_FOM'));
 
 %% Define test parameters
 rng(2130); % setting random seed generator for reproducibility
@@ -39,6 +40,7 @@ k_values = 10:10:150;
 %% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
+rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
 
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 if do_lr_deflation
@@ -69,7 +71,22 @@ if do_left_precondi_poly_fom
     for i = 1:length(k_values)
         rel_err_left_precondi_poly_fom(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
-end 
+end
+
+if do_left_precondi_poly_fom
+    start = cputime;
+
+    % Compute f(A)x using LR_deflation_scheme
+    fA_b = right_precondi_poly_fom(A, b, k_values, k1);
+
+    finish = cputime;
+    disp(['Time taken by Right preconditioned FOM = ', num2str(finish - start), ' s']);
+    
+    % Loop over the range of k values
+    for i = 1:length(k_values)
+        rel_err_right_precondi_poly_fom(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+    end
+end
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
@@ -79,6 +96,11 @@ end
 
 if do_left_precondi_poly_fom
     semilogy(k_values, rel_err_left_precondi_poly_fom, 'b-o', 'DisplayName', 'Left preconditioned FOM');
+    hold on;
+end
+
+if do_right_precondi_poly_fom
+    semilogy(k_values, rel_err_right_precondi_poly_fom, 'g-^', 'DisplayName', 'Right preconditioned FOM');
     hold on;
 end
 hold off;
