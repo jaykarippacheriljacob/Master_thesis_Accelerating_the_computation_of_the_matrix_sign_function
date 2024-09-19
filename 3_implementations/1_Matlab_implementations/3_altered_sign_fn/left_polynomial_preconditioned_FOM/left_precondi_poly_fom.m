@@ -1,4 +1,4 @@
-function fA_b = left_precondi_poly_fom(A, b, k_values, k1)
+function [fA_b] = left_precondi_poly_FOM(A, b, k_values, k1)
     % Input: 
     %      p_A      - preconditioned polynomial based on Newton interpolation of
     %                 divided differences.
@@ -9,7 +9,7 @@ function fA_b = left_precondi_poly_fom(A, b, k_values, k1)
     %      k1       - No. of iterations for the krylov's subspace to be used in
     %                 pre-conditioning polynomial Arnoldi
     % Output: 
-    %      fA_b     - f(A)b
+    %      fA_b     - Approximation of f(A)b for k_values
 
     %% Step 1: Approximate the matrix function on x_ominus using the preconditioned arnoldi process
     %          for the various values in k

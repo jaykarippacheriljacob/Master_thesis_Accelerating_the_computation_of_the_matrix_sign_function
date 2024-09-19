@@ -1,9 +1,11 @@
-function [Y] = lr_deflation(A, x, m, k_values)
+function [fA_b] = lr_deflation(A, x, m, k_values)
     % Input:
-    %      A - n x n matrix
-    %      x - n x 1 vector
-    %      m - No. of critical values for which defation has to be undergone.
-    %      k - no. of iterations for the krylov's subspace, m < n
+    %      A    - n x n matrix
+    %      x    - n x 1 vector
+    %      m    - No. of critical values for which defation has to be undergone.
+    %      k    - no. of iterations for the krylov's subspace, m < n
+    % Output: 
+    %      fA_b - Approximation of f(A)b for k_values
 
     addpath(fullfile(pwd, 'LR_deflation'));
     
@@ -39,5 +41,5 @@ function [Y] = lr_deflation(A, x, m, k_values)
     end
     
     %% Step 6: Compute the approximation to f(A)x
-    Y = Rm * (f_Tm * (Lm' * x))*ones(1,no_k) + fA_x_ominus;
+    fA_b = Rm * (f_Tm * (Lm' * x))*ones(1,no_k) + fA_x_ominus;
 end
