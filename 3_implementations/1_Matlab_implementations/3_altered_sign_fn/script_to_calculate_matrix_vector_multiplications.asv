@@ -3,8 +3,8 @@ clc;
 close all;
 
 %% Select which methods to test
-do_lr_deflation = true;
-do_left_precondi_poly_fom = true;
+do_lr_deflation = false;
+do_left_precondi_poly_fom = false;
 do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
@@ -90,7 +90,7 @@ if do_left_precondi_poly_fom
     end
 end
 
-if do_right_precondi_poly_fom
+if do_left_precondi_poly_fom
     start = cputime;
 
     % Compute f(A)x using right_precondi_poly_FOM
@@ -142,11 +142,11 @@ if do_combo_LR_def_LPoly_precond
     fA_b = combo_LR_def_LPoly_precond(A, b, m, k_values, k1);
 
     finish = cputime;
-    disp(['Time taken by Combination of LR deflation and Left preconditioned FOM = ', num2str(finish - start), ' s']);
+    disp(['Time taken by Quadrature based sketched truncated FOM = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
     for i = 1:length(k_values)
-        rel_err_combo_LR_def_LPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+        rel_err_quad_based_sketched_trun_fom (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
 
@@ -178,7 +178,7 @@ if do_quad_based_sketched_trun_fom
 end
 
 if do_combo_LR_def_LPoly_precond
-    semilogy(k_values, rel_err_combo_LR_def_LPoly_precond, 'r-o', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
+    semilogy(k_values, rel_err_combo_LR_def_LPoly_precond, 'y-o', 'DisplayName', 'Combination of LR deflation ');
     hold on;
 end
 hold off;

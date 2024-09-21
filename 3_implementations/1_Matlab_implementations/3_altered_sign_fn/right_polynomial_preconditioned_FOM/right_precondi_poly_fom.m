@@ -16,7 +16,7 @@ function fA_b = right_precondi_poly_FOM(A, b, k_values, k1)
     %          We do the Arnoldi process only once and then extract the Arnoldi approximations 
     %          for the different dimensions in k_values
 
-    addpath(fullfile(pwd, 'right_polynomial_preconditioned_FOM'));
+    addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
 
     n = size(A,2);
     no_k = length(k_values);
