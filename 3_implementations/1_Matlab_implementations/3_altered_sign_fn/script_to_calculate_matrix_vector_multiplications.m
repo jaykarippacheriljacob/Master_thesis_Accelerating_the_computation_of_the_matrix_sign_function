@@ -5,13 +5,13 @@ close all;
 %% Select which methods to test
 do_lr_deflation = true;
 do_left_precondi_poly_fom = false;
-do_right_precondi_poly_fom = true;
+do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = false;
-do_quad_based_sketched_trun_fom = false;
+do_quad_based_sketched_trun_fom = true;
 
 do_combo_LR_def_LPoly_precond = false;
-do_combo_LR_def_RPoly_precond = true;
-do_combo_LR_def_quad_sketched_FOM = false;
+do_combo_LR_def_RPoly_precond = false;
+do_combo_LR_def_quad_sketched_FOM = true;
 do_combo_LR_def_quad_sketched_trun_FOM = true;
 
 %% Adding paths for accessing the functions
@@ -193,7 +193,7 @@ if do_combo_LR_def_quad_sketched_trun_FOM
     start = cputime;
 
     % Compute f(A)x using Quadrature_based_sketched_trun_FOM
-    fA_b = combo_LR_def_quad_sketched_trun_FOM(A, b, m, k_values, s);
+    fA_b = combo_LR_def_quad_sketched_trun_FOM(A, b, m, k_values, s, trunc);
 
     finish = cputime;
     disp(['Time taken by Combination of LR deflation and Quadrature based sketched truncated FOM = ', num2str(finish - start), ' s']);
