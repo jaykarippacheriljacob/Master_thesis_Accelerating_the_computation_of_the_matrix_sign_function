@@ -3,16 +3,18 @@ clc;
 close all;
 
 %% Select which methods to test
-do_lr_deflation = true;
-do_left_precondi_poly_fom = true;
-do_right_precondi_poly_fom = true;
+do_lr_deflation = false;
+do_left_precondi_poly_fom = false;
+do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = true;
+do_quad_based_sketched_trun_fom = true;
 
 %% Adding paths for accessing the functions
 addpath(fullfile(pwd, 'LR_deflation'));
 addpath(fullfile(pwd, 'left_polynomial_preconditioned_FOM'));
 addpath(fullfile(pwd, 'right_polynomial_preconditioned_FOM'));
 addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
+addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
 
 %% Define test parameters
 rng(2130); % setting random seed generator for reproducibility
@@ -31,6 +33,8 @@ k1 = 3; % No. of iterations for the Krylov's subspace to be used in pre-conditio
 
 s = 500; % Sketch matrix row dimension
 
+trunc = 19; % Truncate orthogonalization to the last 'trunc' vector
+
 %% Compute f(A)x directly using the sign function
 % exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
 % Save the value to exact_result.mat file
@@ -40,13 +44,14 @@ loadedData = load('exact_result.mat', 'exact_result');
 exact_result = loadedData.exact_result;  % Extract the value from the structure
 
 %% Define the range of k values
-k_values = 10:10:150;
+k_values = 20:10:150;
 
 %% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
+rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
 
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 if do_lr_deflation
@@ -109,6 +114,21 @@ if do_quad_based_sketched_fom
     end
 end
 
+if do_quad_based_sketched_trun_fom
+    start = cputime;
+
+    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    fA_b = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc);
+
+    finish = cputime;
+    disp(['Time taken by Quadrature based sketched truncated FOM = ', num2str(finish - start), ' s']);
+    
+    % Loop over the range of k values
+    for i = 1:length(k_values)
+        rel_err_quad_based_sketched_trun_fom (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+    end
+end
+
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
@@ -130,6 +150,11 @@ if do_quad_based_sketched_fom
     semilogy(k_values, rel_err_quad_based_sketched_fom, 'k-^', 'DisplayName', 'Quadrature based sketched FOM');
     hold on;
 end
+
+if do_quad_based_sketched_trun_fom
+    semilogy(k_values, rel_err_quad_based_sketched_trun_fom, 'k-o', 'DisplayName', 'Quadrature based sketched truncated FOM');
+    hold on;
+end 
 hold off;
 
 xlabel('# mvms ');
