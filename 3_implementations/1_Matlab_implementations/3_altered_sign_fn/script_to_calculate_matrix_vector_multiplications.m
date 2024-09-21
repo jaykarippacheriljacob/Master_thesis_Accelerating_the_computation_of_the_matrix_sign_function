@@ -4,12 +4,13 @@ close all;
 
 %% Select which methods to test
 do_lr_deflation = true;
-do_left_precondi_poly_fom = true;
-do_right_precondi_poly_fom = false;
+do_left_precondi_poly_fom = false;
+do_right_precondi_poly_fom = true;
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
 
-do_combo_LR_def_LPoly_precond = true;
+do_combo_LR_def_LPoly_precond = false;
+do_combo_LR_def_RPoly_precond = true;
 
 %% Adding paths for accessing the functions
 addpath(fullfile(pwd, 'LR_deflation'));
@@ -19,6 +20,7 @@ addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
 addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
 
 addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
+addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 
 %% Define test parameters
 rng(2130); % setting random seed generator for reproducibility
@@ -58,6 +60,7 @@ rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
 
 rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values), 1);
+rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values), 1);
 
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 if do_lr_deflation
@@ -150,6 +153,21 @@ if do_combo_LR_def_LPoly_precond
     end
 end
 
+if do_combo_LR_def_RPoly_precond
+    start = cputime;
+
+    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    fA_b = combo_LR_def_RPoly_precond(A, b, m, k_values, k1);
+
+    finish = cputime;
+    disp(['Time taken by Combination of LR deflation and Right preconditioned FOM = ', num2str(finish - start), ' s']);
+    
+    % Loop over the range of k values
+    for i = 1:length(k_values)
+        rel_err_combo_LR_def_RPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+    end
+end
+
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
@@ -179,6 +197,11 @@ end
 
 if do_combo_LR_def_LPoly_precond
     semilogy(k_values, rel_err_combo_LR_def_LPoly_precond, 'r-o', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
+    hold on;
+end
+
+if do_combo_LR_def_RPoly_precond
+    semilogy(k_values, rel_err_combo_LR_def_RPoly_precond, 'r-o', 'DisplayName', 'Combination of LR deflation and Right preconditioned FOM');
     hold on;
 end
 hold off;
