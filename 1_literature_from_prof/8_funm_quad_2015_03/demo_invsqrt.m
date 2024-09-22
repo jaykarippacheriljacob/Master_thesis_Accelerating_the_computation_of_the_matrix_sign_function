@@ -42,16 +42,16 @@ param.truncation_length = inf;          % truncation length for Arnoldi
 param.verbose = 1;                      % print information about progress of algorithm
 
 % Compute A^(-1/2)*b using FUNM_QUAD without implicit deflation
-% tic
-% [f1,out1] = funm_quad(A,b,param);
-% toc
-% 
-% % plot convergence curve and number of quadrature points
-% semilogy(out1.err,'g-.s','Color',[0,.85,0])
-% hold on
-% for k = 2:length(out1.err)
-%     text(k+0.1,3*out1.err(k),num2str(out1.num_quadpoints(k)),'Color',[0 .85 0],'FontSize',16,'Rotation',45);
-% end
+tic
+[f1,out1] = funm_quad(A,b,param);
+toc
+
+% plot convergence curve and number of quadrature points
+semilogy(out1.err,'g-.s','Color',[0,.85,0])
+hold on
+for k = 2:length(out1.err)
+    text(k+0.1,3*out1.err(k),num2str(out1.num_quadpoints(k)),'Color',[0 .85 0],'FontSize',16,'Rotation',45);
+end
 
 
 %% Now with implicit deflation, adapt the FUNM_QUAD parameters
