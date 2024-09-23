@@ -36,20 +36,23 @@ A = A/s;
 b = kron(e,e);
 b = b/norm(b);
 
-m = 30; % No. of iterations for the krylov's subspace
-max_iter = 50; % Maximum no.of iterations for the restart of the Arnoldi decomposition
+m = 50; % No. of iterations for the krylov's subspace
+max_iter = 20; % Maximum no.of iterations for the restart of the Arnoldi decomposition
 
 % Set tolerance level
-tol = 1e-10;
+tol = 1e-14;
 % Set Error minimum decay rate for convergence
 min_decay = 0.95;
 % Number of target eigenvalues for implicit deflation
 thick_number = 5;
 
+% A_sqr = A * A;
+% Ab = A * b;
+
 start = cputime;
 
 % Call the Quadrature based restarted arnoldi function
-[quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A_sqr, Ab, m, max_iter, thick_number, tol, min_decay);
+[quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, thick_number, tol, min_decay);
 
 finish = cputime;
 disp(['Time taken by Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);

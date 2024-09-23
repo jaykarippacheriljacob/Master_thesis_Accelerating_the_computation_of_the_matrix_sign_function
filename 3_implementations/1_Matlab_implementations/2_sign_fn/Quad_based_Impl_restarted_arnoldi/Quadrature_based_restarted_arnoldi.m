@@ -43,7 +43,7 @@ function [fm_k, iter, f] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter,
     % Step 4: Computation of the schur decomposition of the Hessenberg
     %         matrix
     [U, T] = schur(Hm, 'real');
-    D = ordeig(T);
+    % D = ordeig(T);
     
     %% Need to be completely reordered
     % Step 5: Restart cycles untill convergence
