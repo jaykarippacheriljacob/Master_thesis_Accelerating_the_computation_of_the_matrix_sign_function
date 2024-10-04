@@ -19,6 +19,10 @@ function [h2, N2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_repl
     
     % Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
     % N1 = 8;
+    if N1 > 1000
+        N1 = 500;
+    end
+        
     N2 = floor(sqrt(2) * N1);
 
     % Step 2: Set accurate := false and refined := false

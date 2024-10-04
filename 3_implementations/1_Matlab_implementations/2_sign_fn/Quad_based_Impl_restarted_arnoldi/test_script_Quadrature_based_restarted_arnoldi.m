@@ -52,7 +52,7 @@ thick_number = 5;
 start = cputime;
 
 % Call the Quadrature based restarted arnoldi function
-[quadrature_approximation, ~, ~] = Quadrature_based_restarted_arnoldi(A, b, m, max_iter, thick_number, tol, min_decay);
+[quadrature_approximation, ~, ~] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_number, tol, min_decay);
 
 finish = cputime;
 disp(['Time taken by Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
@@ -64,9 +64,12 @@ start = cputime;
 % Save the value to exact_result.mat file
 % save('exact_result.mat', 'exact_result');
 % Load the value from the file
-loadedData = load('exact_result.mat', 'exact_result');
-exact_result = loadedData.exact_result;  % Extract the value from the structure
+% loadedData = load('exact_result.mat', 'exact_result');
+% exact_result = loadedData.exact_result;  % Extract the value from the structure
 
+% Load exact solution
+load exact_solutions
+exact_result = exact_poisson_invsqrt;
 finish = cputime;
 disp(['Time taken without Quadrature based restarted arnoldi = ', num2str(finish - start), ' s']);
 
