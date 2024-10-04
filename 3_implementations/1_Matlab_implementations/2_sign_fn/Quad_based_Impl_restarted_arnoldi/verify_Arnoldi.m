@@ -16,7 +16,7 @@ function verify_Arnoldi(A, Vm, Hm, hm1m, qm1)
 %       verified or not.
 
     % Compute the left-hand side of the Arnoldi relation
-    lhs = A * Vm - Vm * Hm;
+    lhs = A * (A * Vm) - Vm * Hm;
     %disp(lhs);
     
     % Compute the right-hand side of the Arnoldi relation using the additional equation

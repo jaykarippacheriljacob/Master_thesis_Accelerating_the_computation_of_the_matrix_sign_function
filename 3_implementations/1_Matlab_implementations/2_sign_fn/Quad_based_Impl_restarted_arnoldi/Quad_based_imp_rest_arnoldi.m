@@ -16,6 +16,7 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
     ell = 0;    % thick restart param
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing the norm of v_{m+1})
     f = zeros(size(b));
+    b = A * b;
     b_norm = norm(b);
     fm = [];
     l = 8; % initial number of quadrature points

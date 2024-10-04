@@ -11,7 +11,7 @@ function [v, H, V_big, h] = Arnoldi_process(A, m, s, V_big, H)
 
     for j = s:m
         % Apply matrix A to the last basis vector
-        v = A * V_big(:, j);
+        v = A * (A * V_big(:, j));
 
         % Arnoldi process: Orthogonalization
         for i = 1:j
