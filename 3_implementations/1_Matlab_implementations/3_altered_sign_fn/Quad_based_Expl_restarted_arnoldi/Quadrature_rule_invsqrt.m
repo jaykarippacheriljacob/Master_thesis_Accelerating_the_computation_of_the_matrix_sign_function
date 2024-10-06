@@ -1,4 +1,5 @@
 function [h2, N2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H, tol, N1)
+    %% Computes the quadrature rules ql1(A, Vm, b) and ql2(A, Vm, b) 
     % Input: 
     %      A            - N x N, matrix
     %      active_nodes - m x 1, eigenvalues of hessenberg matrix

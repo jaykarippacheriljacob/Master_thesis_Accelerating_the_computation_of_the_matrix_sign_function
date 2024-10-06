@@ -2,6 +2,24 @@ clear;
 clc;
 close all;
 
+%% Adding paths for accessing the functions
+addpath(fullfile(pwd, 'LR_deflation'));
+
+addpath(fullfile(pwd, 'Left_polynomial_preconditioned_FOM'));
+addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
+
+addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
+addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
+
+addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
+addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
+
+addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
+addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
+
+addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
+addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_FOM'));
+
 %% Select which methods to test
 do_lr_deflation = false;
 do_left_precondi_poly_fom = false;
@@ -9,34 +27,35 @@ do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
 do_quad_based_Expl_restarted_arnoldi = false;
+do_quad_based_Impl_restarted_arnoldi = true;
 
 do_combo_LR_def_LPoly_precond = false;
 do_combo_LR_def_RPoly_precond = false;
 do_combo_LR_def_quad_sketched_FOM = false;
 do_combo_LR_def_quad_sketched_trun_FOM = false;
 
-%% Adding paths for accessing the functions
-addpath(fullfile(pwd, 'LR_deflation'));
-addpath(fullfile(pwd, 'Left_polynomial_preconditioned_FOM'));
-addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
-addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
-addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
-addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
+%% Select the matrix to be tested
+do_4x4_Herm = true;
+do_4x4_Non_Herm = false;
+do_8x4_Non_Herm = false;
+do_16x4_Non_Herm = false;
 
-addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
-addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
-addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
-addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_FOM'));
+%% Loading the Matrix A and defining the vector b for the Lattice size 4^4, Hermitian matrix
+if do_4x4_Herm
+    A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
+    N = size(A, 2); % Size of the matrix
+    gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
+    Gamma5 = kron(speye(N/12),gamma5hat);
+    A = Gamma5*A;
+end
+
+
+%% Define the range of k values
+k_values = 20:10:150;
 
 %% Define test parameters
+
 rng(2130); % setting random seed generator for reproducibility
-
-A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
-N = size(A, 2); % Size of the matrix
-gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
-Gamma5 = kron(speye(N/12),gamma5hat);
-A = Gamma5*A;
-
 b = randn(N, 1); % Generate a random N x 1 vector
 
 m = 20; % Define the number of critical eigenvalues
@@ -53,16 +72,7 @@ tol = 1e-8; % Set tolerance level
 
 max_iter = 50; % Maximum no.of restarts for the Arnoldi process
 
-%% Define the range of k values
-k_values = 20:10:150;
-
-%% Compute f(A)x directly using the sign function
-% exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
-% Save the value to exact_result.mat file
-% save('exact_result.mat', 'exact_result');
-% Load the exact result
-loadedData = load('exact_result.mat', 'exact_result');
-exact_result = loadedData.exact_result;  % Extract the value from the structure
+thick_number = 5; % Number of target eigenvalues for implicit deflation
 
 %% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
@@ -71,11 +81,23 @@ rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
 rel_err_quad_based_Expl_restarted_arnoldi = zeros(length(k_values), 1);
+rel_err_quad_based_Impl_restarted_arnoldi = zeros(length(k_values), 1);
 
 rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values), 1);
 rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values), 1);
 rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values), 1);
 rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values), 1);
+
+%% Compute f(A)x directly using the sign function
+%% For the Lattice size 4^4, Hermitian matrix
+if do_4x4_Herm
+    % exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
+    % Save the value to exact_result.mat file
+    % save('exact_result.mat', 'exact_result');
+    % Load the exact result
+    loadedData = load('exact_result.mat', 'exact_result');
+    exact_result = loadedData.exact_result;  % Extract the value from the structure
+end
 
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 %% LR_deflation
@@ -168,6 +190,18 @@ if do_quad_based_Expl_restarted_arnoldi
     finish = cputime;
     disp(['Time taken by Quadrature based Explicit restarted Arnoldi = ', num2str(finish - start), ' s']);
 end
+
+%% Quad_based_Impl_restarted_arnoldi
+if do_quad_based_Impl_restarted_arnoldi
+    start = cputime;
+    for i = 1:length(k_values)
+        [quadrature_approximation, ~, ~] = Quad_based_imp_rest_arnoldi(A, b,k_values(i), max_iter, thick_number, tol, min_decay);
+        rel_err_quad_based_Impl_restarted_arnoldi(i) = norm(exact_result - quadrature_approximation) / norm(exact_result);
+    end
+    finish = cputime;
+    disp(['Time taken by Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
+end
+
 %% combo_LR_def_LPoly_precond
 if do_combo_LR_def_LPoly_precond
     start = cputime;
@@ -261,6 +295,11 @@ end
 
 if do_quad_based_Expl_restarted_arnoldi
     semilogy(k_values, rel_err_quad_based_Expl_restarted_arnoldi, 'b-o', 'DisplayName', 'Quadrature based Explicit restarted Arnoldi');
+    hold on;
+end
+
+if do_quad_based_Impl_restarted_arnoldi
+    semilogy(k_values, rel_err_quad_based_Impl_restarted_arnoldi, 'r-^', 'DisplayName', 'Quadrature based Implicit restarted Arnoldi');
     hold on;
 end
 

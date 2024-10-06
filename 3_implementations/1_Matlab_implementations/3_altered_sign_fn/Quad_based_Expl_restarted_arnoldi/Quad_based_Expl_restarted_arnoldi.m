@@ -4,6 +4,7 @@ function [fm_k, iter, f] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_iter, 
     %      A         - N x N matrix
     %      b         - N x 1 vector
     %      m         - Kryl ov's subspace dimension
+    %      max_iter  - Maximum no.of restarts of the Arnoldi decomposition
     %      tol       - Set tolerance for stopping criteria
     %      min_decay - The decay rate of error after each iteration.
     % Output: 
