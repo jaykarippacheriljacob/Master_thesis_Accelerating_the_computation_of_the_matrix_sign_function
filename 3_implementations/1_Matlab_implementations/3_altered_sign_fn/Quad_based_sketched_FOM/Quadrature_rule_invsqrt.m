@@ -1,4 +1,5 @@
 function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
+    %% Computes the quadrature rules ql1(S, A, Vm, b) and ql2(S, A, Vm, b) 
     % Input: 
     %      V - N x m, m arnoldi vectors
     %      AV - N x m,  Matrix
@@ -10,15 +11,16 @@ function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
     %      l - no.of quadrature nodes
     %      h - hm calculated based on the quadrature rule
     
-    % Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
+    %% Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
     l1 = 8;
     l2 = floor(sqrt(2) * l1);
-    % Step 2: Set accurate := false and refined := false
+    
+    %% Step 2: Set accurate := false and refined := false
     quad_err = inf; % Initial error set to infinity for the while loop condition
     first = true; % Flag to indicate the first iteration
 
     while quad_err > tol && l2 < 1000
-        % Step 3: Choose sets (ti~, wi) i = 1,...,l~ and (ti, wi) i =
+        %% Step 3: Choose sets (ti~, wi) i = 1,...,l~ and (ti, wi) i =
         %         1,...,l of quadrature nodes / weights
 
         c1 = pi / l1 * ones(1, l1); % quadrature nodes for l~
@@ -26,7 +28,7 @@ function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
         z1 = cos((2 * (1:l1) - 1)/(2 * l1) * pi); % quadrature weights for l~
         z2 = cos((2 * (1:l2) - 1)/(2 * l2) * pi); % quadrature weights for l
         
-        % Step 4: Compute hm~ and hm by quadrature of order l~ and l
+        %% Step 4: Compute hm~ and hm by quadrature of order l~ and l
         %         respectively
         if first
             h1 = 0;
@@ -43,7 +45,7 @@ function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
         end
         h2 = -2/pi*h2;
         
-        % Step 5: Check the quadrature error w.r.t tot the set tolerance.
+        %% Step 5: Check the quadrature error w.r.t tot the set tolerance.
         quad_err = norm(h1 - h2);
         if quad_err <= tol || floor(sqrt(2) * l2) >= 1000
             l = l2;

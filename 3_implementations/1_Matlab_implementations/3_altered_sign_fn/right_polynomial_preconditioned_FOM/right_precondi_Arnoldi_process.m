@@ -1,4 +1,6 @@
 function [V ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
+    %% Computes the Right preconditioned Krylov subspace basis vectors and its
+    %  corresponding hessenberg matrix for a given dimension of subspace.
     % Input: 
     %      p_A - preconditioned polynomial based on Newton interpolation of
     %            divided differences.

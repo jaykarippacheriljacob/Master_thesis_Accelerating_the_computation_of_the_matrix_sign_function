@@ -1,11 +1,13 @@
 function fA_b = right_precondi_Arnoldi_approx(V,H,beta,k)
-% returns the k-th Arnoldi matrix function approximation to the inverse square
-% root applied to the vector beta*V(:,1)
-% Input: V - matrix of Arnoldi vectors, size is n x (m+1)
-%         H - matrix of orthogonalization coefficients, size is (m+1) x m
-%         k - number of approximation, k <= m
-%         beta - see above
-% Output: fA_b, the Arnoldi approximation on the Krylov subspace of dimension k 
+    %% returns the k-th Arnoldi matrix function approximation to the inverse square
+    %  root applied to the vector beta*V(:,1)
+    % Input: 
+    %         V    - matrix of Arnoldi vectors, size is n x (m+1)
+    %         H    - matrix of orthogonalization coefficients, size is (m+1) x m
+    %         k    - number of approximation, k <= m
+    %         beta - see above
+    % Output: 
+    %         fA_b - the Arnoldi approximation on the Krylov subspace of dimension k 
  
  m = size(H,2);  
  if k > m

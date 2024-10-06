@@ -1,10 +1,9 @@
 function verify_compute_eigenvectors(B, m, symm_type)
-    % Verify and compute eigenvectors of a matrix.
-
+    %% Verify and compute eigenvectors of a matrix.
     % Inputs:
-    %   B: Input matrix
-    %   m: Number of critical eigenvalues to compute
-    %   symm_type: Type of symmetric transformation (1 for (B * B'), 0 for (B + B'))
+    %   B         - Input matrix
+    %   m         - Number of critical eigenvalues to compute
+    %   symm_type - Type of symmetric transformation (1 for (B * B'), 0 for (B + B'))
     
     % Check if symm_type is provided, otherwise set default value
     if nargin < 3

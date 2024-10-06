@@ -1,4 +1,5 @@
 function v1 = leja_sort(v)
+    %% Returns sorted vector based on Leja sort.
     % Inputs:
     %   v - A vector of numerical values to be sorted.
     %

@@ -1,4 +1,6 @@
 function [H, V, beta, SV, SAV, Sb] = QS_FOM_process(A, b, m, s)
+    %% Computes the Sketched Krylov subspace basis vectors and its
+    %  corresponding hessenberg matrix for a given dimension of subspace.
     % Input: 
     %      A   - N x N matrix
     %      b   - N x 1 vector

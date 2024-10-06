@@ -1,16 +1,16 @@
 function verify_Arnoldi_4_sqr(A, V, H)
-% This function checks whether the Arnoldi relation is fulfilled for
-% matrices A^2, Vm, and Hm using the Arnoldi relation equation, 
-% A^2*V(:,1:m) - V(:,1:m+1)*H(1_m+1,1:m) should be zero in exact arithmetic
-
-%   Inputs:
-%       A: The matrix A.
-%       V: matrix of Arnoldi vectors
-%       H: matrix of orthogonalizaiion coeffs
-%
-%   Outputs:
-%       None. Prints a message indicating whether the Arnoldi relation is
-%       verified or not.
+    %% This function checks whether the Arnoldi relation is fulfilled for
+    %  matrices A^2, Vm, and Hm using the Arnoldi relation equation, 
+    %  A^2*V(:,1:m) - V(:,1:m+1)*H(1_m+1,1:m) should be zero in exact arithmetic
+    
+    %   Inputs:
+    %       A - The matrix A.
+    %       V - matrix of Arnoldi vectors
+    %       H - matrix of orthogonalizaiion coeffs
+    
+    %   Outputs:
+    %       None. Prints a message indicating whether the Arnoldi relation is
+    %       verified or not.
 
     m = size(V,2)-1;
     em = zeros(m, 1);

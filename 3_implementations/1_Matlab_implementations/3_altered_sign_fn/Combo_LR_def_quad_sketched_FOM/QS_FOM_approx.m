@@ -1,4 +1,6 @@
 function [fA_b] = QS_FOM_approx(V, H, SV, SAV, Sb, m, tol)
+    %% returns the k-th Arnoldi matrix function approximation to the inverse square
+    %  root applied to the vector beta*V(:,1)
     % Input:
     %      V    - Arnoldi basis matrix (size Nx(maxIter+1))
     %      H    - Upper Hessenberg matrix from Arnoldi process (size maxIter x maxIter)

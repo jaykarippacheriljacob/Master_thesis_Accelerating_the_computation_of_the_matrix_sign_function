@@ -1,11 +1,12 @@
 function [Vm, Wm, D1] = compute_eigenvectors(A, m)
+    %% Computes 'm' left and right eigen vectors along with its eigenvalues 
     % Inputs:
-    %       A: The matrix for which eigenvalues and eigenvectors are computed.
-    %       m: The number of eigenvalues and eigenvectors to compute.
+    %       A  - The matrix for which eigenvalues and eigenvectors are computed.
+    %       m  - The number of eigenvalues and eigenvectors to compute.
     % Outputs:
-    %       Vm: Right eigenvectors of A.
-    %       Wm: Left eigenvectors of A.
-    %       D1: Eigenvalues corresponding to the right eigenvectors.
+    %       Vm - Right eigenvectors of A.
+    %       Wm - Left eigenvectors of A.
+    %       D1 - Eigenvalues corresponding to the right eigenvectors.
 
     % A = A / normest(A);
 

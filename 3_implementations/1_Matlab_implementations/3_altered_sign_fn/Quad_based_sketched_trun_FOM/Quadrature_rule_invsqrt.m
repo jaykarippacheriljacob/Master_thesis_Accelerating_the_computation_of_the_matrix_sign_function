@@ -1,4 +1,5 @@
 function [c, z, l, h] = Quadrature_rule_invsqrt(V, AV, v, tol)
+    %% Computes the quadrature rules ql1(S, A, Vm, b) and ql2(S, A, Vm, b) 
     % Input: 
     %      V - N x m, m arnoldi vectors
     %      AV - N x m,  Matrix

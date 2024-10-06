@@ -3,16 +3,17 @@ clc;
 close all;
 
 %% Select which methods to test
-do_lr_deflation = true;
+do_lr_deflation = false;
 do_left_precondi_poly_fom = false;
 do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = false;
-do_quad_based_sketched_trun_fom = true;
+do_quad_based_sketched_trun_fom = false;
+do_quad_based_Expl_restarted_arnoldi = false;
 
 do_combo_LR_def_LPoly_precond = false;
 do_combo_LR_def_RPoly_precond = false;
-do_combo_LR_def_quad_sketched_FOM = true;
-do_combo_LR_def_quad_sketched_trun_FOM = true;
+do_combo_LR_def_quad_sketched_FOM = false;
+do_combo_LR_def_quad_sketched_trun_FOM = false;
 
 %% Adding paths for accessing the functions
 addpath(fullfile(pwd, 'LR_deflation'));
@@ -20,6 +21,7 @@ addpath(fullfile(pwd, 'Left_polynomial_preconditioned_FOM'));
 addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
 addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
 addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
+addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
 
 addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
 addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
@@ -45,6 +47,15 @@ s = 500; % Sketch matrix row dimension
 
 trunc = 19; % Truncate orthogonalization to the last 'trunc' vector
 
+min_decay = 0.95; % Set Error minimum decay rate for convergence
+
+tol = 1e-8; % Set tolerance level
+
+max_iter = 50; % Maximum no.of restarts for the Arnoldi process
+
+%% Define the range of k values
+k_values = 20:10:150;
+
 %% Compute f(A)x directly using the sign function
 % exact_result = (A*(inv(sqrtm(full(A * A)))))*b;
 % Save the value to exact_result.mat file
@@ -53,15 +64,13 @@ trunc = 19; % Truncate orthogonalization to the last 'trunc' vector
 loadedData = load('exact_result.mat', 'exact_result');
 exact_result = loadedData.exact_result;  % Extract the value from the structure
 
-%% Define the range of k values
-k_values = 20:10:150;
-
 %% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
+rel_err_quad_based_Expl_restarted_arnoldi = zeros(length(k_values), 1);
 
 rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values), 1);
 rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values), 1);
@@ -69,6 +78,7 @@ rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values), 1);
 rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values), 1);
 
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
+%% LR_deflation
 if do_lr_deflation
     start = cputime;
 
@@ -84,6 +94,7 @@ if do_lr_deflation
     end
 end 
 
+%% left_precondi_poly_FOM
 if do_left_precondi_poly_fom
     start = cputime;
 
@@ -99,6 +110,7 @@ if do_left_precondi_poly_fom
     end
 end
 
+%% right_precondi_poly_FOM
 if do_right_precondi_poly_fom
     start = cputime;
 
@@ -114,6 +126,7 @@ if do_right_precondi_poly_fom
     end
 end
 
+%% Quadrature_based_sketched_FOM
 if do_quad_based_sketched_fom
     start = cputime;
 
@@ -129,6 +142,7 @@ if do_quad_based_sketched_fom
     end
 end
 
+%% Quadrature_based_sketched_trun_FOM
 if do_quad_based_sketched_trun_fom
     start = cputime;
 
@@ -144,10 +158,21 @@ if do_quad_based_sketched_trun_fom
     end
 end
 
+%% Quad_based_Expl_restarted_arnoldi
+if do_quad_based_Expl_restarted_arnoldi
+    start = cputime;
+    for i = 1:length(k_values)
+        [quadrature_approximation, ~, ~] = Quad_based_Expl_restarted_arnoldi(A, b, k_values(i), max_iter, tol, min_decay);
+        rel_err_quad_based_Expl_restarted_arnoldi(i) = norm(exact_result - quadrature_approximation) / norm(exact_result);
+    end
+    finish = cputime;
+    disp(['Time taken by Quadrature based Explicit restarted Arnoldi = ', num2str(finish - start), ' s']);
+end
+%% combo_LR_def_LPoly_precond
 if do_combo_LR_def_LPoly_precond
     start = cputime;
 
-    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    % Compute f(A)x using combo_LR_def_LPoly_precond
     fA_b = combo_LR_def_LPoly_precond(A, b, m, k_values, k1);
 
     finish = cputime;
@@ -159,10 +184,11 @@ if do_combo_LR_def_LPoly_precond
     end
 end
 
+%% combo_LR_def_RPoly_precond
 if do_combo_LR_def_RPoly_precond
     start = cputime;
 
-    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    % Compute f(A)x using combo_LR_def_RPoly_precond
     fA_b = combo_LR_def_RPoly_precond(A, b, m, k_values, k1);
 
     finish = cputime;
@@ -174,10 +200,11 @@ if do_combo_LR_def_RPoly_precond
     end
 end
 
+%% combo_LR_def_quad_sketched_FOM
 if do_combo_LR_def_quad_sketched_FOM
     start = cputime;
 
-    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    % Compute f(A)x using combo_LR_def_quad_sketched_FOM
     fA_b = combo_LR_def_quad_sketched_FOM(A, b, m, k_values, s);
 
     finish = cputime;
@@ -189,10 +216,11 @@ if do_combo_LR_def_quad_sketched_FOM
     end
 end
 
+%% combo_LR_def_quad_sketched_trun_FOM
 if do_combo_LR_def_quad_sketched_trun_FOM
     start = cputime;
 
-    % Compute f(A)x using Quadrature_based_sketched_trun_FOM
+    % Compute f(A)x using combo_LR_def_quad_sketched_trun_FOM
     fA_b = combo_LR_def_quad_sketched_trun_FOM(A, b, m, k_values, s, trunc);
 
     finish = cputime;
@@ -228,6 +256,11 @@ end
 
 if do_quad_based_sketched_trun_fom
     semilogy(k_values, rel_err_quad_based_sketched_trun_fom, 'k-o', 'DisplayName', 'Quadrature based sketched truncated FOM');
+    hold on;
+end
+
+if do_quad_based_Expl_restarted_arnoldi
+    semilogy(k_values, rel_err_quad_based_Expl_restarted_arnoldi, 'b-o', 'DisplayName', 'Quadrature based Explicit restarted Arnoldi');
     hold on;
 end
 

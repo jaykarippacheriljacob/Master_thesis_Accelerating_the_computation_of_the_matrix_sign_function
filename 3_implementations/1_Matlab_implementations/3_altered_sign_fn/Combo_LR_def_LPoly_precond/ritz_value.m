@@ -1,4 +1,5 @@
 function theta = ritz_value(A, m)
+    %% Returns the sorted ritz values in vector form
     % Input: 
     %      A - N x N matrix
     %      m - no. of iterations for the krylov's subspace

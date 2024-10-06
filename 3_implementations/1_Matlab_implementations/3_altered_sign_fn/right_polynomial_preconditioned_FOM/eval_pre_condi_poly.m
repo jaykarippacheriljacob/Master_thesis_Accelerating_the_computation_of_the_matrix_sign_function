@@ -1,5 +1,15 @@
 function p_A = eval_pre_condi_poly(A, b, theta, m)
-    
+    %% Function to evaluate the Polynomial preconditioning on the matrix A
+    % Input:
+    %      A     - n x n matrix
+    %      b     - n x 1 vector
+    %      theta - The sorted ritz values in vector form
+    %      m     - No. of iterations for the krylov's subspace to be used in
+    %              pre-conditioning polynomial Arnoldi
+    % Output:
+    %      p_A   - Evaluation of the Polynomial preconditioning on the matrix A
+
+    %% defining the initial parameters
     N = size(A, 1);
     p_A = zeros(N, 1); % Polynomial for preconditioning of matrix A
     I = eye(N); % Identity matrix of size N

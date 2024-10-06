@@ -1,15 +1,15 @@
 function fA_b = right_precondi_poly_FOM(A, b, k_values, k1)
-    % Input: 
-    %      p_A      - preconditioned polynomial based on Newton interpolation of
-    %                 divided differences.
-    %      A        - N x N matrix
-    %      b        - N x 1 vector
-    %      k_values - vector of increasing subspace dimensions. We return the deflated 
-    %                 left prec. Arnoldi matrix approximation for all values in k 
+    %% Right polynomial preconditioning approximation for f(A)b.
+    % Input:
+    %      A        - n x n matrix
+    %      b        - n x 1 vector
+    %      k_values - vector of increasing Krylov subspace dimensions. 
     %      k1       - No. of iterations for the krylov's subspace to be used in
     %                 pre-conditioning polynomial Arnoldi
     % Output: 
-    %      fA_b     - Approximation of f(A)b for k_values
+    %      fA_b     - Approximation of f(A)b for k_values. We return the 
+    %                 right prec. Arnoldi matrix approximation for all
+    %                 values in k_values dimensions.
 
     %% Step 1: Approximate the matrix function on x_ominus using the preconditioned arnoldi process
     %          for the various values in k
