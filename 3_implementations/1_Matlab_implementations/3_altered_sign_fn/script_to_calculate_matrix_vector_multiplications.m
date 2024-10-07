@@ -20,19 +20,22 @@ addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
 addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_FOM'));
 
+addpath(fullfile(pwd, 'Combo_LR_def_quad_expl_rest_arnoldi'));
+
 %% Select which methods to test
 do_lr_deflation = false;
 do_left_precondi_poly_fom = false;
 do_right_precondi_poly_fom = false;
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
-do_quad_based_Expl_restarted_arnoldi = false;
-do_quad_based_Impl_restarted_arnoldi = true;
+do_quad_based_Expl_restarted_arnoldi = true;
+do_quad_based_Impl_restarted_arnoldi = false;
 
 do_combo_LR_def_LPoly_precond = false;
 do_combo_LR_def_RPoly_precond = false;
 do_combo_LR_def_quad_sketched_FOM = false;
 do_combo_LR_def_quad_sketched_trun_FOM = false;
+do_combo_LR_def_quad_expl_rest_arnoldi = true;
 
 %% Select the matrix to be tested
 do_4x4_Herm = true;
@@ -58,7 +61,7 @@ k_values = 20:10:150;
 rng(2130); % setting random seed generator for reproducibility
 b = randn(N, 1); % Generate a random N x 1 vector
 
-m = 20; % Define the number of critical eigenvalues
+m = 50; % Define the number of critical eigenvalues
 
 k1 = 3; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
@@ -76,17 +79,23 @@ thick_number = 5; % Number of target eigenvalues for implicit deflation
 
 %% Initialize arrays to store relative errors
 rel_err_lr_deflation = zeros(length(k_values), 1);
+
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
+
 rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
+
 rel_err_quad_based_Expl_restarted_arnoldi = zeros(length(k_values), 1);
 rel_err_quad_based_Impl_restarted_arnoldi = zeros(length(k_values), 1);
 
 rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values), 1);
 rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values), 1);
+
 rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values), 1);
 rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values), 1);
+
+rel_err_combo_LR_def_quad_expl_rest_arnoldi = zeros(length(k_values), 1);
 
 %% Compute f(A)x directly using the sign function
 %% For the Lattice size 4^4, Hermitian matrix
@@ -266,6 +275,22 @@ if do_combo_LR_def_quad_sketched_trun_FOM
     end
 end
 
+%% combo_LR_def_quad_expl_rest_arnoldi
+if do_combo_LR_def_quad_expl_rest_arnoldi
+    start = cputime;
+
+    % Compute f(A)x using combo_LR_def_quad_expl_rest_arnoldi
+    fA_b = combo_LR_def_quad_expl_rest_arnoldi(A, b, m, k_values, max_iter, tol, min_decay);
+
+    finish = cputime;
+    disp(['Time taken by Combination of LR deflation and Quadrature based Explicit Restarted Arnoldi = ', num2str(finish - start), ' s']);
+    
+    % Loop over the range of k values
+    for i = 1:length(k_values)
+        rel_err_combo_LR_def_quad_expl_rest_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+    end
+end
+
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
@@ -320,6 +345,11 @@ end
 
 if do_combo_LR_def_quad_sketched_trun_FOM
     semilogy(k_values, rel_err_combo_LR_def_quad_sketched_trun_FOM, 'y-^', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched truncated FOM');
+    hold on;
+end
+
+if do_combo_LR_def_quad_expl_rest_arnoldi
+    semilogy(k_values, rel_err_combo_LR_def_quad_expl_rest_arnoldi, 'g-^', 'DisplayName', 'Combination of LR deflation and Quadrature based Explicit restarted Arnoldi');
     hold on;
 end
 hold off;
