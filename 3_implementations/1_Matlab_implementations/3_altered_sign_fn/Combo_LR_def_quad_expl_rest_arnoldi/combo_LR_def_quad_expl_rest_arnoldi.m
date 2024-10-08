@@ -27,7 +27,7 @@ function [Y] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, 
     % .' -> transpose
     x_ominus = compute_x_ominus(Rm, Lm, x);
 
-    %% Step 4: Construct an orthonormal basis for the Krylov subspace using the arnoldi process
+    %% Step 4: Compute f(A)x_ominus using the restarted arnoldi process for k_values krylov subspace dimensions.
     no_k = length(k_values);
     n = size(A,2);
     fA_x_ominus = zeros(n,no_k);

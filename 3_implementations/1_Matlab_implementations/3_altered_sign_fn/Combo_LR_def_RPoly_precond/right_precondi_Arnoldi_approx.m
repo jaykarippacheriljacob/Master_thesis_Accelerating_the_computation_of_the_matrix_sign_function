@@ -5,7 +5,7 @@ function fA_b = right_precondi_Arnoldi_approx(V,H,beta,k)
     %         V    - matrix of Arnoldi vectors, size is n x (m+1)
     %         H    - matrix of orthogonalization coefficients, size is (m+1) x m
     %         k    - number of approximation, k <= m
-    %         beta - see above
+    %         beta - norm of the vector p^(A)*A*b
     % Output: 
     %         fA_b - the Arnoldi approximation on the Krylov subspace of dimension k 
  

@@ -1,9 +1,14 @@
-function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_num, tol, min_decay)
+function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, c_norm, theta, m, m1, m2, max_iter, thick_num, tol, min_decay)
     %% Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
-    %      b         - N x 1 vector
+    %      v         - N x 1 vector
+    %      c_norm    - norm of the starting residual vector
+    %      theta     - The sorted ritz values in vector form
     %      m         - each restart cycle consists of m Arnoldi iterations
+    %      m1        - no of interpolaiton points for the prec. polynomial 
+    %                  which has degree m1-1
+    %      m2        - No. of times the preconditioned Arnoldi process has to be exceuted.
     %      max_iter  - Maximum no.of restart cycles
     %      thick_num - Number of target eigenvalues for implicit deflation
     %      tol       - Set tolerance for stopping criteria
@@ -17,16 +22,13 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
 
     ell = 0;    % thick restart param
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing the norm of v_{m+1})
-    f = zeros(size(b));
-    b = A * b;
-    b_norm = norm(b);
+    f = zeros(size(v));
     fm = [];
     l = 8; % initial number of quadrature points
 
     % allocate memory [ >= m+max(ell) ]
     alloc = m + 20;
-    V_big = zeros(length(b),alloc);
-    v = b / b_norm;
+    V_big = zeros(length(v),alloc);
 
     % restart loop starts here
     for k = 1:max_iter
@@ -67,9 +69,11 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
      
         %% Rewrite the arnoldi process.
         % compute/extend Krylov decomposition
-        % [ v,H,eta,breakdown, accuracy_flag ] = arnoldi( A,m+ell,H,ell+1,param );
-        [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
-        %%
+        if k <= m2
+            [v, H, V_big,eta] = left_precondi_Arnoldi_process(A, m1, m+ell, ell+1, V_big, H, theta);
+        else
+            [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
+        end
     
         thick_interpol{k} = eig(H);
      
@@ -109,7 +113,7 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
             [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, l);
         end
      
-        h_big = b_norm*h2(1:m+ell,1);
+        h_big = c_norm*h2(1:m+ell,1);
         if size(V_big,2) > length(h_big)
             h_big(size(V_big,2),1) = 0;
         end
@@ -129,7 +133,7 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
         %% Need to check if necessary or not.
         % s = eta;
         %%
-        err_new = b_norm * h_big;
+        err_new = c_norm * h_big;
         % if (norm_update(k-1) / norm(f)) < tol
         if k > 2
             if err_new / err_old > min_decay
