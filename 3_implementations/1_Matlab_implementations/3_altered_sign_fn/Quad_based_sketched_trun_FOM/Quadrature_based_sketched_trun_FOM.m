@@ -1,4 +1,4 @@
-function [fA_b] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, tol)
+function [fA_b, cost] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, tol)
     %% Quadrature based sketched truncated FOM approximation for f(A)b.
     % Input: 
     %      A        - N x N matrix
@@ -11,6 +11,7 @@ function [fA_b] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, t
     %      trunc    - Truncate orthogonalization to the last 'trunc' vector
     % Output: 
     %      fA_b     - Approximation of f(A)b for k_values
+    %      cost     - No.of matrix{A} vector multiplications
     
     addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
 
@@ -18,6 +19,7 @@ function [fA_b] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, t
     no_k = length(k_values);
     fA_b = zeros(n,no_k);
     kmax = max(k_values);
+    cost = zeros(no_k, 1);
 
     % Setting the tolerance of the quadrature rule if not provided.
     if nargin < 6
@@ -35,6 +37,7 @@ function [fA_b] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, t
 
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_b(:,l) = QS_trun_FOM_approx(V, H, SV, SAV, Sb, k_values(l), tol);
+        cost(l) = 1 + 2 * k_values(l);
     end 
     
 end

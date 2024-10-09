@@ -1,4 +1,4 @@
-function [fm_k, iter, f] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
+function [fm_k, iter, f, cost] = Quad_based_Exp_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
     %% Quadrature-based Explicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -11,6 +11,7 @@ function [fm_k, iter, f] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_iter, 
     %      fm_k      - f(A)b Approximation Upon Achieving Final Convergence
     %      iter      - No.of restarts completed undergone to converge
     %      f         - f(A)*b Approximation at each restart
+    %      cost      - No.of matrix{A} vector multiplications
 
     addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
 
@@ -78,4 +79,5 @@ function [fm_k, iter, f] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_iter, 
         end
     end
     iter = k;
+    cost = 1 + 2 * m * iter;
 end

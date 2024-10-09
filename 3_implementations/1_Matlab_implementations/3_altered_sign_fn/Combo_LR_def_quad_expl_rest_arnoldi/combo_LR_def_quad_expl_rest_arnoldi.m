@@ -1,4 +1,4 @@
-function [Y] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, tol, min_decay)
+function [Y, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, tol, min_decay)
     %% Combination of LR-deflation and Quadrture based Explicit restarted arnoldi approximation for f(A)b.
     % Input:
     %      A         - n x n matrix
@@ -12,7 +12,7 @@ function [Y] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, 
     %      Y         - Approximation of f(A)b for k_values. We return the deflated 
     %                  left prec. Arnoldi matrix approximation for all
     %                  values in k_values dimensions.
-
+    %      cost      - No.of matrix{A} vector multiplications
     
     addpath(fullfile(pwd, 'Combo_LR_def_quad_expl_rest_arnoldi'));
 
@@ -31,8 +31,10 @@ function [Y] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, 
     no_k = length(k_values);
     n = size(A,2);
     fA_x_ominus = zeros(n,no_k);
+    cost = zeros(no_k, 1);
+
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
-        [fA_x_ominus(:,l), ~, ~] = Quad_based_Expl_restarted_arnoldi(A, x_ominus, k_values(l), max_iter, tol, min_decay);
+        [fA_x_ominus(:,l), ~, ~,cost(l)] = Quad_based_Expl_restarted_arnoldi(A, x_ominus, k_values(l), max_iter, tol, min_decay);
     end
 
     %% Step 6: Compute the approximation to f(A)x

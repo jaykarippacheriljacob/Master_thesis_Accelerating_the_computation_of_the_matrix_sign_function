@@ -1,4 +1,4 @@
-function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_num, tol, min_decay)
+function [f, iter, fm, cost] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_num, tol, min_decay)
     %% Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -12,6 +12,7 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
     %      f         - f(A)b
     %      iter      - No.of restarts done
     %      fm        - The f(A)*b calculated between each restarts
+    %      cost      - No.of matrix{A} vector multiplications
 
     addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 
@@ -148,4 +149,5 @@ function [f, iter, fm] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, thick_nu
         end
     end
     iter = k;
+    cost = 1 + 2 * m * iter;
 end

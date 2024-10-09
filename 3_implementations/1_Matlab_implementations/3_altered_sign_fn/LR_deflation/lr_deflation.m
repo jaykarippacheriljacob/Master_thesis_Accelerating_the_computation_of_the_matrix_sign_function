@@ -1,4 +1,4 @@
-function [fA_b] = lr_deflation(A, x, m, k_values)
+function [fA_b, cost] = lr_deflation(A, x, m, k_values)
     % Input:
     %      A    - n x n matrix
     %      x    - n x 1 vector
@@ -6,6 +6,7 @@ function [fA_b] = lr_deflation(A, x, m, k_values)
     %      k    - no. of iterations for the krylov's subspace, m < n
     % Output: 
     %      fA_b - Approximation of f(A)b for k_values
+    %      cost - No.of matrix{A} vector multiplications
 
     addpath(fullfile(pwd, 'LR_deflation'));
     
@@ -28,6 +29,7 @@ function [fA_b] = lr_deflation(A, x, m, k_values)
     no_k = length(k_values);
     fA_x_ominus = zeros(n,no_k);
     kmax = max(k_values);
+    cost = zeros(no_k, 1);
 
     [H, V, beta] = Arnoldi_process(A, x_ominus, kmax);
 
@@ -38,6 +40,7 @@ function [fA_b] = lr_deflation(A, x, m, k_values)
     %% Step 5: Compute f(A)x_ominus
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_x_ominus(:,l) = Arnoldi_approx(V,H,beta,k_values(l));
+        cost(l) = k_values(l);
     end
     
     %% Step 6: Compute the approximation to f(A)x

@@ -1,4 +1,4 @@
-function [fA_b] = combo_LR_def_quad_sketched_FOM(A, x, m, k_values, s, tol)
+function [fA_b, cost] = combo_LR_def_quad_sketched_FOM(A, x, m, k_values, s, tol)
     %% Combination of LR-deflation and Quadrature based sketched FOM approximation for f(A)b.
     % Input:
     %      A        - n x n matrix
@@ -11,6 +11,7 @@ function [fA_b] = combo_LR_def_quad_sketched_FOM(A, x, m, k_values, s, tol)
     %                 rule
     % Output: 
     %      fA_b     - Approximation of f(A)b for k_values
+    %      cost     - No.of matrix{A} vector multiplications
 
     addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
     
@@ -33,6 +34,7 @@ function [fA_b] = combo_LR_def_quad_sketched_FOM(A, x, m, k_values, s, tol)
     no_k = length(k_values);
     fA_x_ominus = zeros(n,no_k);
     kmax = max(k_values);
+    cost = zeros(no_k, 1);
 
     % Setting the tolerance of the quadrature rule if not provided.
     if nargin < 6
@@ -47,6 +49,7 @@ function [fA_b] = combo_LR_def_quad_sketched_FOM(A, x, m, k_values, s, tol)
     %% Step 5: Compute f(A)x_ominus
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_x_ominus(:,l) = QS_FOM_approx(V, H, SV, SAV, Sb, k_values(l), tol);
+        cost(l) = 1 + 2 * k_values(l);
     end
     
     %% Step 6: Compute the approximation to f(A)x

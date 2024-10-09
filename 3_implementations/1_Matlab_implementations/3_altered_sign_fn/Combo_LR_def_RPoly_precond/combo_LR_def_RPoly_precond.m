@@ -1,4 +1,4 @@
-function [fA_b] = combo_LR_def_RPoly_precond(A, x, m, k_values, k1)
+function [fA_b, cost] = combo_LR_def_RPoly_precond(A, x, m, k_values, k1)
     %% Combination of LR-deflation and Left polynomial preconditioning approximation for f(A)b.
     % Input:
     %      A        - n x n matrix
@@ -11,6 +11,7 @@ function [fA_b] = combo_LR_def_RPoly_precond(A, x, m, k_values, k1)
     %      fA_b     - Approximation of f(A)b for k_values. We return the deflated 
     %                 right prec. Arnoldi matrix approximation for all
     %                 values in k_values dimensions.
+    %      cost     - No.of matrix{A} vector multiplications
 
     addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
     
@@ -33,12 +34,14 @@ function [fA_b] = combo_LR_def_RPoly_precond(A, x, m, k_values, k1)
     no_k = length(k_values);
     fA_x_ominus = zeros(n,no_k);
     kmax = max(k_values);
+    cost = zeros(no_k, 1);
 
     [V,H,beta] = right_precondi_Arnoldi_process(A, x_ominus, kmax, k1);
     
     %% Step 5: Compute f(A)x_ominus
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_x_ominus(:,l) = right_precondi_Arnoldi_approx(V,H,beta,k_values(l));
+        cost(l) = 2*k1 + (1+2*k_values(l)) + 2*k1*(1+2*k_values(l));
     end
     
     %% Step 6: Compute the approximation to f(A)x
