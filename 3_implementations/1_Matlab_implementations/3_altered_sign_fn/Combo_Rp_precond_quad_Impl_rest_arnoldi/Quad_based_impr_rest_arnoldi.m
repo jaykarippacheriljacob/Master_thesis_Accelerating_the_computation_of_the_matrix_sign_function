@@ -34,8 +34,6 @@ function [f, iter, fm] = Quad_based_impr_rest_arnoldi(A, v, V, H, eta, c_norm, t
         % compute A-invariant subspace of prev. cycle (thick restart)
         if k > 1
             ell_prev = ell;
-
-            %% Rewrite it to a function as shown in the funm_quad.m
             % reordered Schur form and eigenvalues such that the ell "wanted" ones occur first
             ell = thick_num;
             [~, jj] = sort(abs(real(D)), 1, 'ascend');
@@ -47,7 +45,6 @@ function [f, iter, fm] = Quad_based_impr_rest_arnoldi(A, v, V, H, eta, c_norm, t
             if(length(D) > ell && abs(conj(D(ell+1)) - D(ell)) < 100 * eps * abs(D(ell)))
                 ell = ell + 1;
             end
-            %%
      
             thick_replaced{k-1} = D(1:ell);
             thick_interpol{k-1} = D(ell+1:end);
@@ -59,8 +56,6 @@ function [f, iter, fm] = Quad_based_impr_rest_arnoldi(A, v, V, H, eta, c_norm, t
             else
                 H = [];
             end
-        % else
-        %     H = [];
         end
      
         if k > 1
@@ -100,8 +95,7 @@ function [f, iter, fm] = Quad_based_impr_rest_arnoldi(A, v, V, H, eta, c_norm, t
         for kk = 1:k-1
             active_nodes = [ active_nodes ; thick_interpol{kk} ];
         end
-    
-        %% Missing earlier
+
         if k>1
             active_nodes = [active_nodes; thick_replaced{k-1}];
         end
@@ -134,9 +128,7 @@ function [f, iter, fm] = Quad_based_impr_rest_arnoldi(A, v, V, H, eta, c_norm, t
         else
             subdiag = [ subdiag ; eta ];
         end
-        %% Need to check if necessary or not.
-        % s = eta;
-        %%
+        
         err_new = c_norm * h_big;
         % if (norm_update(k-1) / norm(f)) < tol
         if k > 2

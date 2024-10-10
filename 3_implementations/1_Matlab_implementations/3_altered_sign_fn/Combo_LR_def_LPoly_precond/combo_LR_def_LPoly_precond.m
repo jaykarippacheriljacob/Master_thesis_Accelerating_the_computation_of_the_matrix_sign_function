@@ -1,17 +1,17 @@
 function [fA_b, cost] = combo_LR_def_LPoly_precond(A, x, m, k_values, k1)
     %% Combination of LR-deflation and Left polynomial preconditioning approximation for f(A)b.
     % Input:
-    %      A        - n x n matrix
-    %      x        - n x 1 vector
+    %      A        - n x n matrix.
+    %      x        - n x 1 vector.
     %      m        - No. of critical values for which defation has to be undergone.
     %      k_values - vector of increasing Krylov subspace dimensions. 
     %      k1       - No. of iterations for the krylov's subspace to be used in
-    %                 pre-conditioning polynomial Arnoldi
+    %                 pre-conditioning polynomial Arnoldi.
     % Output: 
     %      fA_b     - Approximation of f(A)b for k_values. We return the deflated 
     %                 left prec. Arnoldi matrix approximation for all
     %                 values in k_values dimensions.
-    %      cost     - No.of matrix{A} vector multiplications
+    %      cost     - No.of matrix{A} vector multiplications.
 
     addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
     

@@ -1,17 +1,17 @@
 function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, theta, m, m1, m2, max_iter, thick_num, tol, min_decay)
     %% Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
-    %      A         - N x N matrix
-    %      v         - N x 1 vector
-    %      c_norm    - norm of the starting residual vector
-    %      theta     - The sorted ritz values in vector form
-    %      m         - each restart cycle consists of m Arnoldi iterations
+    %      A         - N x N matrix.
+    %      v         - N x 1 vector.
+    %      c_norm    - norm of the starting residual vector.
+    %      theta     - The sorted ritz values in vector form.
+    %      m         - each restart cycle consists of m Arnoldi iterations.
     %      m1        - no of interpolaiton points for the prec. polynomial 
-    %                  which has degree m1-1
+    %                  which has degree m1-1.
     %      m2        - No. of times the preconditioned Arnoldi process has to be exceuted.
-    %      max_iter  - Maximum no.of restart cycles
-    %      thick_num - Number of target eigenvalues for implicit deflation
-    %      tol       - Set tolerance for stopping criteria
+    %      max_iter  - Maximum no.of restart cycles.
+    %      thick_num - Number of target eigenvalues for implicit deflation.
+    %      tol       - Set tolerance for stopping criteria.
     %      min_decay - the decay rate of error after each iteration.
     % Output: 
     %      f         - f(A)b
@@ -35,7 +35,6 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
         if k > 1
             ell_prev = ell;
 
-            %% Rewrite it to a function as shown in the funm_quad.m
             % reordered Schur form and eigenvalues such that the ell "wanted" ones occur first
             ell = thick_num;
             [~, jj] = sort(abs(real(D)), 1, 'ascend');
@@ -47,7 +46,6 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             if(length(D) > ell && abs(conj(D(ell+1)) - D(ell)) < 100 * eps * abs(D(ell)))
                 ell = ell + 1;
             end
-            %%
      
             thick_replaced{k-1} = D(1:ell);
             thick_interpol{k-1} = D(ell+1:end);
@@ -59,8 +57,6 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             else
                 H = [];
             end
-        % else
-        %     H = [];
         end
      
         if k > 1
@@ -69,7 +65,6 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             V_big(:, 1:m+ell) = V;
         end
      
-        %% Rewrite the arnoldi process.
         % compute/extend Krylov decomposition
         if k > 1
             if k <= m2
@@ -101,11 +96,9 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             active_nodes = [ active_nodes ; thick_interpol{kk} ];
         end
     
-        %% Missing earlier
         if k>1
             active_nodes = [active_nodes; thick_replaced{k-1}];
         end
-        %%
      
         % approximate the restart function:
         if k == 1 % in the first iteration g_1 = f and we use the "closed" form
@@ -134,9 +127,7 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
         else
             subdiag = [ subdiag ; eta ];
         end
-        %% Need to check if necessary or not.
-        % s = eta;
-        %%
+        
         err_new = c_norm * h_big;
         % if (norm_update(k-1) / norm(f)) < tol
         if k > 2

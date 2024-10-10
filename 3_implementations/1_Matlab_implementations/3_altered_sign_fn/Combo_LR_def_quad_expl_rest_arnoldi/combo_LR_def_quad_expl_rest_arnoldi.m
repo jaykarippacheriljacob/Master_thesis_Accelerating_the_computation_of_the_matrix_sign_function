@@ -1,18 +1,18 @@
 function [Y, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, tol, min_decay)
     %% Combination of LR-deflation and Quadrture based Explicit restarted arnoldi approximation for f(A)b.
     % Input:
-    %      A         - n x n matrix
-    %      x         - n x 1 vector
+    %      A         - n x n matrix.
+    %      x         - n x 1 vector.
     %      m         - No. of critical values for which defation has to be undergone.
     %      k_values  - vector of increasing Krylov subspace dimensions.
-    %      max_iter  - Maximum no.of iterations for the restart of the Arnoldi decomposition
-    %      tol       - Set tolerance for stopping criteria
+    %      max_iter  - Maximum no.of iterations for the restart of the Arnoldi decomposition.
+    %      tol       - Set tolerance for stopping criteria.
     %      min_decay - the decay rate of error after each iteration.
     % Output:
     %      Y         - Approximation of f(A)b for k_values. We return the deflated 
     %                  left prec. Arnoldi matrix approximation for all
     %                  values in k_values dimensions.
-    %      cost      - No.of matrix{A} vector multiplications
+    %      cost      - No.of matrix{A} vector multiplications.
     
     addpath(fullfile(pwd, 'Combo_LR_def_quad_expl_rest_arnoldi'));
 

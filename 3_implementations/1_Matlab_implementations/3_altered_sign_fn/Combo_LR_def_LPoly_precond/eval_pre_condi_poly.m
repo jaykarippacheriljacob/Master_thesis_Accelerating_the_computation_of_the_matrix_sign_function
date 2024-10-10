@@ -1,13 +1,13 @@
 function p_A = eval_pre_condi_poly(A, b, theta, m)
     %% Function to evaluate the Polynomial preconditioning on the matrix A
     % Input:
-    %      A     - n x n matrix
-    %      b     - n x 1 vector
-    %      theta - The sorted ritz values in vector form
+    %      A     - n x n matrix.
+    %      b     - n x 1 vector.
+    %      theta - The sorted ritz values in vector form.
     %      m     - No. of iterations for the krylov's subspace to be used in
-    %              pre-conditioning polynomial Arnoldi
+    %              pre-conditioning polynomial Arnoldi.
     % Output:
-    %      p_A   - Evaluation of the Polynomial preconditioning on the matrix A
+    %      p_A   - Evaluation of the Polynomial preconditioning on the matrix A.
 
     %% defining the initial parameters
     N = size(A, 1);

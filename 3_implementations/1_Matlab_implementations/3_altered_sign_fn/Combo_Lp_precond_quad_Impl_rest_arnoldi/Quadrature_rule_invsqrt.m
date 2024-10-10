@@ -1,19 +1,21 @@
 function [h2, N2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, N1)
     %% Computes the quadrature rules ql1(A, Vm, b) and ql2(A, Vm, b) 
     % Input:
-    %      A              - N x N, matrix
-    %      active_nodes   - Interpolation nodes currently active in f
-    %      subdiag        - subdiagonal elements of Hessenberg matrix
-    %      thick_replaced - subspace of prev. cycle (thick restart)
-    %      H              - m x m, Hessenberg matrix
-    %      m              - no. of iterations for the kryl ov's subspace
+    %      A              - N x N, matrix.
+    %      active_nodes   - Interpolation nodes currently active in f.
+    %      subdiag        - subdiagonal elements of Hessenberg matrix.
+    %      thick_replaced - subspace of prev. cycle (thick restart).
+    %      H              - m x m, Hessenberg matrix.
+    %      m              - no. of iterations for the kryl ov's subspace.
     %      tol            - tolerance for the error computed to be.
-    %      ell            - thick restart parameter
-    %      k              - current iteration number of the restarted arnoldi
-    %      N1             - numbers of quadrature nodes
+    %      ell            - thick restart parameter.
+    %      k              - current iteration number of the restarted
+    %                       arnoldi.
+    %      N1             - numbers of quadrature nodes.
     % Output: 
-    %     h2              - coefficients calculated based on the quadrature rule
-    %     N2              - numbers of quadrature nodes
+    %     h2              - coefficients calculated based on the quadrature
+    %                       rule.
+    %     N2              - numbers of quadrature nodes.
     
     % For f(z) = 1/sqrt(z), using Gauss-Jacobi quadrature
     % This implementation is for non - implicit non-Hermitian matrices.

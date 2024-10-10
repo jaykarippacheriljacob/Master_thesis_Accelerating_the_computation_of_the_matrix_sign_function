@@ -1,28 +1,28 @@
 function [fA_b, cost] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, m1, m2, max_iter, thick_num, tol, min_decay)
-    % Quadrature-based restarted Arnoldi approximation for f(A)b.
+    % Combination of Left polynomial preconditioning and Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
-    %      A         - N x N matrix
-    %      b         - N x 1 vector
-    %      k_values  - each restart cycle consists of m Arnoldi iterations
-    %      m1        - no of interpolaiton points for the prec. polynomial 
-    %                  which has degree m1-1
+    %      A         - N x N matrix.
+    %      b         - N x 1 vector.
+    %      k_values  - vector of increasing Krylov subspace dimensions.
+    %      m1        - no of interpolation points for the prec. polynomial 
+    %                  which has degree m1-1.
     %      m2        - No. of times the preconditioned Arnoldi process has to be exceuted.
-    %      max_iter  - Maximum no.of restart cycles
-    %      thick_num - Number of target eigenvalues for implicit deflation
-    %      tol       - Set tolerance for stopping criteria
+    %      max_iter  - Maximum no.of restart cycles.
+    %      thick_num - Number of target eigenvalues for implicit deflation.
+    %      tol       - Set tolerance for stopping criteria.
     %      min_decay - the decay rate of error after each iteration.
     % Output: 
     %      fA_b      - Approximation of f(A)b for k_values. We return the 
-    %                  left prec. Restarted Implicit Arnoldi matrix approximation for all
-    %                  values in k_values dimensions.
-    %      cost      - No.of matrix{A} vector multiplications
+    %                  left prec. Restarted Implicit Arnoldi matrix 
+    %                  approximation for all values in k_values dimensions.
+    %      cost      - No.of matrix{A} vector multiplications.
     
     addpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
 
     %% Defining initial parameters
     b = A * b;
 
-    %% Step 1: determine interpolation nodes for the polynomials
+    %% Step 1: determine the interpolation nodes for the polynomials
     theta = ritz_value(A, m1);
     
     %% Step 2: Generate basis Vm of Km(A, b)

@@ -1,10 +1,10 @@
 function theta = ritz_value(A, m)
     %% Returns the sorted ritz values in vector form
     % Input: 
-    %      A     - N x N matrix
-    %      m     - no. of iterations for the krylov's subspace
+    %      A     - N x N matrix.
+    %      m     - Dimension of the krylov's subspace.
     % Output: 
-    %      theta - The sorted ritz values in vector form
+    %      theta - The sorted ritz values in vector form.
     
     rng(2130); % setting random seed generator for reproducibility
     %% Arnoldi process to obtain ritz values
@@ -13,9 +13,6 @@ function theta = ritz_value(A, m)
     V = zeros(N, m+1); % m+1 arnoldi vectors
     
     % Generate basis Vm of Km(A, b)
-    %% Correction 1
-    % beta = norm(b);
-    % V(:, 1) = b / beta;
     r0 = randn(N, 1);
     beta = norm(r0);
     V(:, 1) = r0 / beta;
@@ -44,7 +41,5 @@ function theta = ritz_value(A, m)
     verify_Arnoldi_4_sqr(A, V, H);
     
     %% implementation of Ritz value based Newton iteration for A^{-1/2}
-    %% Correction 2
-    % theta = sort(eig(H(1:m,1:m))); % Ritz values <- eigen values of the Hessenberg matrix Hm.
     theta = leja_sort(eig(H(1:m,1:m)));
 end

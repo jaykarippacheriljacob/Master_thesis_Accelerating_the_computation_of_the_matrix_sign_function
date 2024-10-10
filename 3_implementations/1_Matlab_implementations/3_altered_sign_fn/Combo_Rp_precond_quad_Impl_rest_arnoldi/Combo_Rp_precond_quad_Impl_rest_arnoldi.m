@@ -1,21 +1,21 @@
 function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, m1, m2, max_iter, thick_num, tol, min_decay)
-    % Quadrature-based restarted Arnoldi approximation for f(A)b.
+    %% Combination of Right proynomial preconditioning and Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
     %      b         - N x 1 vector
-    %      k_values  - each restart cycle consists of m Arnoldi iterations
+    %      k_values  - vector in increasing order of Krylov subspace dimensions.
     %      m1        - no of interpolaiton points for the prec. polynomial 
-    %                  which has degree m1-1
+    %                  which has degree m1-1.
     %      m2        - No. of times the preconditioned Arnoldi process has to be exceuted.
-    %      max_iter  - Maximum no.of restart cycles
-    %      thick_num - Number of target eigenvalues for implicit deflation
-    %      tol       - Set tolerance for stopping criteria
+    %      max_iter  - Maximum no.of restart cycles.
+    %      thick_num - Number of target eigenvalues for implicit deflation.
+    %      tol       - Set tolerance for stopping criteria.
     %      min_decay - the decay rate of error after each iteration.
     % Output: 
     %      fA_b      - Approximation of f(A)b for k_values. We return the 
     %                  lright prec. Restarted Implicit Arnoldi matrix approximation for all
     %                  values in k_values dimensions.
-    %      cost      - No.of matrix{A} vector multiplications
+    %      cost      - No.of matrix{A} vector multiplications.
     
     addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 
@@ -47,15 +47,15 @@ function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
         [fA_b(:,l), iter, ~] = Quad_based_impr_rest_arnoldi(A, v, V(:, 1:k_values(l)), H(1:k_values(l), 1:k_values(l)), eta, c_norm, theta, k_values(l), m1, m2, max_iter, thick_num, tol, min_decay);
         temp_m2 = m2 - 1;
         cost(l) = 1 + 2*(m1-1) + 2*(m1-1) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
-        disp([num2str(cost(l)), ', ', num2str(1)]);
+        % disp([num2str(cost(l)), ', ', num2str(1)]);
         for i = 2:iter
             if temp_m2 ~= 0
                 cost(l) = cost(l) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
                 temp_m2 = temp_m2 - 1;
-                disp([num2str(cost(l)), ', ', num2str(i)]);
+                % disp([num2str(cost(l)), ', ', num2str(i)]);
             else
                 cost(l) = cost(l) + 2*k_values(l);
-                disp([num2str(cost(l)), ', ', num2str(i)]);
+                % disp([num2str(cost(l)), ', ', num2str(i)]);
             end
         end
     end

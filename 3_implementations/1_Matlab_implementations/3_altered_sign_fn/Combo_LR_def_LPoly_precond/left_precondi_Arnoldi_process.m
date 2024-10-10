@@ -4,18 +4,18 @@ function [V ,H, beta] = left_precondi_Arnoldi_process(A, b, m, m1)
     % Input: 
     %      p_A - preconditioned polynomial based on Newton interpolation of
     %            divided differences.
-    %      A - N x N matrix
-    %      b - N x 1 vector
-    %      m - dimension of the (preconditioned) krylov subspace
+    %      A - N x N matrix.
+    %      b - N x 1 vector.
+    %      m - dimension of the (preconditioned) krylov subspace.
     %      m1 - no of interpolaiton points for the prec. polynomial 
-    %           which has degree m1-1 
+    %           which has degree m1-1 .
     % Output: 
     %      V - matrix with m+1 columns holding the Arnoldi vectors for the
-    %      Krylov subspace with matrix A^2p^2(A^2) and vector p^(A)*A*b
-    %      H - magtrix of orth. coefficients
-    %      beta: norm of the vector p^(A)*A*b
+    %      Krylov subspace with matrix A^2p^2(A^2) and vector p^(A)*A*b.
+    %      H - magtrix of orth. coefficients.
+    %      beta: norm of the vector p^(A)*A*b.
 
-    % Initializing variables
+    %% Initializing variables
     N = size(A, 1);
     V = zeros(N, m+1); % m+1 arnoldi vectors 
     H = zeros(N, m+1);
