@@ -29,6 +29,6 @@ function [fA_b, cost] = left_precondi_poly_FOM(A, b, k_values, k1)
     
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_b(:,l) = left_precondi_Arnoldi_approx(V,H,beta,k_values(l));
-        cost(l) = 2*k1 + (1+2*k_values(l)) + 2*k1*(1+2*k_values(l));
+        cost(l) = 2*k1 + 1 + 2*(k1-1) + k_values(l)*(2 + 2*(k1-2) + 2*(k1-1));
     end
 end

@@ -47,8 +47,8 @@ do_combo_LR_def_quad_sketched_trun_FOM = false;
 
 do_combo_LR_def_quad_expl_rest_arnoldi = false;
 
-do_combo_Lp_precond_quad_Impl_rest_arnoldi = true;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
 
 %% Select the matrix to be tested
 do_4x4_Herm = false;
@@ -106,7 +106,7 @@ k_values = 20:10:150;
 
 m = 50; % Define the number of critical eigenvalues
 
-k1 = 3; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
+k1 = 5; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
 s = 500; % Sketch matrix row dimension
 
@@ -114,7 +114,7 @@ trunc = 19; % Truncate orthogonalization to the last 'trunc' vector
 
 min_decay = 0.95; % Set Error minimum decay rate for convergence
 
-tol = 1e-8; % Set tolerance level
+tol = 1e-10; % Set tolerance level
 
 max_iter = 50; % Maximum no.of restarts for the Arnoldi process
 
@@ -371,8 +371,8 @@ if do_combo_Lp_precond_quad_Impl_rest_arnoldi
     start = cputime;
 
     % Compute f(A)x using combo_Lp_precond_quad_Impl_rest_arnoldi
-    % [fA_b, mvms_combo_Lp_precond_quad_Impl_rest_arnoldi] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, thick_number, tol, min_decay);
-    [fA_b] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, thick_number, tol, min_decay);
+    [fA_b, mvms_combo_Lp_precond_quad_Impl_rest_arnoldi] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, thick_number, tol, min_decay);
+    % [fA_b] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, thick_number, tol, min_decay);
     finish = cputime;
     disp(['Time taken by Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
     
@@ -401,72 +401,73 @@ end
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
-    semilogy(mvms_lr_deflation, rel_err_lr_deflation, 'r-o', 'DisplayName', 'LR Deflation');
+    semilogy(mvms_lr_deflation, rel_err_lr_deflation, 'c-o', 'DisplayName', 'LR Deflation');
     hold on;
 end
 
 if do_left_precondi_poly_fom
-    semilogy(mvms_left_precondi_poly_fom, rel_err_left_precondi_poly_fom, 'b-o', 'DisplayName', 'Left preconditioned FOM');
+    semilogy(mvms_left_precondi_poly_fom, rel_err_left_precondi_poly_fom, 'r-o', 'DisplayName', 'Left preconditioned FOM');
     hold on;
 end
 
 if do_right_precondi_poly_fom
-    semilogy(mvms_right_precondi_poly_fom, rel_err_right_precondi_poly_fom, 'g-^', 'DisplayName', 'Right preconditioned FOM');
+    semilogy(mvms_right_precondi_poly_fom, rel_err_right_precondi_poly_fom, 'b-o', 'DisplayName', 'Right preconditioned FOM');
     hold on;
 end
 
 if do_quad_based_sketched_fom
-    semilogy(mvms_quad_based_sketched_fom, rel_err_quad_based_sketched_fom, 'k-^', 'DisplayName', 'Quadrature based sketched FOM');
+    semilogy(mvms_quad_based_sketched_fom, rel_err_quad_based_sketched_fom, '-o', 'DisplayName', 'Quadrature based sketched FOM', 'Color', [0.5, 0, 0.5]);
     hold on;
 end
 
 if do_quad_based_sketched_trun_fom
-    semilogy(mvms_quad_based_sketched_trun_fom, rel_err_quad_based_sketched_trun_fom, 'k-o', 'DisplayName', 'Quadrature based sketched truncated FOM');
+    semilogy(mvms_quad_based_sketched_trun_fom, rel_err_quad_based_sketched_trun_fom, '-o', 'DisplayName', 'Quadrature based sketched truncated FOM');
     hold on;
 end
 
 if do_quad_based_Expl_restarted_arnoldi
-    semilogy(mvms_quad_based_Expl_restarted_arnoldi, rel_err_quad_based_Expl_restarted_arnoldi, 'b-o', 'DisplayName', 'Quadrature based Explicit restarted Arnoldi');
+    semilogy(mvms_quad_based_Expl_restarted_arnoldi, rel_err_quad_based_Expl_restarted_arnoldi, 'k-o', 'DisplayName', 'Quadrature based Explicit restarted Arnoldi');
     hold on;
 end
 
 if do_quad_based_Impl_restarted_arnoldi
-    semilogy(mvms_quad_based_Impl_restarted_arnoldi, rel_err_quad_based_Impl_restarted_arnoldi, 'r-^', 'DisplayName', 'Quadrature based Implicit restarted Arnoldi');
+    semilogy(mvms_quad_based_Impl_restarted_arnoldi, rel_err_quad_based_Impl_restarted_arnoldi, '-o', 'DisplayName', 'Quadrature based Implicit restarted Arnoldi', 'Color', [1, 0.5, 0]);
     hold on;
 end
 
 if do_combo_LR_def_LPoly_precond
-    semilogy(mvms_combo_LR_def_LPoly_precond, rel_err_combo_LR_def_LPoly_precond, 'r-o', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
+    semilogy(mvms_combo_LR_def_LPoly_precond, rel_err_combo_LR_def_LPoly_precond, 'r-*', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
     hold on;
 end
 
 if do_combo_LR_def_RPoly_precond
-    semilogy(mvms_combo_LR_def_RPoly_precond, rel_err_combo_LR_def_RPoly_precond, 'r-^', 'DisplayName', 'Combination of LR deflation and Right preconditioned FOM');
+    semilogy(mvms_combo_LR_def_RPoly_precond, rel_err_combo_LR_def_RPoly_precond, 'b-*', 'DisplayName', 'Combination of LR deflation and Right preconditioned FOM');
     hold on;
 end
 
 if do_combo_LR_def_quad_sketched_FOM
-    semilogy(mvms_combo_LR_def_quad_sketched_FOM, rel_err_combo_LR_def_quad_sketched_FOM, 'y-o', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched FOM');
+    semilogy(mvms_combo_LR_def_quad_sketched_FOM, rel_err_combo_LR_def_quad_sketched_FOM, '-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched FOM', 'Color', [0.5, 0, 0,5]);
     hold on;
 end
 
 if do_combo_LR_def_quad_sketched_trun_FOM
-    semilogy(mvms_combo_LR_def_quad_sketched_trun_FOM, rel_err_combo_LR_def_quad_sketched_trun_FOM, 'y-^', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched truncated FOM');
+    semilogy(mvms_combo_LR_def_quad_sketched_trun_FOM, rel_err_combo_LR_def_quad_sketched_trun_FOM, 'm-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched truncated FOM');
     hold on;
 end
 
 if do_combo_LR_def_quad_expl_rest_arnoldi
-    semilogy(mvms_combo_LR_def_quad_expl_rest_arnoldi, rel_err_combo_LR_def_quad_expl_rest_arnoldi, 'g-^', 'DisplayName', 'Combination of LR deflation and Quadrature based Explicit restarted Arnoldi');
+    semilogy(mvms_combo_LR_def_quad_expl_rest_arnoldi, rel_err_combo_LR_def_quad_expl_rest_arnoldi, 'k-*', 'DisplayName', 'Combination of LR deflation and Quadrature based Explicit restarted Arnoldi');
     hold on;
 end
 
 if do_combo_Lp_precond_quad_Impl_rest_arnoldi
-    semilogy(mvms_combo_Lp_precond_quad_Impl_rest_arnoldi, rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi, 'g-^', 'DisplayName', 'Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi');
+    semilogy(mvms_combo_Lp_precond_quad_Impl_rest_arnoldi, rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi, '-*', 'DisplayName', 'Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi', 'Color', [1, 0.5, 0]);
+    % semilogy(k_values, rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi, 'g-^', 'DisplayName', 'Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi');
     hold on;
 end
 
 if do_combo_Rp_precond_quad_Impl_rest_arnoldi
-    semilogy(mvms_combo_Rp_precond_quad_Impl_rest_arnoldi, rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi, 'g-^', 'DisplayName', 'Combination of Right polynomial preconditioning and Quadrature based Implicit restarted Arnoldi');
+    semilogy(mvms_combo_Rp_precond_quad_Impl_rest_arnoldi, rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi, '-*', 'DisplayName', 'Combination of Right polynomial preconditioning and Quadrature based Implicit restarted Arnoldi', 'Color', [0.6, 0.4, 0.2]);
     hold on;
 end
 hold off;

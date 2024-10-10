@@ -41,7 +41,7 @@ function [fA_b, cost] = combo_LR_def_LPoly_precond(A, x, m, k_values, k1)
     %% Step 5: Compute f(A)x_ominus
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         fA_x_ominus(:,l) = left_precondi_Arnoldi_approx(V,H,beta,k_values(l));
-        cost(l) = 2*k1 + (1+2*k_values(l)) + 2*k1*(1+2*k_values(l));
+        cost(l) = 2*k1 + 1 + 2*(k1-1) + k_values(l)*(2 + 2*(k1-2) + 2*(k1-1));
     end
     
     %% Step 6: Compute the approximation to f(A)x

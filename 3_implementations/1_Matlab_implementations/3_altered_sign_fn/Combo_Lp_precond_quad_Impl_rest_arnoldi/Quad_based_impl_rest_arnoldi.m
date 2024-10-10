@@ -1,4 +1,4 @@
-function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, c_norm, theta, m, m1, m2, max_iter, thick_num, tol, min_decay)
+function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, theta, m, m1, m2, max_iter, thick_num, tol, min_decay)
     %% Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -17,8 +17,6 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, c_norm, theta, m, m1
     %      f         - f(A)b
     %      iter      - No.of restarts done
     %      fm        - The f(A)*b calculated between each restarts
-
-    addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 
     ell = 0;    % thick restart param
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing the norm of v_{m+1})
@@ -61,18 +59,24 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, c_norm, theta, m, m1
             else
                 H = [];
             end
-        else
-            H = [];
+        % else
+        %     H = [];
         end
      
-        V_big(:,ell+1) = v;
+        if k > 1
+            V_big(:,ell+1) = v;
+        else
+            V_big(:, 1:m+ell) = V;
+        end
      
         %% Rewrite the arnoldi process.
         % compute/extend Krylov decomposition
-        if k <= m2
-            [v, H, V_big,eta] = left_precondi_Arnoldi_process(A, m1, m+ell, ell+1, V_big, H, theta);
-        else
-            [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
+        if k > 1
+            if k <= m2
+                [v, H, V_big,eta] = left_precondi_Arnoldi_process(A, m1, m+ell, ell+1, V_big, H, theta);
+            else
+                [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
+            end
         end
     
         thick_interpol{k} = eig(H);
