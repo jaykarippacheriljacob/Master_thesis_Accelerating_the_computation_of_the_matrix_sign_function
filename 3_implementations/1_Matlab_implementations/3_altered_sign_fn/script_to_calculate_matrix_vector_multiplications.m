@@ -10,7 +10,6 @@ addpath(fullfile(pwd, 'LR_deflation'));
 addpath(fullfile(pwd, 'Left_polynomial_preconditioned_FOM'));
 addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
 
-addpath(fullfile(pwd, 'Quad_based_sketched_FOM'));
 addpath(fullfile(pwd, 'Quad_based_sketched_trun_FOM'));
 
 addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
@@ -20,7 +19,6 @@ addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
 % addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond_Copy'));
 addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 
-addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
 addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_FOM'));
 
 addpath(fullfile(pwd, 'Combo_LR_def_quad_expl_rest_arnoldi'));
@@ -43,10 +41,9 @@ do_quad_based_Impl_restarted_arnoldi = false;
 do_combo_LR_def_LPoly_precond = false;
 do_combo_LR_def_RPoly_precond = false;
 
-do_combo_LR_def_quad_sketched_FOM = false;
-do_combo_LR_def_quad_sketched_trun_FOM = true;
+do_combo_LR_def_quad_sketched_trun_FOM = false;
 
-do_combo_LR_def_quad_expl_rest_arnoldi = false;
+do_combo_LR_def_quad_expl_rest_arnoldi = true;
 
 do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
 do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
@@ -130,7 +127,6 @@ rel_err_lr_deflation = zeros(length(k_values), 1);
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
 
-rel_err_quad_based_sketched_fom = zeros(length(k_values), 1);
 rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
 
 rel_err_quad_based_Expl_restarted_arnoldi = zeros(length(k_values), 1);
@@ -139,7 +135,6 @@ rel_err_quad_based_Impl_restarted_arnoldi = zeros(length(k_values), 1);
 rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values) * length(m), 1);
 rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values) * length(m), 1);
 
-rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values) * length(m), 1);
 rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values) * length(m), 1);
 
 rel_err_combo_LR_def_quad_expl_rest_arnoldi = zeros(length(k_values) * length(m), 1);
@@ -232,22 +227,6 @@ if do_right_precondi_poly_fom
     end
 end
 
-%% Quadrature_based_sketched_FOM
-if do_quad_based_sketched_fom
-    start = cputime;
-
-    % Compute f(A)x using Quadrature_based_sketched_FOM
-    [fA_b, mvms_quad_based_sketched_fom] = Quadrature_based_sketched_FOM(A, b, k_values, s);
-
-    finish = cputime;
-    disp(['Time taken by Quadrature based sketched FOM = ', num2str(finish - start), ' s']);
-    
-    % Loop over the range of k values
-    for i = 1:length(k_values)
-        rel_err_quad_based_sketched_fom (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
-    end
-end
-
 %% Quadrature_based_sketched_trun_FOM
 if do_quad_based_sketched_trun_fom
     start = cputime;
@@ -320,22 +299,6 @@ if do_combo_LR_def_RPoly_precond
     end
 end
 
-%% combo_LR_def_quad_sketched_FOM
-if do_combo_LR_def_quad_sketched_FOM
-    start = cputime;
-
-    % Compute f(A)x using combo_LR_def_quad_sketched_FOM
-    [fA_b, mvms_combo_LR_def_quad_sketched_FOM] = combo_LR_def_quad_sketched_FOM(A, b, m, k_values, s);
-
-    finish = cputime;
-    disp(['Time taken by Combination of LR deflation and Quadrature based sketched FOM = ', num2str(finish - start), ' s']);
-    
-    % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
-        rel_err_combo_LR_def_quad_sketched_FOM(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
-    end
-end
-
 %% combo_LR_def_quad_sketched_trun_FOM
 if do_combo_LR_def_quad_sketched_trun_FOM
     start = cputime;
@@ -403,8 +366,15 @@ end
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
-    semilogy(mvms_lr_deflation, rel_err_lr_deflation, 'c-o', 'DisplayName', 'LR Deflation');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('LR Deflation (m = %d)', m(i));
+
+        semilogy(mvms_lr_deflation(j:j+length(k_values)-1), rel_err_lr_deflation(j:j+length(k_values)-1), 'c-o', 'DisplayName', display_name);
+        hold on;
+        j = j+length(k_values);
+    end
 end
 
 if do_left_precondi_poly_fom
@@ -414,11 +384,6 @@ end
 
 if do_right_precondi_poly_fom
     semilogy(mvms_right_precondi_poly_fom, rel_err_right_precondi_poly_fom, 'b-o', 'DisplayName', 'Right preconditioned FOM');
-    hold on;
-end
-
-if do_quad_based_sketched_fom
-    semilogy(mvms_quad_based_sketched_fom, rel_err_quad_based_sketched_fom, '-o', 'DisplayName', 'Quadrature based sketched FOM', 'Color', [0.5, 0, 0.5]);
     hold on;
 end
 
@@ -438,29 +403,73 @@ if do_quad_based_Impl_restarted_arnoldi
 end
 
 if do_combo_LR_def_LPoly_precond
-    semilogy(mvms_combo_LR_def_LPoly_precond, rel_err_combo_LR_def_LPoly_precond, 'r-*', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('Combination of LR deflation and Left preconditioned FOM (m = %d)', m(i));
+        
+        % Plot using the dynamic display name
+        semilogy(mvms_combo_LR_def_LPoly_precond(j:j+length(k_values)-1), ...
+                 rel_err_combo_LR_def_LPoly_precond(j:j+length(k_values)-1), ...
+                 'r-*', 'DisplayName', display_name);
+        hold on;
+        
+        % Update index j for the next segment of data
+        j = j + length(k_values);
+    end
 end
 
 if do_combo_LR_def_RPoly_precond
-    semilogy(mvms_combo_LR_def_RPoly_precond, rel_err_combo_LR_def_RPoly_precond, 'b-*', 'DisplayName', 'Combination of LR deflation and Right preconditioned FOM');
-    hold on;
-end
-
-if do_combo_LR_def_quad_sketched_FOM
-    semilogy(mvms_combo_LR_def_quad_sketched_FOM, rel_err_combo_LR_def_quad_sketched_FOM, '-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched FOM', 'Color', [0.5, 0, 0.5]);
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('Combination of LR deflation and Right preconditioned FOM (m = %d)', m(i));
+        
+        % Plot using the dynamic display name
+        semilogy(mvms_combo_LR_def_RPoly_precond(j:j+length(k_values)-1), ...
+                 rel_err_combo_LR_def_RPoly_precond(j:j+length(k_values)-1), ...
+                 'b-*', 'DisplayName', display_name);
+        hold on;
+        
+        % Update index j for the next segment of data
+        j = j + length(k_values);
+    end
 end
 
 if do_combo_LR_def_quad_sketched_trun_FOM
-    semilogy(mvms_combo_LR_def_quad_sketched_trun_FOM, rel_err_combo_LR_def_quad_sketched_trun_FOM, 'm-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched truncated FOM');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('Combination of LR deflation and Quadrature based sketched truncated FOM (m = %d)', m(i));
+        
+        % Plot using the dynamic display name and magenta color
+        semilogy(mvms_combo_LR_def_quad_sketched_trun_FOM(j:j+length(k_values)-1), ...
+                 rel_err_combo_LR_def_quad_sketched_trun_FOM(j:j+length(k_values)-1), ...
+                 'm-*', 'DisplayName', display_name);
+        hold on;
+        
+        % Update index j for the next segment of data
+        j = j + length(k_values);
+    end
 end
 
 if do_combo_LR_def_quad_expl_rest_arnoldi
-    semilogy(mvms_combo_LR_def_quad_expl_rest_arnoldi, rel_err_combo_LR_def_quad_expl_rest_arnoldi, 'k-*', 'DisplayName', 'Combination of LR deflation and Quadrature based Explicit restarted Arnoldi');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('Combination of LR deflation and Quadrature based Explicit restarted Arnoldi (m = %d)', m(i));
+        
+        % Plot using the dynamic display name and black color
+        semilogy(mvms_combo_LR_def_quad_expl_rest_arnoldi(j:j+length(k_values)-1), ...
+                 rel_err_combo_LR_def_quad_expl_rest_arnoldi(j:j+length(k_values)-1), ...
+                 'k-*', 'DisplayName', display_name);
+        hold on;
+        
+        % Update index j for the next segment of data
+        j = j + length(k_values);
+    end
 end
+
 
 if do_combo_Lp_precond_quad_Impl_rest_arnoldi
     semilogy(mvms_combo_Lp_precond_quad_Impl_rest_arnoldi, rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi, '-*', 'DisplayName', 'Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi', 'Color', [1, 0.5, 0]);
