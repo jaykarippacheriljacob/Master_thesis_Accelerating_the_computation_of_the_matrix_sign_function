@@ -1,4 +1,4 @@
-function [V ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
+function [Y ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
     %% Computes the Right preconditioned Krylov subspace basis vectors and its
     %  corresponding hessenberg matrix for a given dimension of subspace.
     % Input: 
@@ -18,6 +18,7 @@ function [V ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
     % Initializing variables
     N = size(A, 1);
     V = zeros(N, m+1); % m+1 arnoldi vectors 
+    Y = zeros(N, m+1);
     H = zeros(N, m+1);
     
     %% determine interpolation nodes for the polynomials
@@ -25,7 +26,8 @@ function [V ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
 
     %% right polynomially preconditioned Arnoldi process for A^2    
     % Generate basis Vm of Km(A, b)
-    c = eval_pre_condi_poly(A, A*b, theta, m1);
+    % c = eval_pre_condi_poly(A, A*b, theta, m1);
+    c = A*b;
     beta = norm(c);
     V(:, 1) = c / beta;
     
@@ -47,6 +49,8 @@ function [V ,H, beta] = right_precondi_Arnoldi_process(A, b, m, m1)
         % Store the new basis vector
         H(j+1,j) = norm(w);
         V(:, j+1) = w / H(j+1, j);
+        Y(:, j) = y;
     end
+    % Y(:, end) = eval_pre_condi_poly(A, V(:, end), theta, m1);
     
 end

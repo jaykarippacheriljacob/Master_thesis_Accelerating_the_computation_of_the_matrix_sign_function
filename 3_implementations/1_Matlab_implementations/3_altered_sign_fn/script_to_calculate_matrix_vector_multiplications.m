@@ -29,8 +29,8 @@ addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 %% Select which methods to test
 do_lr_deflation = false;
 
-do_left_precondi_poly_fom = false;
-do_right_precondi_poly_fom = false;
+do_left_precondi_poly_fom = true;
+do_right_precondi_poly_fom = true;
 
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
@@ -43,10 +43,10 @@ do_combo_LR_def_RPoly_precond = false;
 
 do_combo_LR_def_quad_sketched_trun_FOM = false;
 
-do_combo_LR_def_quad_expl_rest_arnoldi = true;
+do_combo_LR_def_quad_expl_rest_arnoldi = false;
 
 do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
 
 %% Select the matrix to be tested
 do_4x4_Herm = false;
