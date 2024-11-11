@@ -41,10 +41,10 @@ do_quad_based_Expl_restarted_arnoldi = false;
 do_quad_based_Impl_restarted_arnoldi = false;
 
 do_combo_LR_def_LPoly_precond = false;
-do_combo_LR_def_RPoly_precond = true;
+do_combo_LR_def_RPoly_precond = false;
 
 do_combo_LR_def_quad_sketched_FOM = false;
-do_combo_LR_def_quad_sketched_trun_FOM = false;
+do_combo_LR_def_quad_sketched_trun_FOM = true;
 
 do_combo_LR_def_quad_expl_rest_arnoldi = false;
 
@@ -448,7 +448,7 @@ if do_combo_LR_def_RPoly_precond
 end
 
 if do_combo_LR_def_quad_sketched_FOM
-    semilogy(mvms_combo_LR_def_quad_sketched_FOM, rel_err_combo_LR_def_quad_sketched_FOM, '-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched FOM', 'Color', [0.5, 0, 0,5]);
+    semilogy(mvms_combo_LR_def_quad_sketched_FOM, rel_err_combo_LR_def_quad_sketched_FOM, '-*', 'DisplayName', 'Combination of LR deflation and Quadrature based sketched FOM', 'Color', [0.5, 0, 0.5]);
     hold on;
 end
 
