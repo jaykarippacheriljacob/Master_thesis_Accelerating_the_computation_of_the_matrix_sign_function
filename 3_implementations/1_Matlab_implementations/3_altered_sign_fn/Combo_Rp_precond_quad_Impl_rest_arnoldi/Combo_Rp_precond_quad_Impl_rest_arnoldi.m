@@ -26,7 +26,8 @@ function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
     theta = ritz_value(A, m1);
     
     %% Step 2: Generate basis Vm of Km(A, b)
-    c = eval_pre_condi_poly(A, b, theta, m1);
+    % c = eval_pre_condi_poly(A, b, theta, m1);
+    c = b;
     c_norm = norm(c);
     v = c / c_norm;
 

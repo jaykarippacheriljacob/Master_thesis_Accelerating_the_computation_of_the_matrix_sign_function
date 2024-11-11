@@ -12,14 +12,17 @@ function [w, H, V_big, h] = right_precondi_Arnoldi_process(A, m1, m, s, V_big, H
     %             Krylov subspace with matrix A^2p^2(A^2) and vector p^(A)*A*b
     %      H    - matrix of orth. coefficients
     %      beta - norm of the vector p^(A)*A*b
+    
 
+    Y = zeros(size(V_big, 1), m-s);
     %% right polynomially preconditioned Arnoldi process for A^2
     for j = s:m
         % Apply A^2*p^2(A^2) to the last basis vector v = V(:,j)
         y = eval_pre_condi_poly(A, V_big(:, j), theta, m1);  %p(A^2)*v
         u = eval_pre_condi_poly(A, y, theta, m1);        %p^2(A^2)*v 
         w = A * (A * u);                                 % A^2*p^2(A^2)*v
-    
+        Y(:, j-s+1) = y;
+
         % Arnoldi process: Orthogonalization
         for i = 1:j
             % Compute the coefficient for orthogonalization
@@ -39,6 +42,8 @@ function [w, H, V_big, h] = right_precondi_Arnoldi_process(A, m1, m, s, V_big, H
         end
 
     end
+    Y(:, end) = eval_pre_condi_poly(A, V_big(:, j), theta, m1);
+    V_big(:, s:m) = Y;
     h = H(m+1, m);
     H = H(1:m, 1:m);
 end
