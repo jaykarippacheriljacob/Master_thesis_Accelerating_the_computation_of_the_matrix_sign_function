@@ -48,8 +48,8 @@ do_combo_LR_def_quad_sketched_trun_FOM = false;
 
 do_combo_LR_def_quad_expl_rest_arnoldi = false;
 
-do_combo_Lp_precond_quad_Impl_rest_arnoldi = true;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
+do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
 
 %% Select the matrix to be tested
 do_4x4_Herm = false;
@@ -105,8 +105,8 @@ k_values = 20:10:150;
 
 %% Define test parameters
 
-% m = [0, 2, 4, 8, 16, 32, 64]; % Define the number of critical eigenvalues
-m = 10;
+m = [0, 2, 4, 8, 16, 32, 64]; % Define the number of critical eigenvalues
+% m = 10;
 
 k1 = 5; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
