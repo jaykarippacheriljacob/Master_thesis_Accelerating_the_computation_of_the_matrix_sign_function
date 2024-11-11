@@ -13,7 +13,7 @@ function p_A = eval_pre_condi_poly(A, b, theta, m)
     %% defining the initial parameters
     N = size(A, 1);
     p_A = zeros(N, 1); % Polynomial for preconditioning of matrix A
-    I = eye(N); % Identity matrix of size N
+    I = speye(N); % Identity matrix of size N
     f = @(t) t.^(-1/2); % Define the function
     dd = zeros(m, m); % Initialize the divided difference table
     

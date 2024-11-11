@@ -1,9 +1,9 @@
-function [Y, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_iter, tol, min_decay)
+function [Y, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m_values, k_values, max_iter, tol, min_decay)
     %% Combination of LR-deflation and Quadrture based Explicit restarted arnoldi approximation for f(A)b.
     % Input:
     %      A         - n x n matrix.
     %      x         - n x 1 vector.
-    %      m         - No. of critical values for which defation has to be undergone.
+    %      m_values - vector of increasing no. of critical values for which defation has to be undergone.
     %      k_values  - vector of increasing Krylov subspace dimensions.
     %      max_iter  - Maximum no.of iterations for the restart of the Arnoldi decomposition.
     %      tol       - Set tolerance for stopping criteria.
@@ -15,6 +15,16 @@ function [Y, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m, k_values, max_
     %      cost      - No.of matrix{A} vector multiplications.
     
     addpath(fullfile(pwd, 'Combo_LR_def_quad_expl_rest_arnoldi'));
+
+    %% Initializing variables
+    no_k = length(k_values);
+    no_m = length(m_values);
+    n = size(A,2);
+    fA_x_ominus = zeros(n,no_k);
+    kmax = max(k_values);
+    cost = zeros(no_k*no_m, 1);
+    fA_b = zeros(n, no_k*no_m);
+    j = 1;
 
     %% Step 1: Compute left and right eigenvectors
     [Rm, Lm, Dm] = compute_eigenvectors(A, m);

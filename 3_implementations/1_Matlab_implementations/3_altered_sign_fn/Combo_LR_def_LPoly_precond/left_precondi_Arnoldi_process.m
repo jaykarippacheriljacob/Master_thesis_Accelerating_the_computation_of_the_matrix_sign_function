@@ -38,7 +38,7 @@ function [V ,H, beta] = left_precondi_Arnoldi_process(A, b, m, m1)
         % Arnoldi process: Orthogonalization
         for i = 1:j
             % Compute the coefficient for orthogonalization
-            H(i, j) = V(:, i)' * w;
+            H(i, j) = V(:, i)' * w; 
     
             % Subtract the projection of v onto the already computed basis vectors
             w = w - H(i, j) * V(:, i);

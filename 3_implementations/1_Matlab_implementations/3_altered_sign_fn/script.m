@@ -1,6 +1,6 @@
-clear;
-clc;
-close all;
+% clear;
+% clc;
+% close all;
 
 %% Adding paths for accessing the functions
 
@@ -17,7 +17,6 @@ addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
 addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 
 addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
-% addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond_Copy'));
 addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 
 addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_FOM'));
@@ -40,16 +39,16 @@ do_quad_based_sketched_trun_fom = false;
 do_quad_based_Expl_restarted_arnoldi = false;
 do_quad_based_Impl_restarted_arnoldi = false;
 
-do_combo_LR_def_LPoly_precond = false;
-do_combo_LR_def_RPoly_precond = true;
+do_combo_LR_def_LPoly_precond = true;
+do_combo_LR_def_RPoly_precond = false;
 
 do_combo_LR_def_quad_sketched_FOM = false;
 do_combo_LR_def_quad_sketched_trun_FOM = false;
 
 do_combo_LR_def_quad_expl_rest_arnoldi = false;
 
-do_combo_Lp_precond_quad_Impl_rest_arnoldi = true;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
+do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
 
 %% Select the matrix to be tested
 do_4x4_Herm = false;
@@ -65,6 +64,19 @@ rng(2130); % setting random seed generator for reproducibility
 if do_4x4_Herm
     A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
     N = size(A, 2); % Size of the matrix
+
+    figure;
+    d = eig(full(A^2)); % Compute the eigen values of the generated matrix
+    plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+
+    % Use eigs to find the smallest eigenvalue
+    smallest_eigenvalue = eigs(A, 1, 'smallestreal');
+    shift = (1 - 90/100)*smallest_eigenvalue;
+    A = A - shift*eye(N);
+    figure;
+    d = eig(full(A^2)); % Compute the eigen values of the generated matrix
+    plot(real(d), imag(d), '*'); % plot the real vs imaginary part of the eigen values
+
     gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
     Gamma5 = kron(speye(N/12),gamma5hat);
     A = Gamma5*A;
@@ -105,8 +117,7 @@ k_values = 20:10:150;
 
 %% Define test parameters
 
-% m = [0, 2, 4, 8, 16, 32, 64]; % Define the number of critical eigenvalues
-m = 10;
+m = 0:50:200; % Define the number of critical eigenvalues
 
 k1 = 5; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
@@ -125,7 +136,7 @@ thick_number = 5; % Number of target eigenvalues for implicit deflation
 k2 = 1; % No. of times the preconditioned Arnoldi process has to be exceuted.
 
 %% Initialize arrays to store relative errors
-rel_err_lr_deflation = zeros(length(k_values), 1);
+rel_err_lr_deflation = zeros(length(k_values)*length(m), 1);
 
 rel_err_left_precondi_poly_fom = zeros(length(k_values), 1);
 rel_err_right_precondi_poly_fom = zeros(length(k_values), 1);
@@ -136,13 +147,13 @@ rel_err_quad_based_sketched_trun_fom = zeros(length(k_values), 1);
 rel_err_quad_based_Expl_restarted_arnoldi = zeros(length(k_values), 1);
 rel_err_quad_based_Impl_restarted_arnoldi = zeros(length(k_values), 1);
 
-rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values) * length(m), 1);
-rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values) * length(m), 1);
+rel_err_combo_LR_def_LPoly_precond = zeros(length(k_values)*length(m), 1);
+rel_err_combo_LR_def_RPoly_precond = zeros(length(k_values), 1);
 
-rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values) * length(m), 1);
-rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values) * length(m), 1);
+rel_err_combo_LR_def_quad_sketched_FOM = zeros(length(k_values), 1);
+rel_err_combo_LR_def_quad_sketched_trun_FOM = zeros(length(k_values), 1);
 
-rel_err_combo_LR_def_quad_expl_rest_arnoldi = zeros(length(k_values) * length(m), 1);
+rel_err_combo_LR_def_quad_expl_rest_arnoldi = zeros(length(k_values), 1);
 
 rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi = zeros(length(k_values), 1);
 rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi = zeros(length(k_values), 1);
@@ -195,7 +206,7 @@ if do_lr_deflation
     disp(['Time taken by lr deflation = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:(length(k_values)*length(m))
         rel_err_lr_deflation(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end 
@@ -297,9 +308,9 @@ if do_combo_LR_def_LPoly_precond
 
     finish = cputime;
     disp(['Time taken by Combination of LR deflation and Left preconditioned FOM = ', num2str(finish - start), ' s']);
-    exact_result = fA_b(:, end);
+    
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:(length(k_values)*length(m))
         rel_err_combo_LR_def_LPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
@@ -315,7 +326,7 @@ if do_combo_LR_def_RPoly_precond
     disp(['Time taken by Combination of LR deflation and Right preconditioned FOM = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:length(k_values)
         rel_err_combo_LR_def_RPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
@@ -331,7 +342,7 @@ if do_combo_LR_def_quad_sketched_FOM
     disp(['Time taken by Combination of LR deflation and Quadrature based sketched FOM = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:length(k_values)
         rel_err_combo_LR_def_quad_sketched_FOM(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
@@ -347,7 +358,7 @@ if do_combo_LR_def_quad_sketched_trun_FOM
     disp(['Time taken by Combination of LR deflation and Quadrature based sketched truncated FOM = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:length(k_values)
         rel_err_combo_LR_def_quad_sketched_trun_FOM (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
@@ -363,7 +374,7 @@ if do_combo_LR_def_quad_expl_rest_arnoldi
     disp(['Time taken by Combination of LR deflation and Quadrature based Explicit Restarted Arnoldi = ', num2str(finish - start), ' s']);
     
     % Loop over the range of k values
-    for i = 1:length(k_values) * length(m)
+    for i = 1:length(k_values)
         rel_err_combo_LR_def_quad_expl_rest_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
 end
@@ -403,8 +414,15 @@ end
 %% Plotting the relative errors wrt the no.of matrix mvms
 figure;
 if do_lr_deflation
-    semilogy(mvms_lr_deflation, rel_err_lr_deflation, 'c-o', 'DisplayName', 'LR Deflation');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('LR Deflation (m = %d)', m(i));
+
+        semilogy(mvms_lr_deflation(j:j+length(k_values)-1), rel_err_lr_deflation(j:j+length(k_values)-1), 'c-o', 'DisplayName', display_name);
+        hold on;
+        j = j+length(k_values);
+    end
 end
 
 if do_left_precondi_poly_fom
@@ -438,8 +456,15 @@ if do_quad_based_Impl_restarted_arnoldi
 end
 
 if do_combo_LR_def_LPoly_precond
-    semilogy(mvms_combo_LR_def_LPoly_precond, rel_err_combo_LR_def_LPoly_precond, 'r-*', 'DisplayName', 'Combination of LR deflation and Left preconditioned FOM');
-    hold on;
+    j = 1;
+    for i = 1:length(m)
+        % Create a dynamic display name that includes the value of m(i)
+        display_name = sprintf('Combination of LR deflation and Left preconditioned FOM (m = %d)', m(i));
+        
+        semilogy(mvms_combo_LR_def_LPoly_precond(j:j+length(k_values)-1), rel_err_combo_LR_def_LPoly_precond(j:j+length(k_values)-1), 'r-*', 'DisplayName', display_name);
+        hold on;
+        j = j+length(k_values);
+    end
 end
 
 if do_combo_LR_def_RPoly_precond
