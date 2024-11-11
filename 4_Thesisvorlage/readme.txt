@@ -1,9 +1,3 @@
-** Version 2023-08-21
-** LaTeX-Vorlage für Abschlussarbeiten
-** Erstellt von Nils Potthoff, ab 2020 erneuert und ausgebaut von Simon Lohmann
-** Lehrstuhl Automatisierungstechnik/Informatik Bergische Universität Wuppertal
-********************************************************************************
-
 Die mitgelieferte PDF-Datei "Thesisbeispiel-FAQ-Tipps.pdf" beinhaltet im Anhang
 - LaTeX-Beispiele mit Erklärung
 - ein FAQ zu häufigen Problemen und Lösungen
