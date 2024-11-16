@@ -108,6 +108,7 @@ function [f, iter, fm, cost] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, th
             %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
             %         l2
             [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, l);
+            fprintf('numbers of quadrature nodes = %d\n', l);
         end
      
         h_big = b_norm*h2(1:m+ell,1);

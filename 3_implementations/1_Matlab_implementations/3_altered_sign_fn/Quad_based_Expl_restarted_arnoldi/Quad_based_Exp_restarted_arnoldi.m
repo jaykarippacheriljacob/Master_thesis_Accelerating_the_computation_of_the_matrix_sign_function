@@ -49,6 +49,7 @@ function [fm_k, iter, f, cost] = Quad_based_Exp_restarted_arnoldi(A, b, m, max_i
         subdiag = [subdiag; diag(H(1:m, 1:m), -1); H(m+1, m)];
         [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H(1:m, 1:m), tol, l);
         active_nodes = [active_nodes; sort(eig(H(1:m, 1:m)))];
+        fprintf('numbers of quadrature nodes = %d\n', l);
 
         %% Step 6: Compute fm_k = fm_k-1 + norm(b) * Vm_k * hm_k
         h_new = b_norm * h2;

@@ -29,28 +29,28 @@ addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 %% Select which methods to test
 do_lr_deflation = false;
 
-do_left_precondi_poly_fom = true;
-do_right_precondi_poly_fom = true;
+do_left_precondi_poly_fom = false;
+do_right_precondi_poly_fom = false;
 
 do_quad_based_sketched_fom = false;
 do_quad_based_sketched_trun_fom = false;
 
-do_quad_based_Expl_restarted_arnoldi = false;
-do_quad_based_Impl_restarted_arnoldi = false;
+do_quad_based_Expl_restarted_arnoldi = true;
+do_quad_based_Impl_restarted_arnoldi = true;
 
 do_combo_LR_def_LPoly_precond = false;
 do_combo_LR_def_RPoly_precond = false;
 
 do_combo_LR_def_quad_sketched_trun_FOM = false;
 
-do_combo_LR_def_quad_expl_rest_arnoldi = false;
+do_combo_LR_def_quad_expl_rest_arnoldi = true;
 
-do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
+do_combo_Lp_precond_quad_Impl_rest_arnoldi = true;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
 
 %% Select the matrix to be tested
-do_4x4_Herm = false;
-do_4x4_Non_Herm = true;
+do_4x4_Herm = true;
+do_4x4_Non_Herm = false;
 do_8x4_Non_Herm = false;
 do_16x4_Non_Herm = false;
 
@@ -62,6 +62,12 @@ rng(2130); % setting random seed generator for reproducibility
 if do_4x4_Herm
     A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
     N = size(A, 2); % Size of the matrix
+
+    % Use eigs to find the smallest eigenvalue
+    smallest_eigenvalue = eigs(A, 1, 'smallestreal');
+    shift = 0.99 * real(smallest_eigenvalue);
+    A = A - shift*speye(N);
+
     gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
     Gamma5 = kron(speye(N/12),gamma5hat);
     A = Gamma5*A;
@@ -71,6 +77,12 @@ if do_4x4_Herm
 elseif do_4x4_Non_Herm
     A = read_matrix('periodic_L4_b3.55_k0.137n0_1.mat'); % Read the input matrix from a file.
     N = size(A, 2); % Size of the matrix
+
+    % Use eigs to find the smallest eigenvalue
+    smallest_eigenvalue = eigs(A, 1, 'smallestreal');
+    shift = 0.99 * real(smallest_eigenvalue);
+    A = A - shift*speye(N);
+
     gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
     Gamma5 = kron(speye(N/12),gamma5hat);
     A = Gamma5*A;
@@ -99,13 +111,14 @@ end
 
 %% Define the range of k values
 k_values = 20:10:150;
+% k_values = 50;
 
 %% Define test parameters
 
 m = [0, 2, 4, 8, 16, 32, 64]; % Define the number of critical eigenvalues
-% m = 10;
+% m = 8;
 
-k1 = 5; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
+k1 = 8; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
 s = 500; % Sketch matrix row dimension
 
@@ -117,7 +130,7 @@ tol = 1e-10; % Set tolerance level
 
 max_iter = 50; % Maximum no.of restarts for the Arnoldi process
 
-thick_number = 5; % Number of target eigenvalues for implicit deflation
+thick_number = 8; % Number of target eigenvalues for implicit deflation
 
 k2 = 1; % No. of times the preconditioned Arnoldi process has to be exceuted.
 

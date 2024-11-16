@@ -7,7 +7,7 @@ gamma5hat = [speye(6), zeros(6,6); zeros(6,6), -speye(6)];
 Gamma5 = kron(speye(N/12),gamma5hat);
 A = Gamma5*A;
 
-m = 128; %no.of critical eigenvalues
+m = 1000; %no.of critical eigenvalues
 
 % Setting up of the gmres solver
 tol = 1e-6;
@@ -24,12 +24,14 @@ precond1 = @(x) eval_precon_poly_inv(A, x, theta1, m1);
 Afun1 = @(x) gmres(A, x, [], tol, maxit, precond1);
 % Afun = @(x) gmres(A, x, [], tol, maxit);
 
-[Vm, D1] = eigs(Afun1, N, m, 'smallestabs');
+[~, D1] = eigs(Afun1, N, m, 'smallestabs');
 
 % End the timing
 finish = cputime;
 disp(['Computation time: ', num2str(finish - start), ' seconds']);
 
+% Save eigenvalues and eigenvectors to file
+% save('eigen_values.mat', 'D1');
 %% Start the timing
 start = cputime;
 theta2 = ritz_value(A', m1);
@@ -97,6 +99,3 @@ save('eigen_results.mat', 'Vm', 'Wm', 'D');
 % disp('Eigenvalues:');
 % disp(diag(D1));
 % disp(['Computation time: ', num2str(finish - start), ' seconds']);
-
-% Save eigenvalues and eigenvectors to file
-save('eigen_results.mat', 'Vm', 'Wm', 'D');

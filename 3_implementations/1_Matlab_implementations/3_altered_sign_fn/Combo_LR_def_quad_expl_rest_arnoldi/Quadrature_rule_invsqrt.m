@@ -15,7 +15,7 @@ function [h2, N2] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H, tol, N1
     % This implementation is for non - implicit non-Hermitian matrices.
     
     %% Step 1: Set l_ := 8 and l := round(sqrt(2)*l_)
-    % N1 = 8;
+    N1 = 8;
     N2 = floor(sqrt(2) * N1);
     m = size(H, 2);
 
