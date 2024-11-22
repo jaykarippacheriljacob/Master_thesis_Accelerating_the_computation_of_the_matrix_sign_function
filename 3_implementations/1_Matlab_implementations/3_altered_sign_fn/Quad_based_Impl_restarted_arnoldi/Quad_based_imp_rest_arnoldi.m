@@ -69,7 +69,7 @@ function [f, iter, fm, cost] = Quad_based_imp_rest_arnoldi(A, b, m, max_iter, th
         %% Rewrite the arnoldi process.
         % compute/extend Krylov decomposition
         % [ v,H,eta,breakdown, accuracy_flag ] = arnoldi( A,m+ell,H,ell+1,param );
-        [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
+        [v, H, V_big,eta] = Arnoldi_proces(A, m+ell, ell+1, V_big, H);
         %%
     
         thick_interpol{k} = eig(H);

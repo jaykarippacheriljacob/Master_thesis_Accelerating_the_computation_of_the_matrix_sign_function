@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.28)  17 NOV 2024 09:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.28)  17 NOV 2024 10:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1948,28 +1948,52 @@ _the_matrix_sign_function/4_Thesisvorlage/Medien/Aufgabenstellung.pdf>]
 
 
 ]
+(C:/Users/jkjbt/Documents/GitHub/Master_thesis_Accelerating_the_computation_of_
+the_matrix_sign_function/4_Thesisvorlage\Kapitel/Kurzfassung.tex
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input l
+ine 7.
+)
 
-! LaTeX Error: File `Kapitel/Kurzfassung.tex' not found.
+[7]
+No file Thesis.toc.
+\tf@toc=\write6
+\openout6 = `Thesis.toc'.
 
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: tex)
 
-Enter file name: X
 
+[8
+
+
+]
+
+[9
+
+
+]
+
+[10
+
+])
+(C:/Users/jkjbt/Documents/GitHub/Master_thesis_Accelerating_the_computation_of_
+the_matrix_sign_function/4_Thesisvorlage\Chapter/1_Introduction.tex
+Chapter 1.
+! Undefined control sequence.
+l.5 Consider a matrix $\mathbf{A} \in \mathbb
+                                             {C}^{n \times n}$, a vector $\m...
+
+? 
 ! Emergency stop.
-<read *> 
-         
-l.174 	\input{Kapitel/Kurzfassung}
-                                  
-*** (cannot \read from terminal in nonstop modes)
+l.5 
+    
+End of file on the terminal!
 
  
 Here is how much of TeX's memory you used:
- 54419 strings out of 473938
- 1102555 string characters out of 5727391
- 2039067 words of memory out of 5000000
- 76451 multiletter control sequences out of 15000+600000
- 598472 words of font info for 82 fonts, out of 8000000 for 9000
+ 54610 strings out of 473938
+ 1107082 string characters out of 5727391
+ 2045067 words of memory out of 5000000
+ 76586 multiletter control sequences out of 15000+600000
+ 614504 words of font info for 103 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
- 114i,17n,110p,7316b,2473s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 114i,17n,110p,7316b,2813s stack positions out of 10000i,1000n,20000p,200000b,200000s
 !  ==> Fatal error occurred, no output PDF file produced!

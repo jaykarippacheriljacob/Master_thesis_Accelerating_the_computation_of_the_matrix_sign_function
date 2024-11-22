@@ -1,4 +1,4 @@
-function [fA_b, cost] = Quadrature_based_sketched_trun_FOM(A, b, k_values, s, trunc, tol)
+function [fA_b, cost] = Quadrature_based_sketched_trun_arnoldi(A, b, k_values, s, trunc, tol)
     %% Quadrature based sketched truncated FOM approximation for f(A)b.
     % Input: 
     %      A        - N x N matrix

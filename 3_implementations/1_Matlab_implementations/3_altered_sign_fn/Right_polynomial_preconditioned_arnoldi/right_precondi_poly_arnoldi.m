@@ -1,5 +1,5 @@
-function [fA_b, cost] = left_precondi_poly_FOM(A, b, k_values, k1)
-    %% Left polynomial preconditioning approximation for f(A)b.
+function [fA_b, cost] = right_precondi_poly_arnoldi(A, b, k_values, k1)
+    %% Right polynomial preconditioning approximation for f(A)b.
     % Input:
     %      A        - n x n matrix
     %      b        - n x 1 vector
@@ -8,7 +8,7 @@ function [fA_b, cost] = left_precondi_poly_FOM(A, b, k_values, k1)
     %                 pre-conditioning polynomial Arnoldi
     % Output: 
     %      fA_b     - Approximation of f(A)b for k_values. We return the 
-    %                 left prec. Arnoldi matrix approximation for all
+    %                 right prec. Arnoldi matrix approximation for all
     %                 values in k_values dimensions.
     %      cost     - No.of matrix{A} vector multiplications
 
@@ -17,7 +17,7 @@ function [fA_b, cost] = left_precondi_poly_FOM(A, b, k_values, k1)
     %          We do the Arnoldi process only once and then extract the Arnoldi approximations 
     %          for the different dimensions in k_values
 
-    addpath(fullfile(pwd, 'Left_polynomial_preconditioned_FOM'));
+    addpath(fullfile(pwd, 'Right_polynomial_preconditioned_FOM'));
 
     n = size(A,2);
     no_k = length(k_values);
@@ -25,10 +25,10 @@ function [fA_b, cost] = left_precondi_poly_FOM(A, b, k_values, k1)
     kmax = max(k_values);
     cost = zeros(no_k, 1);
 
-    [V,H,beta] = left_precondi_Arnoldi_process(A, b, kmax, k1);
+    [V,H,beta] = right_precondi_Arnoldi_process(A, b, kmax, k1);
     
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
-        fA_b(:,l) = left_precondi_Arnoldi_approx(V,H,beta,k_values(l));
+        fA_b(:,l) = right_precondi_Arnoldi_approx(V,H,beta,k_values(l));
         cost(l) = 2*k1 + 1 + 2*(k1-1) + k_values(l)*(2 + 2*(k1-2) + 2*(k1-1));
     end
 end

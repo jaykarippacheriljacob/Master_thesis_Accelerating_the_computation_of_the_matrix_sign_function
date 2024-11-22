@@ -1,4 +1,4 @@
-function [fA_b, cost] = combo_LR_def_quad_sketched_trun_FOM(A, x, m_values, k_values, s, trunc, tol)
+function [fA_b, cost] = combo_LR_def_quad_sketched_trun_arnoldi(A, x, m_values, k_values, s, trunc, tol)
     %% Combination of LR-deflation and Quadrature based sketched truncated FOM approximation for f(A)b.
     % Input:
     %      A        - n x n matrix

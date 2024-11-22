@@ -1,4 +1,4 @@
-function [H, V, beta, SV, SAV, Sb] = QS_trun_FOM_process(A, b, m, s, trunc)
+function [H, V, beta, SV, SAV, Sb] = QS_trun_arnoldi_process(A, b, m, s, trunc)
     %% Computes the Sketched Krylov subspace basis vectors and its
     %  corresponding hessenberg matrix for a given dimension of subspace.
     % Input: 

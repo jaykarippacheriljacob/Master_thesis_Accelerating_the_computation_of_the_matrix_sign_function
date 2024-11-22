@@ -1,4 +1,4 @@
-function [fm_k, iter, f, cost] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
+function [fm_k, iter, f, cost] = Quad_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
     %% Quadrature-based Explicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -13,12 +13,15 @@ function [fm_k, iter, f, cost] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_
     %      f         - f(A)*b Approximation at each restart
     %      cost      - No.of matrix{A} vector multiplications
 
+    addpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
+
     %% defining the initial parameters.
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing
                   % the norm of v_{m+1})
     f = [];
     active_nodes = []; % Interpolation nodes (Ritz values) from each
                        % restart cycle
+    quad_nodes = [];
     b = A*b;
 
     %% Step 1: Compute arnoldi decomposition wrt A and b.
@@ -45,9 +48,10 @@ function [fm_k, iter, f, cost] = Quad_based_Expl_restarted_arnoldi(A, b, m, max_
         %         and compute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
         %         l2
         subdiag = [subdiag; diag(H(1:m, 1:m), -1); H(m+1, m)];
-        [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H(1:m, 1:m), tol, l);
+        [h2, l] = Quadra_rule_invsqrt(A, active_nodes, subdiag, H(1:m, 1:m), tol, l);
         active_nodes = [active_nodes; sort(eig(H(1:m, 1:m)))];
         fprintf('numbers of quadrature nodes = %d\n', l);
+        quad_nodes(k-1) = l; 
 
         %% Step 6: Compute fm_k = fm_k-1 + norm(b) * Vm_k * hm_k
         h_new = b_norm * h2;

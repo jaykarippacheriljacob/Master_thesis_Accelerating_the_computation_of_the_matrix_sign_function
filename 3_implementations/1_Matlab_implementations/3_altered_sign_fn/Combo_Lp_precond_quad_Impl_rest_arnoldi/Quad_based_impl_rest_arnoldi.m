@@ -70,7 +70,7 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             if k <= m2
                 [v, H, V_big,eta] = left_precondi_Arnoldi_process(A, m1, m+ell, ell+1, V_big, H, theta);
             else
-                [v, H, V_big,eta] = Arnoldi_process(A, m+ell, ell+1, V_big, H);
+                [v, H, V_big,eta] = Arnoldi_proces(A, m+ell, ell+1, V_big, H);
             end
         end
     
@@ -107,7 +107,7 @@ function [f, iter, fm] = Quad_based_impl_rest_arnoldi(A, v, V, H, eta, c_norm, t
             % Step : Compute h1m_k = em_k-1(Hm_k)e1 by quadrature of order l1
             %         and ompute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
             %         l2
-            [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, l);
+            [h2, l] = Quadratur_rule_invsqrt(A, active_nodes, subdiag, thick_replaced, H, m, tol, ell, k, l);
             fprintf('numbers of quadrature nodes = %d\n', l);
         end
      

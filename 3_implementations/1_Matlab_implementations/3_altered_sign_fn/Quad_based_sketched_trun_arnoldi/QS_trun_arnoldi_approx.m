@@ -1,4 +1,4 @@
-function [fA_b] = QS_trun_FOM_approx(V, H, SV, SAV, Sb, m, tol)
+function [fA_b] = QS_trun_arnoldi_approx(V, H, SV, SAV, Sb, m, tol)
     %% returns the k-th Arnoldi matrix function approximation to the inverse square
     %  root applied to the vector beta*V(:,1)
     % Input:

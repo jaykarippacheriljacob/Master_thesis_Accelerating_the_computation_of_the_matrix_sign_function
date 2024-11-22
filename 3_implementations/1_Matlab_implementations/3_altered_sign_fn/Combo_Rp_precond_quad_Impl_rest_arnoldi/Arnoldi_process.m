@@ -1,4 +1,4 @@
-function [v, H, V_big, h] = Arnoldi_process(A, m, s, V_big, H)
+function [v, H, V_big, h] = Arnoldi_proces(A, m, s, V_big, H)
     %% Computes the Krylov subspace basis vectors and its
     %  corresponding hessenberg matrix for a given dimension of subspace.
     % Inputs:

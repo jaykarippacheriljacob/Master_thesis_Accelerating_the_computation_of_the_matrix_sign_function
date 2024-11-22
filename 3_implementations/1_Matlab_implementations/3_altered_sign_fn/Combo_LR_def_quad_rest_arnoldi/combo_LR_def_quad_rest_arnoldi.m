@@ -1,4 +1,4 @@
-function [fA_b, cost] = combo_LR_def_quad_expl_rest_arnoldi(A, x, m_values, k_values, max_iter, tol, min_decay)
+function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values, max_iter, tol, min_decay)
     %% Combination of LR-deflation and Quadrture based Explicit restarted arnoldi approximation for f(A)b.
     % Input:
     %      A         - n x n matrix.

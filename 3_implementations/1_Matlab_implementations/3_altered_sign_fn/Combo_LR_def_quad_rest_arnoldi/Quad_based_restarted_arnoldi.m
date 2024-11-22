@@ -1,4 +1,4 @@
-function [fm_k, iter, f, cost] = Quad_based_Exp_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
+function [fm_k, iter, f, cost] = Quad_based_restarted_arnoldi(A, b, m, max_iter, tol, min_decay)
     %% Quadrature-based Explicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -12,8 +12,6 @@ function [fm_k, iter, f, cost] = Quad_based_Exp_restarted_arnoldi(A, b, m, max_i
     %      iter      - No.of restarts completed undergone to converge
     %      f         - f(A)*b Approximation at each restart
     %      cost      - No.of matrix{A} vector multiplications
-
-    addpath(fullfile(pwd, 'Quad_based_Expl_restarted_arnoldi'));
 
     %% defining the initial parameters.
     subdiag = []; % subdiagonal entries of hessenberg matrices (for computing
@@ -47,7 +45,7 @@ function [fm_k, iter, f, cost] = Quad_based_Exp_restarted_arnoldi(A, b, m, max_i
         %         and compute h2m_k = em_k-1(Hm_k)e1 by quadrature of order
         %         l2
         subdiag = [subdiag; diag(H(1:m, 1:m), -1); H(m+1, m)];
-        [h2, l] = Quadrature_rule_invsqrt(A, active_nodes, subdiag, H(1:m, 1:m), tol, l);
+        [h2, l] = Quadratue_rule_invsqrt(A, active_nodes, subdiag, H(1:m, 1:m), tol, l);
         active_nodes = [active_nodes; sort(eig(H(1:m, 1:m)))];
         fprintf('numbers of quadrature nodes = %d\n', l);
 
