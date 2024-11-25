@@ -46,7 +46,7 @@ function [fA_b, cost] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         [fA_b(:,l), iter, ~] = Quad_based_impl_rest_arnoldi(A, v, V(:, 1:k_values(l)), H(1:k_values(l), 1:k_values(l)), eta, c_norm, theta, k_values(l), m1, m2, max_iter, thick_num, tol, min_decay);
         temp_m2 = m2 - 1;
-        cost(l) = 1 + 2*(m1-1) + 2*(m1-1) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
+        cost(l) = 1 + 2*(m1) + 2*(m1-1) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
         % disp([num2str(cost(l)), ', ', num2str(1)]);
         for i = 2:iter
             if temp_m2 ~= 0
