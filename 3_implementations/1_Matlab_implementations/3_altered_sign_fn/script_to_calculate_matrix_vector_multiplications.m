@@ -5,25 +5,6 @@ close all;
 %% Adding paths for accessing the functions and Matrices
 
 addpath(fullfile(pwd, 'Matrix_A'));
-addpath(fullfile(pwd, 'LR_deflation'));
-
-addpath(fullfile(pwd, 'Left_polynomial_preconditioned_arnoldi'));
-addpath(fullfile(pwd, 'Right_polynomial_preconditioned_arnoldi'));
-
-addpath(fullfile(pwd, 'Quad_based_sketched_trun_arnoldi'));
-
-addpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
-addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
-
-addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
-addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
-
-addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_arnoldi'));
-
-addpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
-
-addpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
-addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 
 %% Select which methods to test
 do_lr_deflation = true;
@@ -36,15 +17,15 @@ do_quad_based_sketched_trun_arnoldi = false;
 do_quad_based_restarted_arnoldi = false;
 do_quad_based_Impl_restarted_arnoldi = false;
 
-do_combo_LR_def_LPoly_precond = true;
-do_combo_LR_def_RPoly_precond = true;
+do_combo_LR_def_LPoly_precond = false;
+do_combo_LR_def_RPoly_precond = false;
 
-do_combo_LR_def_quad_sketched_trun_arnoldi = true;
+do_combo_LR_def_quad_sketched_trun_arnoldi = false;
 
-do_combo_LR_def_quad_rest_arnoldi = true;
+do_combo_LR_def_quad_rest_arnoldi = false;
 
-do_combo_Lp_precond_quad_Impl_rest_arnoldi = true;
-do_combo_Rp_precond_quad_Impl_rest_arnoldi = true;
+do_combo_Lp_precond_quad_Impl_rest_arnoldi = false;
+do_combo_Rp_precond_quad_Impl_rest_arnoldi = false;
 
 %% Select the matrix to be tested
 do_4x4_Herm = false;
@@ -52,7 +33,7 @@ do_4x4_Non_Herm = true;
 do_8x4_Non_Herm = false;
 do_16x4_Non_Herm = false;
 
-value_present = false; % Read the .mat file containing the exact solution
+value_present = true; % Read the .mat file containing the exact solution
 do_plot = false; % To plot the graphs for the mvms
 do_save = true; % To save the R.E, mvms, k_values and m
 
@@ -204,6 +185,8 @@ end
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 %% LR_deflation
 if do_lr_deflation
+    addpath(fullfile(pwd, 'LR_deflation'));
+
     start = cputime;
 
     % Compute f(A)x using LR_deflation
@@ -216,10 +199,13 @@ if do_lr_deflation
     for i = 1:length(k_values) * length(m)
         rel_err_lr_deflation(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'LR_deflation'));
 end 
 
 %% left_precondi_poly_arnoldi
 if do_left_precondi_poly_arnoldi
+    addpath(fullfile(pwd, 'Left_polynomial_preconditioned_arnoldi'));
+
     start = cputime;
 
     % Compute f(A)x using left_precondi_poly_arnoldi
@@ -232,10 +218,13 @@ if do_left_precondi_poly_arnoldi
     for i = 1:length(k_values)
         rel_err_left_precondi_poly_arnoldi(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Left_polynomial_preconditioned_arnoldi'));
 end
 
 %% right_precondi_poly_arnoldi
 if do_right_precondi_poly_arnoldi
+    addpath(fullfile(pwd, 'Right_polynomial_preconditioned_arnoldi'));
+
     start = cputime;
 
     % Compute f(A)x using right_precondi_poly_arnoldi
@@ -248,10 +237,12 @@ if do_right_precondi_poly_arnoldi
     for i = 1:length(k_values)
         rel_err_right_precondi_poly_arnoldi(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Right_polynomial_preconditioned_arnoldi'));
 end
 
 %% Quadrature_based_sketched_trun_arnoldi
 if do_quad_based_sketched_trun_arnoldi
+    addpath(fullfile(pwd, 'Quad_based_sketched_trun_arnoldi'));
     start = cputime;
 
     % Compute f(A)x using Quadrature_based_sketched_trun_arnoldi
@@ -264,10 +255,12 @@ if do_quad_based_sketched_trun_arnoldi
     for i = 1:length(k_values)
         rel_err_quad_based_sketched_trun_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Quad_based_sketched_trun_arnoldi'));
 end
 
 %% Quad_based_restarted_arnoldi
 if do_quad_based_restarted_arnoldi
+    addpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
     start = cputime;
     mvms_quad_based_restarted_arnoldi = zeros(length(k_values), 1);
     for i = 1:length(k_values)
@@ -276,10 +269,13 @@ if do_quad_based_restarted_arnoldi
     end
     finish = cputime;
     disp(['Time taken by Quadrature based restarted Arnoldi = ', num2str(finish - start), ' s']);
+    rmpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
 end
 
 %% Quad_based_Impl_restarted_arnoldi
 if do_quad_based_Impl_restarted_arnoldi
+    addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
+
     start = cputime;
     mvms_quad_based_Impl_restarted_arnoldi = zeros(length(k_values), 1);
     for i = 1:length(k_values)
@@ -288,10 +284,13 @@ if do_quad_based_Impl_restarted_arnoldi
     end
     finish = cputime;
     disp(['Time taken by Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
+    rmpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 end
 
 %% combo_LR_def_LPoly_precond
 if do_combo_LR_def_LPoly_precond
+    addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
+
     start = cputime;
 
     % Compute f(A)x using combo_LR_def_LPoly_precond
@@ -304,10 +303,13 @@ if do_combo_LR_def_LPoly_precond
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_LPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
 end
 
 %% combo_LR_def_RPoly_precond
 if do_combo_LR_def_RPoly_precond
+    addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
+
     start = cputime;
 
     % Compute f(A)x using combo_LR_def_RPoly_precond
@@ -320,10 +322,13 @@ if do_combo_LR_def_RPoly_precond
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_RPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 end
 
 %% combo_LR_def_quad_sketched_trun_arnoldi
 if do_combo_LR_def_quad_sketched_trun_arnoldi
+    addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_arnoldi'));
+
     start = cputime;
 
     % Compute f(A)x using combo_LR_def_quad_sketched_trun_arnoldi
@@ -336,10 +341,13 @@ if do_combo_LR_def_quad_sketched_trun_arnoldi
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_quad_sketched_trun_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_arnoldi'));
 end
 
 %% combo_LR_def_quad_rest_arnoldi
 if do_combo_LR_def_quad_rest_arnoldi
+    addpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
+
     start = cputime;
 
     % Compute f(A)x using combo_LR_def_quad_rest_arnoldi
@@ -352,10 +360,12 @@ if do_combo_LR_def_quad_rest_arnoldi
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_quad_rest_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
 end
 
 %% combo_Lp_precond_quad_Impl_rest_arnoldi
 if do_combo_Lp_precond_quad_Impl_rest_arnoldi
+    addpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
     
     fA_b = [];
     mvms_combo_Lp_precond_quad_Impl_rest_arnoldi = [];
@@ -383,12 +393,13 @@ if do_combo_Lp_precond_quad_Impl_rest_arnoldi
             rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,(j-1)*length(k_values)+i)) / norm(exact_result);
         end
     end
-
+    rmpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
 end
 
 
 %% combo_Rp_precond_quad_Impl_rest_arnoldi
 if do_combo_Rp_precond_quad_Impl_rest_arnoldi
+    addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 
     fA_b = [];
     mvms_combo_Rp_precond_quad_Impl_rest_arnoldi = [];
@@ -416,6 +427,7 @@ if do_combo_Rp_precond_quad_Impl_rest_arnoldi
             rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,(j-1)*length(k_values)+i)) / norm(exact_result);
         end
     end
+    rmpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 end
 
 
