@@ -1,12 +1,13 @@
-
 \chapter{Introduction}
+\label{sec: intro}
 
-% Introduction to matrix functions and its applications.
+% Introduction to matrix functions and their applications.
 Consider a matrix $\mathbf{A} \in \mathbb{C}^{n \times n}$, a vector $\mathbf{b} \in \mathbb{C}^{n}$ and a function $\mathbf{f} : \mathbb{C} \to \mathbb{C}$, the action of a matrix is defined as:
 \begin{equation}
     f(A)b
+    \label{eq:1.1}
 \end{equation}
-The above expression represents a product of the matrix function $f(A) \in \mathbb{C}^{n \times n}$ on a vector \textbf{b}. There exist a huge interest in the action of a matrix on a vector in the fields of science and engineering.
+The above expression represents a product of the matrix function $f(A) \in \mathbb{C}^{n \times n}$ on a vector \textbf{b}. There exists a huge interest in the action of a matrix on a vector in the fields of science and engineering.
 Some of the most interesting cases widely under studies are :
 \begin{enumerate}
     \item \textbf{Matrix exponential function}  $f(z) = e^z$, forms the core of exponential integrators used for solving differential equations \cite{1,2,3}. 
@@ -30,8 +31,8 @@ Studying the relativistic heavy ion collisions theoretically in lattice simulati
 For smaller lattices, the existing methods could be used in the above-mentioned problem. However, as the dimension of the matrix becomes larger, one has to heavily depend upon the iterative methods for approximating the matrix sign function. Some of the popular methods under use in such situations are polynomial \cite{17,18} and rational \cite{19,20,21} Krylov methods which demand, a high arithmetic cost for the orthogonalization of a Krylov basis or the large memory cost for the storage of Krylov basis vectors. These limitations narrow down the attainable accuracy of the Krylov methods. To address these constraints, there are several strategies available. Among them a popular strategy is the utilization of other subspaces with superior approximation properties.
 
 % Brief on what is being discussed and analysed in this thesis
-In this paper, we explore new possibilities arising from the combination of deflation and Krylov subspace methods, chosen for their strengths in relation to the matrix sign function and specific applications of interest. In Chapter 2, we begin with an introduction to matrix functions, including essential definitions and properties. This discussion narrows in Chapter 3, where we focus on the matrix sign function, our primary area of investigation. Here, we cover definitions and properties derived from matrix functions, along with specific characteristics unique to the matrix sign function.
+In this paper, we explore new possibilities arising from the combination of deflation and Krylov subspace methods, chosen for their strengths in relation to the matrix sign function and specific applications of interest. In Chapter \ref{sec:matrix_fun}, we begin with an introduction to matrix functions, including essential definitions and properties. This discussion narrows in Chapter \ref{sec:matrix_sign_func}, where we focus on the matrix sign function, our primary area of investigation. Here, we cover definitions and properties derived from matrix functions, along with specific characteristics unique to the matrix sign function.
 
-Chapter 4 provides a concise overview of Quantum Chromodynamics (QCD) simulations, particularly the Wilson-Dirac and overlap operators in lattice QCD. We examine the limitations encountered in calculating sign functions in this context, highlighting the challenges and the motivation to develop algorithms that enhance efficiency and stability.
+Chapter \ref{sec:QCD_sim_and_non_herm_challenges} provides a concise overview of Quantum Chromodynamics (QCD) simulations, particularly the Wilson-Dirac and overlap operators in lattice QCD. We examine the limitations encountered in calculating sign functions in this context, highlighting the challenges and the motivation to develop algorithms that enhance efficiency and stability.
 
-Our goal is to approximate the action of a matrix sign function on a vector more efficiently and stably. To this end, we introduce recent methods identified in our literature review, alongside algorithms for their implementation, in Chapters 5 and 6. In Chapter 7, we present a framework for implementing potential new algorithms and discuss the rationale behind the choices and combinations selected for our numerical experiments. Finally, Chapter 8 provides an in-depth analysis of the performance of these algorithms across various parameters.
+Our goal is to approximate the action of a matrix sign function on a vector more efficiently and stably. To this end, we introduce recent methods identified in our literature review, alongside algorithms for their implementation, in Chapters \ref{sec:kryl_subspace_app} and \ref{sec:deflation}. In Chapter \ref{sec:expl_poss}, we present a framework for implementing potential new algorithms and discuss the rationale behind the choices and combinations selected for our numerical experiments. Finally, Chapter \ref{sec:num_exper} provides an in-depth analysis of the performance of these algorithms across various parameters.

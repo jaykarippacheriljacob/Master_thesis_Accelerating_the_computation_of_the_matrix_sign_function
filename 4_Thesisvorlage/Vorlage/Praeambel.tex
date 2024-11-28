@@ -894,6 +894,35 @@
 %%% Lets have some fun %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{tikzducks}
 
+% my new pakages
+\usepackage{amsmath}   % For math environments and symbols
+\usepackage{amssymb}   % For \mathbb
+
+% Define the new math operator \sgn
+\DeclareMathOperator{\sgn}{sign}
+% Define the new math operator \neg
+\DeclareMathOperator{\nega}{neg}
+% Define the new math operator \pos
+\DeclareMathOperator{\posi}{pos}
+% Define the new math operator \arctanh
+\DeclareMathOperator{\arctanh}{arctanh}
+
+\usepackage{amsthm} % for theorem environments
+\usepackage{algorithm}
+\usepackage{algorithmic} % for algorithms
+\usepackage{float} % To use [H] for algorithm placement
+\usepackage[utf8]{inputenc}  % Handles UTF-8 characters
+\usepackage[T1]{fontenc}     % Ensures proper font encoding for special characters
+%\usepackage{subfigure}
+
+% Define an environment for definitions, theorem
+\newtheorem{definition}{Definition}[section] % Number within sections
+\newtheorem{theorem}[definition]{Theorem} % Theorems numbered within sections
+\newtheorem{remark}[definition]{Remark} % Remark numbered within sections
+\newtheorem{lemma}[definition]{Lemma} % Lemma numbered within sections
+% Define a new command for subsubsubsection
+\newcommand{\subsubsubsection}[1]{\paragraph{#1}\mbox{}\\}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Für Debugszwecke: Mehr Infos zu Boxen ausgeben:
 %\showboxdepth=\maxdimen

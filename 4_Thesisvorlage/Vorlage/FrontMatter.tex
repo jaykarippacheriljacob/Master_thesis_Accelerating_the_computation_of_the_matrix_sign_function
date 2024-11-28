@@ -40,9 +40,9 @@
 		\hfill%
 		\begin{minipage}[b]{\linewidth-4.5cm}
 			\begin{flushright}
-				\normalsize{Fakultät für Elektrotechnik,}%
+				\normalsize{Department of Mathematics,}%
 				\\\vspace{0.2mm}
-				\normalsize{Informationstechnik und Medientechnik}%
+				\normalsize{and Natural Sciences}%
 				\vspace*{0.05mm}
 			\end{flushright}
 		\end{minipage}
@@ -51,9 +51,9 @@
 			\color{primary}%
 			\rule{\textwidth}{3pt}%
 		\endgroup%
-		\begin{flushright}
-			\lehrstuhl
-		\end{flushright}
+		%\begin{flushright}
+			%\lehrstuhl
+		%\end{flushright}
 		
 		\vspace{3.2em}
 		\begin{center}
@@ -79,19 +79,19 @@
 			\vspace{2em}%
 			\hspace{0em}\\%
 			\normalsize%
-			\ort, den \abgabedatum%
+			\ort,  \abgabedatum%
 		\end{center}
 		
 		
 %		\vspace{7.5em}
 		\vfill
 		
-		\begin{tabular}{ll}
-			Betreuer       & \betreuer \\
-			               &           \\
-			Erstgutachter  & \prueferA \\
-			Zweitgutachter & \prueferB
-		\end{tabular}
+		%\begin{tabular}{ll}
+		%	Betreuer       & \betreuer \\
+		%	               &           \\
+		%	Erstgutachter  & \prueferA \\
+		%	Zweitgutachter & \prueferB
+		%\end{tabular}
 %		\vspace{-2em}
 	\end{titlepage}
 	\ifbool{doppelseitig}{%
@@ -105,23 +105,23 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Themenblatt / Aufgabenstellung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-	\pdfbookmark[1]{Aufgabenstellung}{aufgabe}%
-	\includepdf[
-		pages={1},
-		fitpaper=true
-	]{Medien/Aufgabenstellung.pdf}%
-	\clearpage{\pagestyle{empty}\cleardoublepage}%
+	%\pdfbookmark[1]{Aufgabenstellung}{aufgabe}%
+	%\includepdf[
+		%pages={1},
+		%fitpaper=true
+	%]{Medien/Aufgabenstellung.pdf}%
+	%\clearpage{\pagestyle{empty}\cleardoublepage}%
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Verlängerung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-	\ifbool{verlaengerung}{%
-		\cleardoublepage%
-		\pdfbookmark[1]{Verlängerung}{verlaengerung}%
-		\includepdf[pages={1},fitpaper=true]{Medien/Verlaengerung.pdf}%
-	  	\clearpage{\pagestyle{empty}\cleardoublepage}%
-	}{}%
+	%\ifbool{verlaengerung}{%
+		%\cleardoublepage%
+		%\pdfbookmark[1]{Verlängerung}{verlaengerung}%
+		%\includepdf[pages={1},fitpaper=true]{Medien/Verlaengerung.pdf}%
+	  	%\clearpage{\pagestyle{empty}\cleardoublepage}%
+	%}{}%
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,49 +129,33 @@
 %
 	\pdfbookmark[1]{Erklärungen}{erklaerung}%
 	\vspace*{2em}%
-	\section*{Eidesstattliche Erklärung}%
-	\noindent Hiermit versichere ich, dass ich die Arbeit selbstständig verfasst, keine anderen als die angegebenen Quellen und Hilfsmittel benutzt sowie Zitate kenntlich gemacht habe.%
 	
-	\ifbool{zusatzErklaerung}{\vfill}{\vspace{4em}}%
-	\begin{tabular}{lc}%
-	\ort, den \abgabedatum \hspace*{1cm}& \rule[2px]{5cm}{0.5px}\\%
-	                                    &\footnotesize{(Unterschrift)}%
-	\end{tabular}
-	\ifbool{zusatzErklaerung}{\vfill}{\vspace{5em}}%
-	
-	\section*{Einverständniserklärung}
-	\noindent Ich bin damit einverstanden, dass meine Abschlussarbeit wissenschaftlich interessierten Personen oder Institutionen zur Verfügung gestellt werden kann. Korrektur- oder Bewertungshinweise in meiner Arbeit dürfen nicht zitiert werden.
-	
-	\ifbool{zusatzErklaerung}{\vfill}{\vspace{4em}}%
-	\begin{tabular}{lc}
-	\ort, den \abgabedatum \hspace*{1cm}& \rule[-2px]{5cm}{0.5px} \\ 
-	                                       &\footnotesize{(Unterschrift)}
-	\end{tabular}
-	\ifbool{zusatzErklaerung}{%
-		\vfill
-		\input{Kapitel/Zusatzerklaerung}
-		\vfill
-	}{}
-	\clearpage	
+	\input{Chapter/Proverb.tex}
+	\newpage
+	\input{Chapter/Authorship.tex}
+	\newpage
+	\input{chapter/Acknowledgement.tex}
+	\newpage
+	\input{Chapter/Abstract.tex}
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Danksagung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\ifbool{danksagung}{%
-		\vspace*{\fill}\vspace{-3em}%
-		\pdfbookmark[1]{Danksagung}{danksagung}%
-		\input{Kapitel/Danksagung}%
-		\vfill%
-	}{}
+	%\ifbool{danksagung}{%
+		%\vspace*{\fill}\vspace{-3em}%
+		%\pdfbookmark[1]{Danksagung}{danksagung}%
+		%\input{Kapitel/Danksagung}%
+		%\vfill%
+	%}{}
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Kurzfassung & Abstract %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-	\clearpage{\pagestyle{empty}\cleardoublepage}
-	\vspace*{\fill}\vspace{-3em}
-	\pdfbookmark[1]{Kurzfassung}{kurzfassung}
-	\input{Kapitel/Kurzfassung}
+	%\clearpage{\pagestyle{empty}\cleardoublepage}
+	%\vspace*{\fill}\vspace{-3em}
+	%\pdfbookmark[1]{Kurzfassung}{kurzfassung}
+	%\input{Kapitel/Kurzfassung}
 	\vfill
 	\clearpage
 %

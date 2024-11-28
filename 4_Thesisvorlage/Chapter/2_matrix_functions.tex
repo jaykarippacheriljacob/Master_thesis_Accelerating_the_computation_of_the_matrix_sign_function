@@ -1,0 +1,163 @@
+\chapter{Matrix Functions}
+\label{sec:matrix_fun}
+
+% It provides a brief overview of what we will discuss in this section.
+As a starting point for this thesis, we begin our research by reviewing the existing literature on our domain of interest, the action of a matrix $f(A)\mathbf{b}$. Specifically, we are focused on algorithms that can expedite the matrix sign functions, $sgn(A)$ for large non-Hermitian matrices with dimension $N$.To achieve this objective, we begin by presenting fundamental information on matrix functions. This is followed by a discussion of the matrix sign function in Chapter \ref{sec:matrix_sign_func}. 
+
+In the prior Chapter, we indicated our interest in large non-Hermitian matrices of dimension $N$. Hence, with the help of chapter \ref{sec:QCD_sim_and_non_herm_challenges}, we will elucidate the reason behind the focus on this particular class of matrices. Proceeding further in this review, we aim to address algorithms that could potentially minimize the two significant computational challenges: cost and time. Chapter \ref{sec:kryl_subspace_app} introduces Krylov methods, including the Arnoldi method, the restarted Arnoldi method, and the sketched Arnoldi method, which are of particular interest for further research. Chapter \ref{sec:deflation} will explore deflation along with the LR-deflation algorithm, another area of keen interest.
+
+% A small introduction to start on the topic matrix functions
+Throughout this Chapter, we will anchor our discussion on \cite{8}, which provides a robust foundation for the theory of matrix functions. As outlined in this reference, although there exist different ways of defining $f(A)$ there are three definitions we are interested in the context of computing $f(A)$.
+
+\section{Definitions of \emph{$f(A)$}}
+\label{sec:def_f(A)}
+
+% In this subsection we will introduce the general definitions for the action of a matrix.
+
+\begin{definition}
+    \label{def:2.1}
+    \cite{8}(Jordan canonical form). Any matrix $A \in \mathbb{C}^{n \times n}$ can be written in the Jordan canonical form,
+
+    \begin{align}
+        Z^{-1} A Z &= J = \text{diag}(J_1, J_2, \ldots, J_p),
+        \label{eq:2.1}
+    \end{align}
+
+    \begin{align}
+        J_k &= J_k(\lambda_k) = \begin{bmatrix}
+        \lambda_k & 1 & & \\
+        & \lambda_k & \ddots & \\
+        & & \ddots & 1 \\
+        & & & \lambda_k
+        \end{bmatrix} \in \mathbb{C}^{m_k \times m_k}.
+        \label{eq:2.2}
+    \end{align}
+    where $Z$ is non-singular and $m_1 + m_2 + ... + m_p = n$.
+\end{definition}
+
+In the above standard result, the Jordan matrix $J$ is unique up to the ordering of the blocks $J_i$, whereas $Z$ known as the transforming matrix is not unique. Here, $\lambda_1,...,\lambda_p$ denotes the distinct eigenvalues of the matrix $A$ used to formulate Jordan blocks, with $n_i$ representing the size of the largest Jordan block containing eigenvalue $\lambda_i$.
+
+Before presenting the definition of matrix functions via Jordan canonical form, we first introduce the following terminology.
+
+\begin{definition}
+    \label{def:2.2}
+    \cite{8}The function $f$ is said to be defined on the spectrum of A if the values
+    \[
+        f^{(j)}(\lambda_i), \quad j=0:n_i-1, \quad i=1:s
+    \]
+    exist. These are called the values of the function f on the spectrum of A.
+\end{definition}
+
+The following definition of matrix functions via the Jordan canonical form depends solely on the values of $f$ evaluated at the spectrum of $A$, without requiring additional information beyond this spectrum. Indeed, any $\sum_{i=1}^s n_i$ arbitrary values can be chosen and assigned as the values of $f$ on the spectrum of $A$. Only when making statements about global properties, such as continuity, do we need to impose additional assumptions on $f$.
+
+\begin{definition}
+    \label{def:2.3}
+    \cite{8}(matrix function via Jordan canonical form). Let $f$ be defined on the spectrum of $A \in \mathbb{C}^{n \times n}$ and let $A$ have the Jordan canonical form \ref{eq:2.1} and \ref{eq:2.2}. Then
+    \begin{equation}
+        f(A) := Zf(J)Z^{-1} = Z \mathrm{diag}(f(J_k))Z^{-1}
+        \label{eq:2.3}
+    \end{equation}
+    where
+    \begin{equation}
+        f(J_k) :=
+        \begin{bmatrix}
+            f(\lambda_k) & f'(\lambda_k) & \cdots & \frac{f^{(m_k-1)}(\lambda_k)}{(m_k-1)!} \\
+            & f(\lambda_k) & \ddots & \vdots \\
+            & & \ddots & f'(\lambda_k) \\
+            & & & f(\lambda_k)
+        \end{bmatrix}
+        \label{eq:2.4}
+    \end{equation}.
+\end{definition}
+
+The insights we infer from the first definition for $f(A)$ are:
+\begin{enumerate}
+    \item $f(A)$ is independent of the Jordan canonical form used.
+    \item If $A$ is diagonalizable then the Jordan canonical form reduces to an eigendecomposition $A=ZDZ^{-1}$, with $D=diag(\lambda_i)$ and the columns of $Z$ are eigenvectors of $A$
+    \end{enumerate}
+    
+The Jordan canonical form is rarely used in computations due to its high sensitivity to perturbations. However, in the special case where \( A \) is normal (i.e., unitarily diagonalizable), the second inference from the aforementioned definition becomes applicable and $f(A)$ could be computed from the well-conditioned eigendecomposition. This direct method of computing $f(A)$ is therefore employed only when $A$ is a small Hermitian matrix, with a computational complexity of \( O(n^3) \) \cite{8}. 
+
+The second approach for defining $f(A)$ is with the help of polynomial interpolation, which yields numerous useful properties.
+
+\begin{theorem}
+    \label{the:2.4}
+    \cite{8}For polynomials $p$ and $q$ and $A \in \mathbb{C}^{n \times n}$, $p(A) = q(A)$ if and only if $p$ and $q$  take the same values on the spectrum of A.
+\end{theorem}
+
+The above theorem establishes that the matrix $p(A)$ is entirely determined by the values of $p$ on the spectrum of $A$.
+
+\begin{definition}
+    \label{def:2.5}
+    \cite{8}(matrix function via Hermitian interpolation). Let $f$ be defined on the spectrum of $A \in \mathbb{C}^{n \times n}$ and let $\psi$ be the minimal polynomial of $A$, where $\psi(x)=\prod^{s}_{i=1}(x-\lambda_{i})^{n_{i}}$ Then $f(A) := p(A)$, where $p$ is the polynomial of degree less than
+    \[
+        \sum_{i=1}^{s} n_i = \deg \psi
+    \]
+    that satisfies the interpolation conditions
+    \begin{equation}
+        p^{(j)}(\lambda_i) = f^{(j)}(\lambda_i), \quad j=0:n_i-1, \quad i=1:s
+        \label{eq:2.5}
+    \end{equation}
+
+    There is a unique such $p$ with minimal degree and it is known as the Hermite interpolation polynomial.
+\end{definition}
+
+While the second definition of $f(A)$ appears more numerically practical than the first, it is important to note that the interpolating polynomial $p$ not only depends on $f$ but also on the eigenvalues of $A$. As cited in \cite{15}, it would necessitate $O(n^{4} )$ floating point operations ($(O(n)$ matrix-matrix multiplications each of which costs $O(n^{3} )$) to produce $f(A)$ and is numerically unstable.
+
+\begin{remark}
+    \label{rem:2.6}
+    Some important remarks on the above definition based on \cite{8}are:
+    \begin{enumerate}
+    \item If the polynomial $q$ satisfies the interpolation conditions specified in Equation \ref{eq:2.5} as well as additional interpolation conditions (whether at the same or different $\lambda_i$), then $q$ and the polynomial  $p$ from Definition \ref{def:2.5} yield identical values on the spectrum of $A$. Consequently, by Theorem \ref{the:2.4}, it follows that $q(A) = p(A) = f(A)$.
+
+    \item The Hermite interpolating polynomial $p$ can be defined explicitly by the Lagrange–Hermite formula
+
+    \begin{equation}
+        p(t) = \sum_{i=1}^{s} \left[ \left( \sum_{j=0}^{n_{i}-1} \frac{1}{j!} \phi_{i}^{(j)}(\lambda_{i})(t-\lambda_{i})^{j} \right) \prod_{\substack{j=1 \\ j \neq i}}^{s} (t-\lambda_{j})^{n_{j}} \right]
+        \label{eq:2.6}
+    \end{equation}
+    where  $\phi_i(t) = \frac{f(t)}{\prod_{j \neq i} (t - \lambda_j)^{n_j}}$.
+
+    \item The definition explicitly makes $f(A)$ a polynomial in $A$.
+
+    \item According to Definition \ref{def:2.5}, even if $f$ is represented by a power series, $f(A)$ can still be expressed as a polynomial in $A$ of degree at most $n-1$.
+
+    \item If $A$ is a real, diagonal matrix, then for the condition  $f(A)$ to be real whenever $A$ is real becomes evident only when the scalar function $f$ is real on the subset of the real line on which it is defined.
+
+    \item The Definition \ref{def:2.5} could be directly derived from the formula mentioned in equation \ref{eq:2.4} for a function of the Jordan block $J_k$. 
+    We can directly derive from Definition \ref{def:2.5} the formula \ref{eq:2.4} for a function of the Jordan block $J_k$. The sufficient interpolation conditions to achieve the Hermite interpolating polynomial,
+    \[
+        p(t) = f(\lambda_k) + f'(\lambda_k)(t - \lambda_k) + \frac{f''(\lambda_k)}{2!}(t - \lambda_k)^2 + \cdots + \frac{f^{(m_k-1)}(\lambda_k)}{(m_k-1)!}(t - \lambda_k)^{m_k-1}.
+    \]
+
+    \end{enumerate}
+\end{remark}
+
+The third approach of defining $f(A)$ involves the Cauchy integral theorem, assuming $f$ is analytic, unlike the other two definitions where $f$ has to be defined on the spectrum of $A$.
+
+\begin{definition}
+    \label{def:2.7}
+    \cite{8}(matrix function via Cauchy integral). For $A \in \mathbb{C}^{n \times n}$,
+
+    \begin{equation}
+        f(A) := \frac{1}{2\pi i} \int_\Gamma f(z)(zI - A)^{-1}dz
+        \label{eq:2.7}
+    \end{equation}
+    where $f$ is analytical on and inside a closed contour $\Gamma$ that encloses $spec(A)$.
+\end{definition}
+
+The above definition is highly applicable to our problem of interest. Here we face many numerical challenges and the most critical challenge encountered is the identification of an appropriate contour $\Gamma$ and a quadrature rule that depends on both $f$ and $A$.
+
+Thus, a good definition is one that can be chosen to not only yield the expected properties but also reveal useful, less obvious ones. Accordingly, we conclude this chapter by presenting some general properties derived from the definition of $f(A)$.
+
+\begin{remark}
+\label{rem:2.8}
+    (properties of the matrix functions)\cite{8}
+    \begin{enumerate}
+        \item $f(A)$ commutes with A.
+        \item $f(A^{T})=f(A)^{T}$.
+        \item $f(XAX^{-1})=Xf(A)X^{-1}$.
+        \item The eigenvalues of $f(A)$ are $f(\lambda_{i})$, where the $\lambda_{i}$ are the eigenvalues of $A$.
+        \item If $X$ commutes with $A$ then $X$ commutes with $f(A)$.
+    \end{enumerate}
+\end{remark}

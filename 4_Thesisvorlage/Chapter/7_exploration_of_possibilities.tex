@@ -1,0 +1,171 @@
+\chapter{Exploration of Possibilities}
+\label{sec:expl_poss}
+
+%% First an introduction on the heading and then further subsections.
+So far, we have explored various approaches currently present for computing the sign function of a non-Hermitian matrix. Each method analyzed has its own advantages depending on the specific computational context. In this Chapter, we aim to combine various methods to leverage their respective strengths and enhance the overall computation.
+
+\section{Combination of LR-deflation with Krylov Methods}
+\label{sec:comb_LR_def_kryl_method}
+
+% Explanation of the formation of various combinations with LR-deflation
+In Chapter \ref{sec:deflation}, we discussed the paper \cite{11}, which demonstrates that deflation can potentially serve as an accelerator. There we were introduced to the concept of a composite subspace. Building on this foundation, our proposed combination of methods incorporates these ideas and integrates efficient Krylov subspace approaches to further enhance computational performance. In our study, we specifically adopted the LR-deflation approach, as numerical experiments in \cite{11} demonstrate that the LR-deflation scheme offers significantly better accuracy and requires less CPU time per iteration compared to other deflation methods the paper tested. As we are considering LR-deflation as the base for our combinations for evaluation, let's recap the method outlining the important ingredients to develop the new methods.
+
+The key idea behind LR-deflation is the construction of an augmented subspace, 
+$\Omega_{m} + \mathcal{K}_{m}(A, x)$, which incorporates both left and right 
+eigenvectors for $m$ critical eigenvalues. As discussed in the paper \cite{11}, 
+degenerate eigenvalues can be addressed by forming linear combinations of 
+eigenvectors, thereby preserving orthogonality in a generalized sense. This 
+allows us to create an oblique projector $R_{m}L_{m}^{\dagger}$ onto the 
+subspace $\Omega_{m}$, spanned by the right eigenvectors.
+
+With these results, the vector $x$ can be decomposed within the composite subspace as follows:
+\[
+\begin{aligned}
+    x &= x_{\mathcal{k}} + x_{\ominus}, \\
+    x_{\mathcal{k}} &= R_{m} L_{m}^{\dagger} x, \\
+    x_{\ominus} &= x - x_{\mathcal{K}},
+\end{aligned}
+\]
+where $x_{\mathcal{k}}$ represents the oblique projection of $x$ onto $\Omega_{m}$. Substituting this into the action of a matrix, the expression for $f(A)x$ can be rewritten as:
+\[
+\begin{aligned}
+    f(A)x &= f(A)(x_{\mathcal{k}} + x_{\ominus}) \\
+          &= f(A)x_{\mathcal{k}} + f(A)x_{\ominus} \\
+          &= f(A)R_{m}L_{m}^{\dagger}x + f(A)x_{\ominus}.
+\end{aligned}
+\]
+Applying the spectral definition of the matrix function, we obtain:
+\[
+    f(A)R_{m}L_{m}^{\dagger}x = R_{m}f(\lambda_{m})L_{m}^{\dagger}x.
+\]
+where, $\lambda_m$ is the diagonal eigenvalue matrix for $m$ critical eigenvalues.
+
+Our primary interest in creating new combinations lies in evaluating $f(A)x_{\ominus}$. As discussed in the paper \cite{11}, $f(A)x_{\ominus}$ can be computed efficiently using appropriate Krylov subspace methods depending on the application. However, the study presented in the paper\cite{11} was limited to just the implementation of Arnoldi iteration combined with LR-deflation.
+
+A general algorithm for combining Krylov methods with LR-deflation can be outlined as follows:
+
+\begin{algorithm}[H]
+    \caption{Framework for Approximating $f(A)x$ using a Combination of LR-Deflation and Krylov Subspace Methods}
+    \label{alg:lr_combo}
+    \textbf{Given:} Matrix $A$, vector $x$, function $f$ and no. of deflated eigenvectors $m$.\\
+    \textbf{Output:} Approximation of $f(A)x$.
+    \begin{algorithmic}[1]
+        \STATE Determine the left and right eigenvectors for $m$ critical eigenvalues of $A$. Store the corresponding eigenvector matrices $L_m$ and $R_m$.
+        \STATE Compute $f(\lambda_i)$ for $i = 1, \dots, m$ for the critical eigenvalues.
+        \STATE Compute $x_{\Theta} = \left(1 - R_m L_m^{\dagger} \right) x$.
+        \STATE Approximant for $f(A)x_{\ominus}$ is computed using Krylov subspace method of your interest.
+        \STATE Compute the approximation to $f(A)x$ using \ref{eq:2.60}.
+    \end{algorithmic}
+\end{algorithm}
+
+The choice of LR-deflation over other methods in our study is motivated by the following factors \cite{11}:
+\begin{enumerate}
+    \item Unlike other deflation methods such as the Schur deflation, the absence of coupling between subspaces.
+    \item Krylov subspace methods do not require the deflated directions to be (obliquely) projected out of the Krylov subspace, as the subspaces remain distinct.
+    \begin{equation}
+        A(I-R_mL_m^{\dagger})=(I-R_mL_m^{\dagger})A
+    \end{equation}
+\end{enumerate}
+
+However, no method is without its limitations. While LR-deflation offers the above advantages, it comes with the drawback of a longer initial phase of computation, as it requires the calculation of both left and right eigenvectors. 
+
+\subsection{Rationale for the Selection of Methods in the Combination}
+\label{sec:rationale_selec_method_in_combo}
+
+% Justifying the choice of various methods.
+From the perspective of our application, specifically, the QCD lattice problem involving non-Hermitian matrices, several Krylov methods could benefit from acceleration through LR-deflation. After reviewing various approaches, we identified a few methods that are particularly well-suited to the problem at hand. These include:
+\begin{enumerate}
+    \item Quadrature-based restarted Arnoldi method,
+    \item Polynomial preconditioning method,
+    \item Quadrature-based sketched FOM.
+\end{enumerate}
+
+These methods and their corresponding algorithms were thoroughly discussed in Chapter \ref{sec:kryl_subspace_app}. They can be seamlessly integrated into the LR-deflation framework \ref{alg:lr_combo} at the stage where $f(A)x_{\ominus}$ is evaluated, thereby enhancing the overall computation of the approximate. In this section, we present a few justifications for the chosen methods, explaining why these specific combinations are of interest for computing the action of the sign function of a matrix on a vector.
+
+\subsubsection{Quadrature-based restarted Arnoldi method}
+\label{sec:quad_restarted_arnoldi}
+
+In reviewing the paper on quadrature-based restarted Arnoldi \cite{52}, the authors support their method through numerical experiments demonstrating its stability and efficiency—two highly desirable properties for Krylov methods. Additionally, the method is particularly significant due to its ability to limit memory usage through restarts, where, at each restart, the last Krylov basis vector is used as the new initial residual vector.
+
+The plots presented in the paper \cite{52}, which illustrate the absolute 2-norm error over cycles, further demonstrate the method's superiority in convergence compared to divided difference and rational approximation methods. Additionally, the paper reports promising numerical experiments with both restarted explicit and implicit deflation, as evidenced by the plot of absolute 2-norm error over cycles. Notably, these numerical experiments were conducted on the same application we are addressing, further reinforcing the suitability of the Quadrature-based restarted Arnoldi method for our study.
+
+\subsubsection{Polynomial preconditioning method}
+\label{sec:poly_precond_method}
+
+The authors of the paper \cite{49} on polynomial preconditioned Arnoldi discussed the effects of polynomial preconditioning on the spectrum of the matrix. They specifically investigated the case of a Hermitian positive definite matrix $A$, which serves as a reflection of more general settings. They measured the quality of the preconditioner, which depends on the accuracy of the polynomial approximation. However, it should be noted that these measurements were made under the assumption of the following bound:
+
+\[
+  \left|\frac{1}{\sqrt{z}} - q(z)\right| \leq \delta(z) \quad \text{for} \quad z \in [\lambda_{\min}, \lambda_{\max}],
+\]
+
+where $q(z)$ represents the polynomial preconditioner, $\lambda_{\min}$ and $\lambda_{\max}$ are the smallest and largest eigenvalues respectively. $\delta(z)$ denotes the uniform bound for the relative approximation error on the spectral interval, given by $\delta(z)=\frac{\epsilon}{\sqrt{z}}$, with $\epsilon < \sqrt{2} - 1 \approx 0.4142$.
+
+Using this information, the authors derived the following condition number for $A(q(A))^{2}$ to assess the effect of the preconditioning:
+
+\[
+    \kappa_{\text{pre}} \leq \frac{1+2\epsilon+\epsilon^{2}}{1-2\epsilon-\epsilon^{2}}.
+\]
+
+In their numerical experiment, the authors considered a matrix $A \in \mathbb{R}^{2500 \times 2500}$, representing the discretization of the Laplace operator on a square grid with 50 interior grid points in each direction. This matrix had a condition number of $\kappa(A) \approx 1054$. A Chebyshev preconditioning polynomial with $d = 32$ was applied \cite{49}. For this specific experiment matrix, they estimated the condition number of $A(q(A))^2$ as $\kappa_{\text{pre}} \leq 1.7345$, which was verified by the experiment. The actual condition number achieved was $\kappa_{\text{pre}} = 1.5153$ for $A(q(A))^2$, slightly smaller than predicted by the bounds and approximately 700 times smaller than the condition number of $A$.
+
+Further analysis of the findings presented in the paper \cite{49} reveals that the use of polynomial preconditioning leads to significantly improved convergence for Arnoldi iterations compared to methods without preconditioning. More specifically, in the context of our application, this approach demonstrates substantial improvements in convergence. Consequently, polynomial preconditioning emerges as a promising candidate for combination with LR-deflation in our study. However, this raises the question of which polynomial preconditioner should be utilized.
+
+A logical solution is to select a polynomial that minimizes computational effort. Additionally, it would be beneficial to choose a method that does not require extensive attention to the properties of the matrix or prior knowledge of the spectrum of $A$. Therefore, we favour the polynomial formed by interpolation at the (harmonic) Ritz values, as it automatically adapts to the spectrum of $A$.
+
+\subsubsection{Quadrature-based sketched FOM}
+\label{sec:quad_sketch_FOM}
+
+The paper on randomized sketching of matrix functions \cite{41} briefly explains why this method is well-suited for applications in lattice QCD problems, illustrating its effectiveness through numerical experiments in two parts.
+
+In the first part of the experiment, a fixed Gauss-Chebyshev quadrature rule with an accuracy parameter $\text{tol} = 10^{-7}$ was used, resulting in $l = 176$ quadrature points. The maximum Krylov dimension for the experiment was $\text{m}_{\text{max}} = 300$, with a fixed sketching parameter $\text{s} = 2\text{m}_{\text{max}} = 600$. Results were compared with the state-of-the-art HPC code for overlap fermion simulation \cite{32}, the quadrature-based restarted Arnoldi method. As noted in \cite{41}, the sketched approximations converged robustly and closely tracked the error of the best approximation. Additionally, the authors observed that convergence in the restarted method is significantly delayed, and even the largest restart length considered in the experiments led to much slower convergence than the sketching-based approach.
+
+In the second part of the experiment, the authors measured the runtime of various methods. Results reported in \cite{41} indicate that among all methods, the sketched FOM using the closed form ran the fastest. This was attributed to the need for fewer matrix-vector products, short-recurrence orthogonalization, and the absence of overhead from operations such as quadrature. Furthermore, the experimental results show that sketched FOM, the second-fastest method, saved approximately $15\%$ of runtime and achieved higher accuracy than the quadrature-based restarted Arnoldi method. The paper concludes that quadrature-based sketching methods require slightly less than twice the time of restarted Arnoldi while also having significantly lower memory consumption, highlighting sketching-based methods as a compelling candidate for further investigation.
+
+
+\section{Combination of Deflated Quadrature-based restarted Arnoldi method and  Polynomial preconditioning method}
+\label{sec:combo_def_quad_based_rest_arnoldi_poly_recond}
+
+% Explanation of the combination of Deflated Quadrature-based restarted Arnoldi method and  Polynomial preconditioning method
+The paper \cite{56} presents an implementation of deflation in the restarted Arnoldi method, which extends the general restarted Arnoldi approach (Algorithm \ref{alg:restarted_arnoldi_approximation}). In this approach, after each restart cycle of the Arnoldi process, a Schur decomposition of the Hessenberg matrix is used to restart the Arnoldi process with a set of targeted Ritz values.
+
+An interesting aspect of this method is that the same approach can be incorporated into the framework of the quadrature-based restarted Arnoldi (Algorithm \ref{alg:quadrature_based_arnoldi}), as explained in \cite{52}. The modification of the nodal polynomials required in Algorithm \ref{alg:quadrature_based_arnoldi} can be understood through Theorem 3.2 in \cite{56}. This is particularly relevant to the goals of this thesis, as we have already established that deflation acts as a catalyst to accelerate Krylov's methods.
+
+However, we observe that the implicit quadrature-based restarted Arnoldi method experiences stagnation, at a specific relative error for various $k$ dimensions of the Krylov subspace, indicating a slow convergence rate. Importantly, as noted in \cite{52}, after an initial phase of slow convergence, the restarting method with implicit deflation exhibits the same convergence slope as the method with explicit deflation. This indicates that both methods share the same asymptotic behaviour. Here we raise the question of whether it is possible to overcome the stagnation or intermittent slow convergence observed.
+
+In polynomial preconditioning, we noted that the preconditioner improved the condition number and had significant effects on the spectrum of the matrix. Therefore, conducting numerical experiments on the combination of implicit deflated quadrature-based restarted Arnoldi with polynomial preconditioning would be interesting. However, since polynomial preconditioned Arnoldi is computationally expensive and time-consuming, we propose adding a new parameter to control the number of polynomial preconditioned Arnoldi steps used between different cycles. This allows us to optimize the number of polynomial preconditioned Arnoldi iterations in the restarts. A framework for the implementation of the above combination is provisioned below:
+
+\begin{algorithm}[H]
+    \caption{Framework for Approximating $f(A)x$ using a Combination of Implicit deflated Quadrature-based restarted Arnoldi approximation and polynomial preconditioning}
+    \label{alg:combo_impl_quad_rest_arnoldi_and_poly_precond}
+    \textbf{Given:} $A$, $b$, $f$, $m$, $tol$, $no\_pre$.
+    \begin{algorithmic}[1]
+        \STATE Compute the Polynomial preconditioned Arnoldi for $A$ and $b$.
+        \STATE Set $f_m^{(1)} := \|b\|\|V^{(1)}_m f(H_m^{(1)}) e_1\|$.
+        \STATE Set $\ell := 8$ and $\tilde{\ell} := \text{round}(\sqrt{2} \cdot \ell)$.
+        \FOR{$k = 2, 3, \dots$ until convergence}
+            \STATE Compute partial Schur decomposition, $H^{(k-1)} U^{(k-1)} = U^{(k-1)} T^{(k-1)}$
+            \STATE Set $Y^{(k-1)} := V^{(k-1)} U^{(k-1)}$ and reorthogonalize.
+            \IF{ $k \leq no\_pre$}
+                \STATE Compute the Polynomial preconditioned Arnoldi.
+            \ELSE
+                \STATE Compute the Arnoldi decomposition $A(Y^{(k-1)} V^{(k)}) =(Y^{(k-1)} V^{(k)}) H^{(k)}_m + h^{(k)}_{m+1,m}v^{(k)}_{m+1}e_m^T$.
+            \ENDIF
+            \STATE Choose sets $(t_i, \omega_i)_{i=1,\dots,\tilde{\ell}}$ and $(t_i, \omega_i)_{i=1,\dots,\ell}$ of quadrature nodes/weights.
+            \STATE Set \texttt{accurate} := \texttt{false} and \texttt{refined} := \texttt{false}.
+            \WHILE{\texttt{accurate} = \texttt{false}}
+                \STATE Compute $\tilde{h}_m^{(k)} = (e_m^{(k-1)})^T f(H_m^{(k)}) e_1$ by quadrature of order $\tilde{\ell}$.
+                \STATE Compute $h_m^{(k)} = (e_m^{(k-1)})^T f(H_m^{(k)}) e_1$ by quadrature of order $\ell$.
+                \IF{$\|h_m^{(k)} - \tilde{h}_m^{(k)}\| < tol$}
+                    \STATE \texttt{accurate} := \texttt{true}.
+                \ELSE
+                    \STATE Set $\tilde{\ell} := \ell$ and $\ell := \text{round}(\sqrt{2} \cdot \tilde{\ell})$.
+                    \STATE Set \texttt{refined} := \texttt{true}.
+                \ENDIF
+            \ENDWHILE
+            \STATE Set $f_m^{(k)} := f_m^{(k-1)} + \|b\|\|V_m^{(k)} h_m^{(k)}\|$.
+            \IF{\texttt{refined} = \texttt{false}}
+                \STATE Set $\ell := \tilde{\ell}$ and $\tilde{\ell} := \text{round}(\ell / \sqrt{2})$.
+            \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}

@@ -1,0 +1,748 @@
+\chapter{Numerical Experiment}
+\label{sec:num_exper}
+
+% An intro. on what was used for the numerical experiment and considerations to be kept in mind.
+
+In this Chapter, we investigate various combinations of methods introduced in the previous Chapter, focusing on their stability and efficiency. The study and comparative analysis here draws upon references from \cite{52, 49, 11, 41}.
+
+All computations were performed using MATLAB RB2023b Update 9 on a PC equipped with an AMD Ryzen 7 5700U, a 16-core CPU with a clock speed of 1.80 GHz, and 16 GB of RAM, running on Windows 11 Home. Given that portions of the MATLAB code are interpreted, it is important to note that MATLAB implementations may not always be optimal for comparing algorithmic runtimes. However, MATLAB remains well-suited for assessing stability. Since most of the computational load arises from sparse matrix-vector multiplications (handled by precompiled libraries), notable differences in running times across methods are still meaningful.
+
+Due to this study's limited timeframe, the implementations were not fully optimized. Nonetheless, all Krylov bases used here were generated through a modified Gram-Schmidt process, and truncations were incorporated for the sketching methods applied in these experiments. Additionally, it is worth noting that a whitening-conditioned basis was used for the sketching approximation methods.
+
+%Here is an extra paragraph to be introduced later providing a brief on the subsections.
+
+\section{Critical Eigenvalues of the $\gamma_5$-Wilson-Dirac operator}
+\label{sec:crit_eig_wil_dirac_oper}
+
+We begin our numerical experiments by examining the spectrum of the \(\gamma_5\)-Wilson-Dirac operator, \(H(\mu)\), which is crucial for gaining a better understanding of the properties of the matrix used in our numerical experiments. From the spectrum of \(H(\mu)\) for both \(4^4\) and \(8^4\) lattices (for the \(8^4\) lattice, only the 2000 smallest eigenvalues were calculated due to the heavy computational expense involved) with chemical potential, computed using MATLAB’s \texttt{eigs} solver with GMRES, as shown in Fig.~\ref{fig:spectrum_A}, we observe that the eigenvalues are close to the imaginary axis and are more spread compared to the spectrum of a lattice with no chemical potential (see Fig.~\ref{fig:spectrum_A_herm}).
+
+Hence, as stated in \cite{11}, if the left and right eigenvalues are close to the imaginary axis and spread on both sides of the imaginary axis, no low-order polynomial can accurately approximate all eigenvalues. This highlights the significance of deflation as a means of improving approximations.
+
+It is important to note that computing the full spectrum is not feasible for regular production runs, particularly for $8^4$ lattices. Nevertheless, we computed it as part of our numerical investigations to illustrate the spectral properties of $H(\mu)$.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A_hermitian_4_to_4.png} % Replace with your image path
+        %\caption{First Image}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_hermitian_4_to_4.png} % Replace with your image path
+        %\caption{Second Image}
+        %\label{fig:image2}
+    \end{minipage}
+    \caption{\small Spectrum of Hermitian $ H_w(\mu)$ in equation \ref{eq:2.22} (left pane) and $H_w^2(\mu)$ (right pane) for a $4^4$ lattice with zero chemical potential.}
+    \label{fig:spectrum_A_herm}
+\end{figure}
+
+Although the eigenvalues most relevant for deflation in the case of the sign function are those with the smallest absolute real parts, we instead deflate based on the smallest magnitudes. This approach, borrowed from \cite{11}, is validated to yield nearly identical deflations for the $\gamma_5$-Wilson-Dirac operator at the non-zero chemical potential. This equivalence holds as long as the chemical potential remains relatively small and the spectrum resembles a narrow, bow-tie-shaped strip along the real axis (see Fig.~\ref{fig:spectrum_A}). Under these conditions, the sets of eigenvalues with the smallest absolute real parts and smallest magnitudes overlap.
+
+\begin{table}[H]
+    \centering
+    \label{tab:crit_eigenvalue_time_degree_of_poly_precond} % Use for referencing in the document
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \input{plots_for_thesis/eigenvalue_ratios_4_to4} % Insert the table from the external file
+    \end{minipage}
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \input{plots_for_thesis/eigenvalue_ratios_8_to_4}
+    \end{minipage}
+    \caption{\small The ratio of the largest deflated eigenvalue to the largest eigenvalue for different values of the number of deflated eigenvalues, $m$, on both $4^4$ (left pane) and $8^4$ (right pane) lattices with chemical potential.}
+\end{table}
+
+A key metric of interest is the ratio of the magnitude of the largest deflated eigenvalue to the largest overall eigenvalue. This ratio, provided in Table~\ref{tab:crit_eigenvalue_time_degree_of_poly_precond} for various numbers of deflated eigenvalues, facilitates comparisons across different lattice sizes. It also clarifies how the count of eigenvalues below a specified magnitude threshold scales with lattice volume. From Figs.~\ref{fig:spectrum_A} and \ref{fig:spectrum_A^2}, we observe that the smallest eigenvalues scale closer to the imaginary axis as the lattice volume increases, while the contours enclosing the spectra remain unchanged. Thus, as suggested in \cite{11}, scaling the number of deflated eigenvalues, $m$, with the lattice volume ensures comparable convergence properties for various lattice sizes.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A_non_hermitian_4_to_4.png} % Replace with your image path
+        %\caption{First Image}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Second Image}
+        %\label{fig:image2}
+    \end{minipage}
+    \caption{\small Spectrum of $ H_w(\mu)$ in equation \ref{eq:2.22} for a $4^4$ lattice (left pane) and a $8^4$ lattice (right pane) with chemical potential. However, for the $8^4$ lattice, only the 2000 smallest eigenvalues were calculated due to the heavy computational expense involved.}
+    \label{fig:spectrum_A}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_4_to_4.png} % Replace with your image path
+        %\caption{First Image}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Second Image}
+        %\label{fig:image2}
+    \end{minipage}
+    \caption{\small Spectrum of $H_w^2(\mu)$ for a $4^4$ lattice (left pane) and a $8^4$ lattice (right pane) with chemical potential. However, for the $8^4$ lattice, only the 2000 smallest eigenvalues were calculated due to the heavy computational expense involved.}
+    \label{fig:spectrum_A^2}
+\end{figure}
+
+As noted earlier, the number of smallest eigenvalues increases with lattice size and these eigenvalues lie close to the imaginary axis, making their computation both costly and time-consuming. One major challenge, therefore, is efficiently identifying these eigenvalues. While several approaches exist to address this issue based on the properties of the matrix, our numerical experiments utilized the GMRES method with a preconditioner, implemented within MATLAB's built-in \texttt{eigs} function. From \cite{52}, we observe the effectiveness of polynomial preconditioners, as reflected in the improvement of the condition number. Furthermore, Fig.~\ref{tab:crit_eigenvalue_time_degree_of_poly_precond} illustrates the reduction in computational time for MATLAB’s \texttt{eigs} function as the degree of the polynomial preconditioner varies. Thus, this approach provides a potential solution to mitigate the overhead caused by the \texttt{eigs} solver in MATLAB and demonstrates a significant improvement in efficiency compared to the time required to compute the smallest eigenvalues, as discussed in \cite{52}. However, selecting an optimal degree to balance computational cost and efficiency remains crucial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{plots_for_thesis/time_vs_degree_of_polynomial_preconditioner_to find_64_critical_values.png}
+    \caption{\small Plot showing the timing improvement for the non-Hermitian $H(\mu)$ of the $4^4$ lattice with chemical potential using the \texttt{eigs} solver with GMRES for $m=32$, both with and without polynomial preconditioning. The GMRES parameters were set to \texttt{tol} = $1 \times 10^{-6}$ and \texttt{maxit} = 200, with the polynomial preconditioner having degree $d-1$.}
+    \label{fig:crit_eigenvalue_time_degree_of_poly_precond} % Use for referencing in the document
+\end{figure}
+
+\section{Restart lengths}
+\label{sec:restart_lengths}
+
+From the numerical experiments and results presented in \cite{11, 52}, it is evident that deflation significantly enhances the performance of Krylov subspaces. However, we aim to investigate this improvement within the context of our specific combinations. Hence, a key aspect of interest is quantifying the observed enhancement.
+
+One notable parameter to analyze is the restart length, which corresponds to the dimension of the Krylov subspace. A smaller Krylov subspace dimension that maintains a close approximation to the exact value implies reduced computational storage requirements. This trend is evident in the various combinations we explored, as illustrated in Fig.~\ref{fig:k}, which presents plots of the 2-norm error against restart lengths for the different methods introduced. Thus, this demonstrates the potential usefulness of new combinations for non-Hermitian matrices. Furthermore, each curve corresponds to a different number of deflated eigenvalues in the deflation combinations.
+
+An intriguing observation from these plots is the proximity of the lines to each other, alongside an unexpected pattern where the lines, despite their closeness, appear scattered up to some extent. This does not imply that the new combinations are less effective. Rather, this behaviour is noteworthy and can be interpreted through two justifications, which we explore further in this discussion. To justify the correctness of our implementations, it is worth referring to Fig.~\ref{fig:herm_non_herm_k_values_lr_def}, which demonstrates that the implementations generate approximations consistent with those expected based on \cite{11}.
+
+The first justification lies in the inherent dependence of a method's efficiency on the properties of the matrix in question. Regardless of how efficient a method might be, it is ultimately the matrix properties that dictate the convergence behaviour of any method. Consequently, selecting a method that aligns well with these properties is crucial. In our case, the matrix is non-symmetric, non-Hermitian, and non-positive definite, which complicates the approximation of \(f(A)b\).
+
+Another reason for the observed behaviour lies in the use of non-orthonormal normal bases and the 2-norm employed to assess the closeness to the exact result. In the LR deflation method for non-Hermitian matrices, the left and right eigenvectors are essential for isolating the eigenvalues by projecting out the corresponding subspaces. However, when these eigenvectors are non-orthonormal, inaccuracies arise. Unlike Hermitian matrices, where eigenvectors are orthogonal, non-orthonormal eigenvectors lead to misalignment, resulting in incorrect projections during the deflation process. This misalignment amplifies errors, especially in the calculation of \( f(A) b \). The lack of orthogonality introduces errors in the iterative deflation, impacting the stability and accuracy of eigenvalue extraction.
+
+The mathematical expressions that describe the projection process can be written as:
+\[
+\mathbf{v}_r \cdot \mathbf{v}_l =  \sum_{i} \epsilon_i^2
+\]
+where \( \mathbf{v}_r \) and \( \mathbf{v}_l \) are the right and left eigenvectors, respectively, and the error sum \( \sum_i \epsilon_i^2 \) represents the total error due to the misalignment of the eigenvectors.
+
+As shown in Fig.~\ref{fig:non_orthonormal_vs_orthonormal}, the orthonormal basis (ONB) preserves orthogonality, ensuring accurate projections and minimizing relative errors. In contrast, the non-orthonormal basis introduces misalignment, which propagates through the iterations and results in larger errors. This is illustrated by the following relationship:
+\[
+\| \mathbf{e} \|^2 = \| \mathbf{e}_1 \|^2 + \| \mathbf{e}_2 \|^2
+\]
+where \( \| \mathbf{e} \|^2 \) denotes the total error, and \( \mathbf{e}_1 \) and \( \mathbf{e}_2 \) represent the errors introduced by the non-orthonormal basis.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{plots_for_thesis/orthonormal_non_orthonormal_basis.png}
+    \caption{\small Comparison of orthonormal and non-orthonormal bases. The orthonormal basis preserves orthogonality, while the non-orthonormal basis introduces misalignment and error propagation.}
+    \label{fig:non_orthonormal_vs_orthonormal}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_LPoly_precond_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_LPoly_precond_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_LPoly_precond_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the combination of LR-deflation and left preconditioning polynomial Arnoldi. All plots were executed with parameters $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension) and $d = 4$ (degree of the polynomial). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, and the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+left_pre_cond_k_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_RPoly_precond_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_RPoly_precond_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_RPoly_precond_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the combination of LR-deflation and right preconditioning polynomial Arnoldi. All plots were executed with parameters $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension) and $d = 4$ (degree of the polynomial). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, and the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+right_pre_cond_k_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_sketched_trun_arnoldi_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_sketched_trun_arnoldi_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_sketched_trun_arnoldi_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the combination of LR-deflation and quadrature-based sketched Arnoldi. All plots were executed with parameters: $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension), $s = 300$ (sketch matrix row dimension, where $s = 2 \cdot k_{\text{max}}$ as in \cite{41}), and \texttt{trunc} = 2 (truncate orthogonalization to the last 'trunc' vector). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+skectched_arnoldi_k_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_rest_arnoldi_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_rest_arnoldi_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_LR_def_quad_rest_arnoldi_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the Combination of LR-deflation and quadrature-based restarted Arnoldi. All plots were executed with the following parameters: $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, and \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+restarted_arnoldi_k_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Lp_precond_quad_Impl_rest_arnoldi_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Lp_precond_quad_Impl_rest_arnoldi_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Lp_precond_quad_Impl_rest_arnoldi_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the Combination of implicit deflated quadrature-based restarted Arnoldi and left preconditioning polynomial. All plots were executed with the following parameters: $m = [2, 4, 8, 10]$ (number of target eigenvalues for implicit deflation), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process), $d = 4$ (degree of the polynomial), and \texttt{k2} = 2 (number of times polynomial preconditioning Arnoldi is run upon cycle restart). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_imp_rest_arnoldi+left_precond_k_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Rp_precond_quad_Impl_rest_arnoldi_kplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Rp_precond_quad_Impl_rest_arnoldi_kplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/k_values/combo_Rp_precond_quad_Impl_rest_arnoldi_kplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of Krylov subspace dimension for the Combination of Implicit deflated quadrature-based restarted Arnoldi and right preconditioning polynomial.All plots were executed with the following parameters: $m = [2, 4, 8, 10]$ (number of target eigenvalues for implicit deflation), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process), $d = 4$ (degree of the polynomial), and \texttt{k2} = 2 (number of times polynomial preconditioning Arnoldi is run upon cycle restart). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_imp_rest_arnoldi+right_precond_k_plot}
+\end{figure}
+
+\section{Convergence Rate}           
+\label{sec:convergence_rate}
+
+When using the Krylov subspace method to approximate matrix functions of the form $f(A)b$, the convergence rate is heavily influenced by the condition number $\kappa$ of the matrix $A$. Specifically, the residual error at the $k$-th Krylov subspace iteration. One can often express this bound by the expression,
+\begin{equation}
+    \left(1 - \frac{1}{\kappa}\right)^k.
+    \label{eq:8.1}
+\end{equation} 
+Here, $\kappa = \lambda_{\max}/\lambda_{\min}$, the ratio of the largest singular value ($\lambda_{\max}$) to the smallest singular value ($\lambda_{\min}$). This relationship highlights the role of the spectral properties of $A$ in determining the efficiency of the approximation.
+
+For well-conditioned matrices, where $\kappa$ is close to unity, the convergence is rapid, as $\left(1 - \frac{1}{\kappa}\right)$ becomes small and the approximation error decreases exponentially with $k$. Conversely, when $A$ is poorly conditioned ($\kappa$ is large), convergence is significantly slower. The non-Hermitian matrices used from the $4^4$ and $8^4$ QCD lattices with chemical potential had condition numbers of 129.2774 and 18.4395, respectively. Table~\ref{tab:convergence_rate} shows the convergence rates for the two non-Hermitian matrices we have considered based on Eq.~\ref{eq:8.1}.
+
+
+\begin{table}[H]
+    \centering
+    \label{tab:convergence_rate} % Use for referencing in the document
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \input{plots_for_thesis/convergence_rate_4_to4} % Insert the table from the external file
+    \end{minipage}
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \input{plots_for_thesis/convergence_rate_8_to4}
+    \end{minipage}
+    \caption{\small The table illustrates the potential convergence rates corresponding to varying restart lengths for the non-Hermitian matrix $A$, evaluated on $4^4$ (left panel) and $8^4$ (right panel) lattices under the influence of a chemical potential.}
+\end{table}
+
+In such cases, achieving a desired accuracy $ \epsilon $ may require an impractically large number of iterations. This challenge is further compounded for non-Hermitian matrices, where the eigenvalues may be complex. In our case, the eigenvalues are indeed complex, with many clustering near the imaginary axis, as illustrated in Fig.~\ref{fig:spectrum_A}. Consequently, the Krylov subspace method must account for contributions from a broader spectral distribution, which increases the difficulty of achieving convergence.
+
+While the condition number $ \kappa $ serves as a useful metric for estimating the convergence rate, it is insufficient to fully characterize the behaviour of the Krylov subspace method for general non-Hermitian matrices. The interplay between the spectrum of $ A $, the function $ f(A) $, and the starting vector $ b $ introduces additional complexities that $ \kappa $ alone cannot capture. As a result, further spectral and subspace analyses are often required to accurately predict convergence rates for non-Hermitian problems, as discussed in \cite{38}. However, such detailed investigations are beyond the scope of this thesis due to the limited time available.
+
+\section{Matrix-vector multiplications and inner products}
+\label{sec:mvms_and_inner_pdt}
+
+Another key aspect of analysis in our numerical experiments is the computation of matrix-vector multiplications (mvms). This is particularly significant as, after excluding matrix-matrix multiplications involving $A$ (e.g., $A \times A$), the most expensive computation is $A \times x$, where $A$ is the large matrix of interest and $x$ is an arbitrary vector. Understanding the performance of $A \times x$ is crucial as it helps evaluate the suitability of these new methods for matrices with larger dimensions, which are the primary focus of our applications.
+
+The plots in Fig.~\ref{fig:combo_imp_rest_arnoldi+left_precond_mvms_plot}, ~\ref{fig:combo_imp_rest_arnoldi+right_precond_mvms_plot}, ~\ref{fig:combo_LR+left_pre_cond_mvms_plot}, ~\ref{fig:combo_LR+restarted_arnoldi_mvms_plot}, ~\ref{fig:combo_LR+skectched_arnoldi_mvms_plot}, and ~\ref{fig:combo_LR+right_pre_cond_mvms_plot} illustrate the relative error as a function of mvms. An interesting observation is that, with deflation, combinations involving quadrature-based sketched Arnoldi and both left and right preconditioning exhibit significant improvements in relative error for the same number of mvms. On the other hand, the combination of LR-deflation with quadrature-based restarted Arnoldi achieve even better results, where fewer mvms are required to reach higher accuracy compared to cases without deflation. However, the results appear uneven for the combination of implicit deflated quadrature-based restarted Arnoldi with preconditioning. This behaviour arises because the stopping criteria between cycles are reached faster, preventing the method from attaining exact approximations.
+
+Thus, deflation demonstrates its potential as a critical catalyst for enhancing the performance of these methods, especially in large-scale applications. However, it is important to note that these mvms do not account for the computation of the smallest critical eigenvalues obtained using MATLAB's built-in \texttt{eigs} function. Furthermore, calculating the smallest eigenvalues is one of the most expensive operations and depends significantly on the matrix's properties. Specifically, when the eigenvalues are closer to the imaginary axis in the matrix's spectrum, the computation time increases substantially.
+
+Another interesting parameter, in conjunction with computational cost, is the number of inner products. This is of particular interest because we have considered both quadrature-based sketched Arnoldi and quadrature-based restarted Arnoldi methods in combination with LR-deflation. In the case of quadrature-based sketched Arnoldi, due to the truncation of the orthogonalization of the vectors, it is expected that fewer inner products are required. This is illustrated in Table~\ref{tab:inner_pdt_8x4_non_hermitian} for the $8^4$ non-Hermitian matrix. On the other hand, for quadrature-based restarted Arnoldi, the number of inner products varies due to the presence of restart cycles, which operate based on the stopping criteria.
+
+In general, the number of inner products can be expressed by the following equation:
+\begin{equation}
+    \text{inner product} = \frac{k \times (k+1)}{2}.
+\end{equation}
+However, with the introduction of truncation, the calculation of inner products is modified and varies as follows:
+\begin{equation}
+    \text{inner product} = \frac{(\text{trunc}+1)}{2} \times \text{trunc} + \text{trunc} \times (k - \text{trunc}).
+\end{equation}
+
+
+\begin{table}[H]
+    \label{tab:inner_pdt_8x4_non_hermitian}
+    \centering
+     \input{plots_for_thesis/innerpdt_8_to_4_non_hermitian}
+     \caption{\small The table represents the inner product of all six combinations with respect to the restart length $k$ and the parameters mentioned previously. Here, 
+        A = Combination of LR-deflation and left preconditioning polynomial Arnoldi, 
+        B = Combination of LR-deflation and right preconditioning polynomial Arnoldi, 
+        C = Combination of LR-deflation and quadrature-based sketched Arnoldi, 
+        D = Combination of LR-deflation and quadrature-based restarted Arnoldi, 
+        E = Combination of implicit deflated quadrature-based restarted Arnoldi and left preconditioning polynomial, and 
+        F = Combination of implicit deflated quadrature-based restarted Arnoldi and right preconditioning polynomial.}
+
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_LPoly_precond_combo_LR_def_LPoly_precond_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_LPoly_precond_combo_LR_def_LPoly_precond_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_LPoly_precond_combo_LR_def_LPoly_precond_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the combination of LR-deflation and left preconditioning polynomial Arnoldi. All plots were executed with parameters $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension) and $d = 4$ (degree of the polynomial). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, and the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+left_pre_cond_mvms_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_RPoly_precond_combo_LR_def_RPoly_precond_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_RPoly_precond_combo_LR_def_RPoly_precond_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_RPoly_precond_combo_LR_def_RPoly_precond_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the combination of LR-deflation and right preconditioning polynomial Arnoldi. All plots were executed with parameters $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension) and $d = 4$ (degree of the polynomial). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, and the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+right_pre_cond_mvms_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_sketched_trun_arnoldi_combo_LR_def_quad_sketched_trun_arnoldi_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_sketched_trun_arnoldi_combo_LR_def_quad_sketched_trun_arnoldi_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_sketched_trun_arnoldi_combo_LR_def_quad_sketched_trun_arnoldi_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the combination of LR-deflation and quadrature-based sketched Arnoldi. All plots were executed with parameters: $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension), $s = 300$ (sketch matrix row dimension, where $s = 2 \cdot k_{\text{max}}$ as in \cite{41}), and \texttt{trunc} = 2 (truncate orthogonalization to the last 'trunc' vector). The plot in the top left corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot is for the $4^4$ lattice with chemical potential, and the bottom right plot is for the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+skectched_arnoldi_mvms_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnoldi_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnoldi_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnoldi_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the Combination of LR-deflation and quadrature-based restarted Arnoldi. All plots were executed with the following parameters: $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, and \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+restarted_arnoldi_mvms_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the Combination of implicit deflated quadrature-based restarted Arnoldi and left preconditioning polynomial. All plots were executed with the following parameters: $m = [2, 4, 8, 10]$ (number of target eigenvalues for implicit deflation), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process), $d = 4$ (degree of the polynomial), and \texttt{k2} = 2 (number of times polynomial preconditioning Arnoldi is run upon cycle restart). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_imp_rest_arnoldi+left_precond_mvms_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Rp_precond_quad_Impl_rest_arnoldi_combo_Rp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Rp_precond_quad_Impl_rest_arnoldi_combo_Rp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/mvms/combo_Rp_precond_quad_Impl_rest_arnoldi_combo_Rp_precond_quad_Impl_rest_arnoldi_mvmsplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of mvms for the Combination of Implicit deflated quadrature-based restarted Arnoldi and right preconditioning polynomial. All plots were executed with the following parameters: $m = [2, 4, 8, 10]$ (number of target eigenvalues for implicit deflation), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process), $d = 4$ (degree of the polynomial), and \texttt{k2} = 2 (number of times polynomial preconditioning Arnoldi is run upon cycle restart). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_imp_rest_arnoldi+right_precond_mvms_plot}
+\end{figure}
+
+
+\section{Restart cycles}
+\label{sec:restart_cycles}
+
+Restart cycles are of particular interest in this study, as we focus on two methods: the combination of quadrature-based restarted Arnoldi with LR deflation, and the implicit quadrature-based restarted Arnoldi with polynomial preconditioning. It is important to emphasize that, to ensure consistency, we explicitly required every method to follow the modified Gram-Schmidt process. Consequently, we did not employ the most optimized adaptive version of the quadrature-based restarted Arnoldi, as illustrated in \cite{21}. 
+
+It is interesting to note that with the introduction of LR-deflation into the quadrature-based restarted Arnoldi method, the number of restart cycles for the same restart length reduced significantly. This indicates that the convergence rate of the approximation $f(A)b$ is much faster than without LR-deflation. A similar observation can be made for the combination of implicit deflated quadrature-based restarted Arnoldi with polynomial preconditioning, further suggesting the potential to approximate $\sgn(A)$ at a faster convergence rate with reduced computational storage requirements. 
+
+Moreover, an insightful observation is the flexibility to vary the number of preconditioned Arnoldi iterations, allowing for the computational overhead to be optimized and maintained at a desired level.
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_restplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_restplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_Lp_precond_quad_Impl_rest_arnoldi_combo_Lp_precond_quad_Impl_rest_arnoldi_restplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+
+    \caption{\small Relative error as a function of number of restarts for the Combination of implicit deflated quadrature-based restarted Arnoldi and left preconditioning polynomial. All plots were executed with the following parameters: $m = [2, 4, 8, 10]$ (number of target eigenvalues for implicit deflation), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process), $d = 4$ (degree of the polynomial), and \texttt{k2} = 2 (number of times polynomial preconditioning Arnoldi is run upon cycle restart). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_imp_rest_arnoldi+left_precond_rest_plot}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % First row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnoldi_restplot_4x4_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 1}
+        %\label{fig:image1}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnoldi_restplot_4x4_non_hermitian_from_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 2}
+        %\label{fig:image2}
+    \end{minipage}
+    
+    \vspace{0.02\textwidth} % Space between rows
+    
+    % Second row
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/restart_cycles/combo_LR_def_quad_rest_arnoldi_combo_LR_def_quad_rest_arnold_restplot_4x4_non_hermitian.png} % Replace with your image path
+        %\caption{Caption for Image 3}
+        %\label{fig:image3}
+    \end{minipage}%
+    \hspace{0.02\textwidth} % Space between the images
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{plots_for_thesis/spectrum_A^2_non_hermitian_8_to_4.png} % Replace with your image path
+        %\caption{Caption for Image 4}
+        %\label{fig:image4}
+    \end{minipage}
+    
+    \caption{\small Relative error as a function of number of restarts for the Combination of LR-deflation and quadrature-based restarted Arnoldi. All plots were executed with the following parameters: $m = [0, 2, 4, 8, 16, 64, 128]$ (number of critical eigenvalues), $k = 10:10:150$ (Krylov subspace dimension), \texttt{min\_decay} = 0.95 (minimum decay rate parameter for convergence), \texttt{tol} = $1 \times 10^{-12}$, and \texttt{max\_iter} = 50 (maximum number of restarts for the Arnoldi process). The top left plot corresponds to the $4^4$ lattice with zero chemical potential, while the top right shows the modification of the $4^4$ lattice with zero chemical potential, transitioning from a Hermitian to a non-Hermitian matrix by adding $1 \times 10^{-7}$ to the bottom left element. The bottom left plot represents the $4^4$ lattice with chemical potential, and the bottom right plot shows the $8^4$ lattice with chemical potential.}
+    \label{fig:combo_LR+restarted_arnoldi_rest_plot}
+    
+\end{figure}

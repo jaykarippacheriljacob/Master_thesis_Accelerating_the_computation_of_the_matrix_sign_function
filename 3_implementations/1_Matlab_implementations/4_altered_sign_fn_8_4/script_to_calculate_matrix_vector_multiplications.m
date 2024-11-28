@@ -1,4 +1,4 @@
-clear;
+ clear;
 clc;
 close all;
 
@@ -10,17 +10,17 @@ addpath(fullfile(pwd, 'Matrix_A'));
 do_lr_deflation = false;
 
 do_left_precondi_poly_arnoldi = false;
-do_right_precondi_poly_arnoldi = true;
+do_right_precondi_poly_arnoldi = false;
 
 do_quad_based_sketched_trun_arnoldi = false;
 
-do_quad_based_restarted_arnoldi = true;
+do_quad_based_restarted_arnoldi = false;
 do_quad_based_Impl_restarted_arnoldi = false;
 
-do_combo_LR_def_LPoly_precond = false;
-do_combo_LR_def_RPoly_precond =false;
+do_combo_LR_def_LPoly_precond = true;
+do_combo_LR_def_RPoly_precond = true;
 
-do_combo_LR_def_quad_sketched_trun_arnoldi = false;
+do_combo_LR_def_quad_sketched_trun_arnoldi = true;
 
 do_combo_LR_def_quad_rest_arnoldi = true;
 
@@ -34,8 +34,8 @@ do_8x4_Non_Herm = true;
 do_16x4_Non_Herm = false;
 
 value_present = true; % Read the .mat file containing the exact solution
-do_plot = true; % To plot the graphs for the mvms
-do_save = false; % To save the R.E, mvms, k_values and m
+do_plot = false; % To plot the graphs for the mvms
+do_save = true; % To save the R.E, mvms, k_values and m
 
 %% Loading the Matrix A and defining the vector b for the Lattice size 4^4, Hermitian matrix
 rng(2130); % setting random seed generator for reproducibility
@@ -43,7 +43,7 @@ rng(2130); % setting random seed generator for reproducibility
 if do_4x4_Herm
     A = read_matrix('4x4x4x4b6.0000id3n1.mat'); % Read the input matrix from a file.
     N = size(A, 2); % Size of the matrix
-    % A(end, 1) = A(end, 1)+ 1e-7;
+    A(end, 1) = A(end, 1)+ 1e-7;
 
     % Use eigs to find the smallest eigenvalue
     smallest_eigenvalue = eigs(A, 1, 'smallestreal');
@@ -55,14 +55,14 @@ if do_4x4_Herm
     A = Gamma5*A;
 
     % Calculate the conjugate transpose of A
-A_conjugate_transpose = A';
-
-% Check if A is equal to its conjugate transpose
-if isequal(A, A_conjugate_transpose)
-    disp('The matrix is Hermitian.');
-else
-    disp('The matrix is not Hermitian.');
-end
+    A_conjugate_transpose = A';
+    
+    % Check if A is equal to its conjugate transpose
+    if isequal(A, A_conjugate_transpose)
+        disp('The matrix is Hermitian.');
+    else
+        disp('The matrix is not Hermitian.');
+    end
 
     b = randn(N, 1); % Generate a random N x 1 vector
     
@@ -107,7 +107,7 @@ k_values = 10:10:150;
 %% Define test parameters
 
 m = [0, 2, 4, 8, 16, 64, 128]; % Define the number of critical eigenvalues
-% m = 64;
+% m = [0, 64];
 
 k1 = 4; % No. of iterations for the Krylov's subspace to be used in pre-conditioning polynomial
 
@@ -155,10 +155,9 @@ if value_present
         loadedData = load('4x4_Herm.mat', 'exact_result');
         exact_result = loadedData.exact_result;  % Extract the value from the structure
 
-   elseif do_4x4_Non_Herm
+    elseif do_4x4_Non_Herm
         loadedData = load('4x4_Non_Herm.mat', 'exact_result');
         exact_result = loadedData.exact_result;  % Extract the value from the structure
-
     elseif do_8x4_Non_Herm
         loadedData = load('8x4_Non_Herm.mat', 'exact_result');
         exact_result = loadedData.exact_result;  % Extract the value from the structure
@@ -178,9 +177,11 @@ else
         disp('Saved the exact result to 4x4_Non_Herm.mat');
 
     elseif do_8x4_Non_Herm
-        [exact_result, ~, ~, ~] = Quad_based_restarted_arnoldi(A, b, 250, 50, 10-12, 0.95);
+        addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
+        [exact_result, ~] = combo_LR_def_LPoly_precond(A, b, 2000, 200, 8);
         save('8x4_Non_Herm.mat', 'exact_result');
         disp('Saved the exact result to 8x4_Non_Herm.mat');
+        rmpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
         
     elseif do_16x4_Non_Herm
         save('16x4_Non_Herm.mat', 'exact_result');
@@ -191,7 +192,6 @@ end
 %% Invoking various functions to compute the product of the sign matrix of A and  b.
 %% LR_deflation
 if do_lr_deflation
-
     addpath(fullfile(pwd, 'LR_deflation'));
 
     start = cputime;
@@ -206,12 +206,11 @@ if do_lr_deflation
     for i = 1:length(k_values) * length(m)
         rel_err_lr_deflation(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
-    rmpath('C:\MyFolder');
+    rmpath(fullfile(pwd, 'LR_deflation'));
 end 
 
 %% left_precondi_poly_arnoldi
 if do_left_precondi_poly_arnoldi
-
     addpath(fullfile(pwd, 'Left_polynomial_preconditioned_arnoldi'));
 
     start = cputime;
@@ -226,13 +225,11 @@ if do_left_precondi_poly_arnoldi
     for i = 1:length(k_values)
         rel_err_left_precondi_poly_arnoldi(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
-
-    
+    rmpath(fullfile(pwd, 'Left_polynomial_preconditioned_arnoldi'));
 end
 
 %% right_precondi_poly_arnoldi
 if do_right_precondi_poly_arnoldi
-
     addpath(fullfile(pwd, 'Right_polynomial_preconditioned_arnoldi'));
 
     start = cputime;
@@ -247,13 +244,12 @@ if do_right_precondi_poly_arnoldi
     for i = 1:length(k_values)
         rel_err_right_precondi_poly_arnoldi(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Right_polynomial_preconditioned_arnoldi'));
 end
 
 %% Quadrature_based_sketched_trun_arnoldi
 if do_quad_based_sketched_trun_arnoldi
-
     addpath(fullfile(pwd, 'Quad_based_sketched_trun_arnoldi'));
-
     start = cputime;
 
     % Compute f(A)x using Quadrature_based_sketched_trun_arnoldi
@@ -266,13 +262,12 @@ if do_quad_based_sketched_trun_arnoldi
     for i = 1:length(k_values)
         rel_err_quad_based_sketched_trun_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Quad_based_sketched_trun_arnoldi'));
 end
 
 %% Quad_based_restarted_arnoldi
 if do_quad_based_restarted_arnoldi
-
     addpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
-
     start = cputime;
     mvms_quad_based_restarted_arnoldi = zeros(length(k_values), 1);
     for i = 1:length(k_values)
@@ -281,11 +276,11 @@ if do_quad_based_restarted_arnoldi
     end
     finish = cputime;
     disp(['Time taken by Quadrature based restarted Arnoldi = ', num2str(finish - start), ' s']);
+    rmpath(fullfile(pwd, 'Quad_based_restarted_arnoldi'));
 end
 
 %% Quad_based_Impl_restarted_arnoldi
 if do_quad_based_Impl_restarted_arnoldi
-
     addpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 
     start = cputime;
@@ -296,11 +291,11 @@ if do_quad_based_Impl_restarted_arnoldi
     end
     finish = cputime;
     disp(['Time taken by Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
+    rmpath(fullfile(pwd, 'Quad_based_Impl_restarted_arnoldi'));
 end
 
 %% combo_LR_def_LPoly_precond
 if do_combo_LR_def_LPoly_precond
-
     addpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
 
     start = cputime;
@@ -310,16 +305,15 @@ if do_combo_LR_def_LPoly_precond
 
     finish = cputime;
     disp(['Time taken by Combination of LR deflation and Left preconditioned Arnoldi = ', num2str(finish - start), ' s']);
-    exact_result = fA_b(:, end);
     % Loop over the range of k values
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_LPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_LPoly_precond'));
 end
 
 %% combo_LR_def_RPoly_precond
 if do_combo_LR_def_RPoly_precond
-
     addpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 
     start = cputime;
@@ -334,11 +328,11 @@ if do_combo_LR_def_RPoly_precond
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_RPoly_precond(i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_RPoly_precond'));
 end
 
 %% combo_LR_def_quad_sketched_trun_arnoldi
 if do_combo_LR_def_quad_sketched_trun_arnoldi
-
     addpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_arnoldi'));
 
     start = cputime;
@@ -353,17 +347,17 @@ if do_combo_LR_def_quad_sketched_trun_arnoldi
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_quad_sketched_trun_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_quad_sketched_trun_arnoldi'));
 end
 
 %% combo_LR_def_quad_rest_arnoldi
 if do_combo_LR_def_quad_rest_arnoldi
-
     addpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
 
     start = cputime;
 
     % Compute f(A)x using combo_LR_def_quad_rest_arnoldi
-    [fA_b, mvms_combo_LR_def_quad_rest_arnoldi] = combo_LR_def_quad_rest_arnoldi(A, b, m, k_values, max_iter, tol, min_decay);
+    [fA_b, mvms_combo_LR_def_quad_rest_arnoldi, restarts_combo_LR_def_quad_rest_arnoldi] = combo_LR_def_quad_rest_arnoldi(A, b, m, k_values, max_iter, tol, min_decay);
 
     finish = cputime;
     disp(['Time taken by Combination of LR deflation and Quadrature based Restarted Arnoldi = ', num2str(finish - start), ' s']);
@@ -372,55 +366,80 @@ if do_combo_LR_def_quad_rest_arnoldi
     for i = 1:length(k_values) * length(m)
         rel_err_combo_LR_def_quad_rest_arnoldi (i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
     end
+    rmpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
 end
 
 %% combo_Lp_precond_quad_Impl_rest_arnoldi
 if do_combo_Lp_precond_quad_Impl_rest_arnoldi
-
     addpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
+    
+    fA_b = [];
+    mvms_combo_Lp_precond_quad_Impl_rest_arnoldi = [];
+    restarts_combo_Lp_precond_quad_Impl_rest_arnoldi = [];
 
     start = cputime;
 
-    % Compute f(A)x using combo_Lp_precond_quad_Impl_rest_arnoldi
-    for j=1:length(thick_number)
+    for j = 1:length(thick_number)
         no = thick_number(j);
-        [fA_b, mvms_combo_Lp_precond_quad_Impl_rest_arnoldi] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, no, tol, min_decay);
+        
+        % Call the function and get results
+        [fAb, mvms, r] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, no, tol, min_decay);
+        
+        % Concatenate results
+        fA_b = [fA_b, fAb]; % Concatenate fA_b
+        mvms_combo_Lp_precond_quad_Impl_rest_arnoldi = [mvms_combo_Lp_precond_quad_Impl_rest_arnoldi; mvms]; % Append mvms
+        restarts_combo_Lp_precond_quad_Impl_rest_arnoldi = [restarts_combo_Lp_precond_quad_Impl_rest_arnoldi; r];
     end
-    % [fA_b] = Combo_Lp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, thick_number, tol, min_decay);
+
+    % Timing
     finish = cputime;
     disp(['Time taken by Combination of Left polynomial preconditioning and Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
-    
-    % Loop over the range of k values
-    for j=1:length(thick_number)
+
+    % Compute relative error for each value of fA_b
+    for j = 1:length(thick_number)
         for i = 1:length(k_values)
-            rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi ((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+            rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,(j-1)*length(k_values)+i)) / norm(exact_result);
         end
     end
+    rmpath(fullfile(pwd, 'Combo_Lp_precond_quad_Impl_rest_arnoldi'));
 end
+
 
 %% combo_Rp_precond_quad_Impl_rest_arnoldi
 if do_combo_Rp_precond_quad_Impl_rest_arnoldi
-
     addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 
+    fA_b = [];
+    mvms_combo_Rp_precond_quad_Impl_rest_arnoldi = [];
+    restarts_combo_Rp_precond_quad_Impl_rest_arnoldi = [];
+    
     start = cputime;
 
-    % Compute f(A)x using combo_Rp_precond_quad_Impl_rest_arnoldi
-    for j=1:length(thick_number)
+    for j = 1:length(thick_number)
         no = thick_number(j);
-        [fA_b, mvms_combo_Rp_precond_quad_Impl_rest_arnoldi] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, no, tol, min_decay);
+        
+        % Call the function and get results
+        [fAb, mvms] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, k1, k2, max_iter, no, tol, min_decay);
+        
+        % Concatenate results
+        fA_b = [fA_b, fAb]; % Concatenate fA_b
+        mvms_combo_Rp_precond_quad_Impl_rest_arnoldi = [mvms_combo_Rp_precond_quad_Impl_rest_arnoldi; mvms]; % Append mvms
+        restarts_combo_Rp_precond_quad_Impl_rest_arnoldi = [restarts_combo_Rp_precond_quad_Impl_rest_arnoldi; r];
     end
 
+    % Timing
     finish = cputime;
     disp(['Time taken by Combination of Right polynomial preconditioning and Quadrature based Implicit restarted Arnoldi = ', num2str(finish - start), ' s']);
-    
-    for j=1:length(thick_number)
-        % Loop over the range of k values
+
+    % Compute relative error for each value of fA_b
+    for j = 1:length(thick_number)
         for i = 1:length(k_values)
-            rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi ((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,i)) / norm(exact_result);
+            rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi((j-1)*length(k_values)+i) = norm(exact_result - fA_b(:,(j-1)*length(k_values)+i)) / norm(exact_result);
         end
     end
+    rmpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 end
+
 
 %% Plotting the relative errors wrt the no.of matrix mvms
 if do_plot
@@ -587,16 +606,16 @@ if do_save
     end
     
     if do_combo_LR_def_quad_rest_arnoldi
-        save(fullfile('results', 'combo_LR_def_quad_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_LR_def_quad_rest_arnoldi', 'mvms_combo_LR_def_quad_rest_arnoldi', 'm');
+        save(fullfile('results', 'combo_LR_def_quad_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_LR_def_quad_rest_arnoldi', 'mvms_combo_LR_def_quad_rest_arnoldi', 'm', 'restarts_combo_LR_def_quad_rest_arnoldi');
     end
     
     if do_combo_Lp_precond_quad_Impl_rest_arnoldi
         m = thick_number;
-        save(fullfile('results', 'combo_Lp_precond_quad_Impl_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi', 'mvms_combo_Lp_precond_quad_Impl_rest_arnoldi', 'm');
+        save(fullfile('results', 'combo_Lp_precond_quad_Impl_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_Lp_precond_quad_Impl_rest_arnoldi', 'mvms_combo_Lp_precond_quad_Impl_rest_arnoldi', 'm', 'restarts_combo_Lp_precond_quad_Impl_rest_arnoldi');
     end
     
     if do_combo_Rp_precond_quad_Impl_rest_arnoldi
         m = thick_number;
-        save(fullfile('results', 'combo_Rp_precond_quad_Impl_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi', 'mvms_combo_Rp_precond_quad_Impl_rest_arnoldi', 'm');
+        save(fullfile('results', 'combo_Rp_precond_quad_Impl_rest_arnoldi_results.mat'), 'k_values', 'rel_err_combo_Rp_precond_quad_Impl_rest_arnoldi', 'mvms_combo_Rp_precond_quad_Impl_rest_arnoldi', 'm', 'restarts_combo_Rp_precond_quad_Impl_rest_arnoldi');
     end
 end

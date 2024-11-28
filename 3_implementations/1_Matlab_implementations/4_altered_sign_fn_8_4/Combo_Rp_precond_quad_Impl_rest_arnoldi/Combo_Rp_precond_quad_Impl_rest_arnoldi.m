@@ -1,4 +1,4 @@
-function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, m1, m2, max_iter, thick_num, tol, min_decay)
+function [fA_b, cost, restarts] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, m1, m2, max_iter, thick_num, tol, min_decay)
     %% Combination of Right proynomial preconditioning and Quadrature-based Implicit restarted Arnoldi approximation for f(A)b.
     % Input: 
     %      A         - N x N matrix
@@ -16,6 +16,7 @@ function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
     %                  lright prec. Restarted Implicit Arnoldi matrix approximation for all
     %                  values in k_values dimensions.
     %      cost      - No.of matrix{A} vector multiplications.
+    %      restarts  - No.of restarts done
     
     addpath(fullfile(pwd, 'Combo_Rp_precond_quad_Impl_rest_arnoldi'));
 
@@ -36,6 +37,7 @@ function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
     n = size(A,2);
     fA_b = zeros(n,no_k);
     cost = zeros(length(k_values), 1);
+    restarts = zeros(length(k_values), 1);
     kmax = max(k_values);
 
     H = [];
@@ -46,8 +48,9 @@ function [fA_b, cost] = Combo_Rp_precond_quad_Impl_rest_arnoldi(A, b, k_values, 
 
     for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
         [fA_b(:,l), iter, ~] = Quad_based_impr_rest_arnoldi(A, v, V(:, 1:k_values(l)), H(1:k_values(l), 1:k_values(l)), eta, c_norm, theta, k_values(l), m1, m2, max_iter, thick_num, tol, min_decay);
+        restarts(l) = iter -1; 
         temp_m2 = m2 - 1;
-        cost(l) = 1 + 2*(m1-1) + 2*(m1-1) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
+        cost(l) = 1 + 2*(m1) + k_values(l)*(2 + 2*(m1-1) + 2*(m1-1));
         % disp([num2str(cost(l)), ', ', num2str(1)]);
         for i = 2:iter
             if temp_m2 ~= 0

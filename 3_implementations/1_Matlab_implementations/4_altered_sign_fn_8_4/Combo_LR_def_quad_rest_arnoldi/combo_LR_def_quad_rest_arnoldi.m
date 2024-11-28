@@ -1,4 +1,4 @@
-function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values, max_iter, tol, min_decay)
+function [fA_b, cost, restarts] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values, max_iter, tol, min_decay)
     %% Combination of LR-deflation and Quadrture based Explicit restarted arnoldi approximation for f(A)b.
     % Input:
     %      A         - n x n matrix.
@@ -13,6 +13,7 @@ function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values,
     %                  left prec. Arnoldi matrix approximation for all
     %                  values in k_values dimensions.
     %      cost      - No.of matrix{A} vector multiplications.
+    %      restarts  - No.of restarts completed undergone to converge
     
     addpath(fullfile(pwd, 'Combo_LR_def_quad_rest_arnoldi'));
 
@@ -22,6 +23,7 @@ function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values,
     n = size(A,2);
     fA_x_ominus = zeros(n,no_k);
     cost = zeros(no_k*no_m, 1);
+    restarts = zeros(no_k*no_m, 1);
     fA_b = zeros(n, no_k*no_m);
     j = 1;
     
@@ -45,7 +47,7 @@ function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values,
 
         %% Step 4: Compute f(A)x_ominus using the restarted arnoldi process for k_values krylov subspace dimensions.
         for l=1:no_k  %l-th column holds approx. for subspace dimension k(l)
-            [fA_x_ominus(:,l), ~, ~,cost(j+l-1)] = Quad_based_restarted_arnoldi(A, x_ominus, k_values(l), max_iter, tol, min_decay);
+            [fA_x_ominus(:,l), restarts(j+l-1), ~,cost(j+l-1)] = Quad_based_restarted_arnoldi(A, x_ominus, k_values(l), max_iter, tol, min_decay);
         end
 
         %% Step 6: Compute the approximation to f(A)x
@@ -53,4 +55,5 @@ function [fA_b, cost] = combo_LR_def_quad_rest_arnoldi(A, x, m_values, k_values,
         fA_b(:,j:(j+no_k-1)) = Rm * (f_Tm * (Lm' * x)) + fA_x_ominus;
         j = j+no_k;
     end
+    restarts = restarts - 1;
 end

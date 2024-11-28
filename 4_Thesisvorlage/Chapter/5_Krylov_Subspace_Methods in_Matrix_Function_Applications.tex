@@ -1,0 +1,701 @@
+\chapter{Krylov Subspace Methods in Matrix Function Applications}
+\label{sec:kryl_subspace_app}
+
+% An intro. and reason for the choice of Krylov methods in general.
+Iterative methods in general play a crucial role in approximating matrix functions efficiently, especially in scenarios where direct calculations are computationally costly and time-consuming. When discussing iterative methods, Krylov subspace methods have garnered significant interest due to extensive research, their properties, and fast convergence. These methods are particularly well-suited for large-scale problems because they produce iterative solutions using only matrix-vector products. In this Chapter, we will introduce some fundamental concepts and algorithms. We will then build upon these basics by exploring selected methods from the Krylov subspace methods that are of particular interest in our research.
+
+To begin, we will first introduce the definition of a Krylov subspace for a matrix $A$ and a vector $b$, which forms the foundation for everything discussed in the upcoming subsections.
+
+\begin{definition}
+    \label{def:2.13}
+    \cite{37}The $m^{th}$ Krylov subspace of $A \in \mathbb{C}^{n \times n}$ and $b \in \mathbb{C}^n$ is given by,
+    \[
+    \mathcal{K}_m(A, b) := \text{span}(b, Ab, A^2 b, \ldots, A^{m-1} b) = \{ p(A)b : p \in \mathcal{P}_{m-1} \},
+    \]
+    where $\mathcal{P}_{m-1}$ is the set of all polynomials of degree at most $m - 1$.
+\end{definition}
+
+Krylov method works by using the Krylov subspace mentioned in Definition \ref{def:2.13} to find a suitable approximation $f_{m}\in \mathcal{K}_m(A,b)$ for $f(A)b$. To achieve this, we need to construct a basis for $\mathcal{K}_m(A, b)$. The concept of seeking an approximation to $f(A)b$ within a Krylov subspace $K_m(A,b)$ is naturally motivated by Definition \ref{def:2.2}, where every matrix function is essentially a polynomial (of degree at most $n-1$) in $A$. Therefore, $f(A)b \in K_n(A,b)$. The significant advantage of Krylov subspace methods lies in their inherent capability to obtain good approximations using a polynomial of lower degree, which proves advantageous for our purposes. Some intriguing properties of these methods are highlighted in the following remark.
+
+\begin{remark}
+    \label{rem:2.14}
+    \cite{37}Let $A \in \mathbb{C}^{n \times n}$ and let $b \in \mathbb{C}^n$. In addition, let $m^*$ be the smallest integer such that there exists a polynomial $p_{m^*} \in \Pi_{m^*}$ which satisfies $p_{m^*}(A)b = 0$. Then
+    \begin{enumerate}
+        \item $K_m(A,b) \subseteq K_{m+1}(A,b)$ for all $m \geq 1$,
+        \item $K_{m^*}(A,b)$ is invariant under $A$, and $K_m(A,b) = K_{m^*}(A,b)$ for all $m \geq m^*$,
+        \item $\dim K_m(A,b) = \min\{m, m^*\}$.
+    \end{enumerate}
+
+\end{remark}
+
+\section{The Arnoldi approximation for matrix functions}
+\label{sec:arnoldi}
+
+% Form a general idea on Arnoldi approximation and its application on matrix functions.
+The Arnoldi process is a method within the family of Krylov subspace methods, where the most apparent choice for a basis of $K_m(A,b)$ is the Krylov basis $b, Ab, A^2b, \ldots, A^{m-1}b$. Nevertheless, this basis can exhibit significant ill-conditioning. To ensure numerical stability, we introduce orthogonalization of the basis. Therefore, the method begins by defining $v_1 = \frac{1}{\|b\|_2} b$ and proceeds to construct additional basis vectors through iterative steps, orthogonalizing $Av_j$ against the previous basis vectors $v_1, \ldots, v_{j-1}$. The algorithm developed based on the above idea is as below:
+
+\begin{algorithm}[H]
+    \caption{Arnoldi process \cite{38}}
+    \label{alg:arnoldi}
+    \begin{algorithmic}[1] % number every line
+        \REQUIRE Matrix $A \in \mathbb{R}^{n \times n}$, vector $b \in \mathbb{R}^n$, integer $m$
+        \STATE Initialize $v_1 = \frac{1}{\|b\|_2} b$
+         \FOR{$j = 1$ to $m$}
+            \STATE Compute $w_j = A v_j$
+            \FOR{$i = 1$ to $j$}
+                \STATE Compute $h_{i,j} = v_i^H w_j$
+                \STATE Update $w_j = w_j - h_{i,j} v_i$
+            \ENDFOR
+            \STATE Compute $h_{j+1,j} = \|w_j\|_2$
+            \IF{$h_{j+1,j} = 0$}
+                \STATE \textbf{break}
+            \ENDIF
+            \STATE Set $v_{j+1} = \frac{w_j}{h_{j+1,j}}$
+        \ENDFOR
+        \STATE Form matrices $V_m = [v_1, \ldots, v_m]$ and $H_m = [h_{i,j}]_{i,j=1,\ldots,m}$
+        \RETURN $V_m$, $H_m$, $h_{m+1,m}$, $v_{m+1}$
+    \end{algorithmic}
+\end{algorithm}
+
+From the aforementioned algorithm, we obtain a matrix $V_m \in \mathbb{C}^{n \times m}$, whose columns consist of the orthonormal basis vectors $v_1, \ldots, v_m$ for $K_m(A, b)$, and an upper Hessenberg matrix $H_m = [h_{i,j}] \in \mathbb{C}^{m \times m}$. These matrices satisfy the Arnoldi relation \cite{38}:
+
+\begin{equation}
+    AV_m = V_m H_m + h_{m+1,m} v_{m+1} e_m^T
+    \label{eq:2.25}
+\end{equation}
+
+If \( H_m = V_m^H A V_m \), we can infer that for a Hermitian matrix \( A = A^H \), the Hessenberg matrix \( H_m \) is also Hermitian, and thus tridiagonal. When \( h_{i,j} = 0 \), the vector \( v_i \) is already orthogonal to \( w_j \) in Algorithm \ref{alg:arnoldi}. Simplifying the Arnoldi process according to this observation results in a more cost-effective method known as the Lanczos process, which is considered a special case.
+
+\begin{algorithm}[H]
+\caption{Lanczos process \cite{38}}
+\label{alg:lanczos}
+\begin{algorithmic}[1] % number every line
+\REQUIRE Matrix $A \in \mathbb{R}^{n \times n}$, vector $b \in \mathbb{R}^n$, integer $m$
+\STATE Initialize $v_1 = \frac{1}{\|b\|_2} b$
+\FOR{$j = 1$ to $m$}
+    \IF{$j \geq 2$}
+        \STATE $w_j = A v_j - h_{j,j-1} v_{j-1}$
+    \ELSE
+        \STATE $w_j = A v_j$
+    \ENDIF
+    \STATE $h_{j,j} = v_j^* w_j$
+    \STATE $w_j = w_j - h_{j,j} v_j$
+    \STATE $h_{j+1,j} = \|w_j\|_2$
+    \IF{$h_{j+1,j} = 0$}
+        \STATE \textbf{break}
+    \ENDIF
+    \STATE $v_{j+1} = \frac{w_j}{h_{j+1,j}}$
+\ENDFOR
+\STATE Form matrices $V_m = [v_1, \ldots, v_m]$ and $H_m = [h_{i,j}]_{i,j=1,\ldots,m}$
+\RETURN $V_m$, $H_m$, $h_{m+1,m}$, $v_{m+1}$
+\end{algorithmic}
+\end{algorithm}
+
+From the above, we have found a way to construct an orthogonal basis for $\mathcal{K}_m(A, b)$. However, our goal is to approximate $f(A)$ using this method. Hence, we need a procedure to achieve $f(A)b \approx f_m \in \mathcal{K}_m(A,b)$. From Definition \ref{def:2.13} and our prior explanation, we understand that the idea behind any Krylov method is to approximate a polynomial $p$ by a smaller polynomial of degree $m-1$. Thus, we can rephrase our problem of approximating $f_m$ as how to choose a polynomial $p_{m-1} \in \Pi_{m-1}$ such that $p_{m-1}(A)b \approx p(A)b \approx f(A)b$.
+
+We know from the definitions of matrix functions that $p$ interpolates $f$ at $\text{spec}(A)$ and we consider the approximating polynomial $p_{m-1}$ to interpolate $f$ at $m$ suitably chosen points. This leads us to the Ritz values corresponding to $\mathcal{K}_m(A, b)$, which are the eigenvalues of $H_m$. These eigenvalues are always related to some form of spectral information of $A$, as they lie within its field of values (which reduces to the spectral interval $[\lambda_{\min}, \lambda_{\max}]$ in the Hermitian case). Moreover, they become exact eigenvalues of $A$ when the Krylov subspace reaches its maximum possible dimension\cite{39}.
+
+The highlight of choosing $p_{m-1}$ as the polynomial that interpolates $f$ at the Ritz values corresponding to $\mathcal{K}_m(A, b)$ is that $p_{m-1}(A)b$ arise as a by-product without the explicit need to compute $p_{m-1}$.
+The above is provided in the below lemma.
+
+\begin{lemma}
+    \label{lem:2.15}
+    \cite{8} Let \( A \in \mathbb{C}^{n \times n} \) and let \( b \in \mathbb{C}^n \). Let \( V_m, H_m \) fulfil the relation \ref{eq:2.25}, and let
+    \begin{equation}
+        f_m = V_m f(V_m^H A V_m) V_m^H b = b_2 V_m f(H_m) \hat{e_1}
+        \label{eq:2.26}
+    \end{equation}
+    where $\hat{e_1}$ is the first unit vector in a coordinate system. Then
+    \[ f_m = p_{m-1}(A)b,\]
+    where \( p_{m-1} \in \Pi_{m-1} \) is the unique polynomial interpolating \( f \) at the eigenvalues of \( H_m \) in the Hermite sense, provided that \( f \) is defined on \( \text{spec}(H_m) \).
+\end{lemma}
+
+The approximation $f_m = p_{m-1}(A)b$ is considered close to the correct value $f(A)b$ if the $m$ Ritz values are near the $n$ eigenvalues of $A$. From $H_m = V_m^H A V_m$, it follows that the eigenvalues of $H_m$ lie within the numerical range of $A$, i.e.,
+
+\[
+    spec(H_m) \subseteq W(A) := \{ x^* A x : \|x\|_2 = 1 \}
+\]
+Since $\text{spec}(A) \subseteq W(A)$, the Arnoldi approximation \ref{eq:2.26} is a reasonable approach. Furthermore, we observe that the eigenvalues of $H_m$ eventually become eigenvalues of $A$ with an increase in $m$. In other words, the Arnoldi approximation becomes exact after a finite number of iterations. i.e., in reference to remark \ref{rem:2.14}, the Arnoldi process is feasible up to $m$ and only then breaks down. We also have
+\begin{equation}
+    \text{spec}(H_m) \subseteq \text{spec}(A), \quad f(A)b = b_2 V_m f(H_m) \hat{e_1},
+    \label{eq:2.27}
+\end{equation}
+i.e., the Arnoldi approximation is exact for $m$.
+
+The merits of having the Arnoldi approximation is that we do not need to store $A$ explicitly because we only require $A$ for matrix-vector multiplication at a cost of $\mathcal{O}(n)$. This makes it particularly advantageous for dealing with large sparse matrices.
+
+While we recognize the benefits of Arnoldi approximations, a significant challenge is storing the full matrix $V_m$, even for large sparse matrices where storing full matrices was previously unnecessary. This challenge applies to sparse and Hermitian or non-Hermitian matrices $A$, leading to memory limitations after $m$ iterations, depending on the matrix size. Some approaches to mitigate these issues include:
+
+\begin{enumerate}
+    \item For Hermitian matrices and Non-Hermitian matrices, it is well known that the computation for a particular case matrix function can be improved by deflating the eigenvalues smallest in absolute value \cite{10}. The idea is to treat these critical eigenvalues exactly and perform the Krylov subspace approximation on a deflated space.
+    \item Recently, \cite{41} introduced a method, Randomized Subspace Embedding, that partly avoids orthogonalization in the Arnoldi process by leveraging randomized subspace embedding techniques \cite{42}. This approach represents $f(A)$ via a Cauchy integral as defined prior in Definition \ref{def:2.7}, thereby reducing the problem of $f(A)b$ to solving shifted inverses $(A + sI)^{-1}b$. Subsequently, Krylov subspace methods for inverses are accelerated through a sketch-and-solve approach akin to \cite{43}.
+    
+    \item Restarting the Arnoldi Process is another approach, first described in \cite{44} and detailed in \cite{45}. Here, the error of the Arnoldi approximation is approximated by another Arnoldi iteration, continuing iteratively to refine the approximation.
+
+    \item Another interesting approach is to use polynomials for preconditioning the matrix $A$, which helps in much faster convergence of the Arnoldi process as introduced by the paper \cite{49}.
+\end{enumerate}
+
+Additionally, it is worth noting that Algorithm \ref{alg:arnoldi} employs a modified Gram-Schmidt orthogonalization process to compute $V_m$, the orthonormal Krylov basis, which requires $\mathcal{O}(Nm^2)$ arithmetic operations for the Arnoldi process. This makes it computationally expensive, with increasing time requirements as $N$ grows. In contrast, the Lanczos process requires only $\mathcal{O}(Nm)$ arithmetic operations. However, it is important to understand that the Lanczos process can only be applied to the special case.
+
+
+For $f(H_m) = f(V_m^+ A V_m)$, the integral representation in FOM can be expressed as
+\begin{align}
+    f_m &= \int_{\Gamma} \|b\| V_m (tI + H_m)^{-1} e_1 \, d\mu(t) \\
+    &= \int_{\Gamma} x_m(t) \, d\mu(t).
+    \label{eq:5.4&5.5}
+\end{align}
+From this, we observe that the integrand contains the FOM (or Galerkin) approximation
+\begin{align*}
+    x_m(t) &:= \|b\| V_m (tI + H_m)^{-1} e_1 \\
+    &= V_m y_m(t)
+\end{align*}
+for the solution $x(t)$ of the shifted linear system $(tI + A)x(t) = b$. The residuals of these approximations are explicitly given by
+\begin{align}
+    r_m(t) &= b - (tI + A)x(t) \\
+    &= -\|b\| h_{m+1,m} (e_m^{T}(tI + H_m)^{-1} e_1) v_{m+1} \\
+    &= \alpha(t) v_{m+1},
+    \label{eq:5.6&5.7&5.8}
+\end{align}
+where $\alpha(t) = -\|b\| h_{m+1,m} (e_m^{T}(tI + H_m)^{-1} e_1)$, and $r_m(t)$ is orthogonal to $\text{span}(V_m)$. These insights are essential in the preceding section.
+
+\section{Randomized Sketching For Krylov Approximations}
+\label{sec:sketching}
+
+% Introduction on randomized sketching for Krylov approximations.
+As discussed in the previous section, the evaluation of Arnoldi approximation methods necessitates the storage of an entire Krylov basis $V_m$ and the orthogonalization of the next Arnoldi vectors against all previous ones, which becomes problematic for large matrices. Sketching offers a potential remedy by relaxing the stringent orthogonality requirement. The proposed approach merely requires that the sketched residual $Sr_m(t)$ be orthogonal to the sketched span of the Krylov basis, $span(SV_m)$ where $S$ is a $s\times N$ sketching matrix. This is similar to the sketched Galerkin orthogonality condition for a parametric linear system\cite{46}. This requires us to have the below,
+
+\[
+    \hat{x_m}(t) = V_m \hat{y_m}(t) \text{    with    } (SV_m)^{H}[Sb - S(tI + A)\hat{x_m}(t)] = 0,
+\]
+or equivalently (if the inverted quantity is well-defined), 
+\begin{equation}
+    \hat{x_m}(t) = V_m\hat{y_m}(t) \text{    with    } \hat{y_m}(t) = [(SV_m)^{H}(tSV_m + SAV_m)]^{-1}(SV_m)^{H}(Sb)
+    \label{eq:2.28}
+\end{equation}
+
+Then as mentioned in the paper \cite{41}, the sketched FOM approximation for $f(A)$ is defined to be,
+\[
+    \hat{f}_m := \int_{\Gamma} \hat{x}_m(t) \, \mathrm{d}\mu(t) = V_m \int_{\Gamma} \left[(SV_m)^H (tSV_m + SAV_m)\right]^{-1} \, \mathrm{d}\mu(t) (SV_m)^H (Sb).
+    \tag{\footnotesize sFOM}
+\]
+
+\begin{remark}
+    \label{rem:2.17}
+    Some important remarks as seen in paper \cite{41} are,
+    \begin{enumerate}
+        \item if $S = I \implies$ FOM and sFOM yield the same approximates.
+        \item The sketched orthogonality condition is imposed explicitly in (sFOM), hence there is no requirement for the Krylov basis $V_m$ to be orthogonal. This means that $V_m$ can be constructed without orthogonalization or by using a truncated orthogonalization procedure
+        \item The sketched matrices $SV_m$ and $SAV_m$ can be constructed on the fly during the Arnoldi iteration, being expanded by $Sv_{m+1}$ and $SAv_{m+1}$ when the new Krylov basis vector $v_{m+1}$ is appended to $V_{m}$. The matrix-vector product $Av_{m+1}$ can be reused in the following iteration so that the overall number of matrix-vector products with A remains the same as for the Arnoldi procedure without sketching.
+        \item If the full vector approximation $\hat{f}_m$ defined by (sFOM) is needed, then $V_m$ will still need to be stored as $\hat{x}_m(t) = V_m\hat{y}_m(t)$. However, as opposed to the standard FOM approach, $V_m$ does not need to be (fully) orthogonal and hence $V_m$ can be held on slow memory (e.g., hard disk). Full access to $V_m$ is only needed once the sketched FOM approximant $\hat{f}_m$ is formed, but not during the basis generation. Alternatively, the sketched approximation also makes it viable to use a two-pass approach \cite{47, 48} in the case of non-Hermitian $A$.
+        \item If only a few (say, $\ell \ll N$) selected components of $\hat{f}_m$ are needed or, more generally, a matrix-vector product $M\hat{f}_m$ with a short matrix $M \in \mathbb{C}^{\ell \times N}$, then with truncated Arnoldi only $k+1$ basis vectors $v_j$ need to be kept in memory in addition to the small matrix $MV_m$.
+    \end{enumerate}   
+\end{remark}
+
+\subsection{ A closed formula for sketched FOM}
+\label{sec_sketched_FOM}
+
+% Further explanation and conversion to a useful algorithm.
+As further investigated in the paper \cite{41}, if equation \ref{eq:2.28} is well defined, this guarantees $SV_m$ is of full rank $m$ and that $V_m^{H}S^{H}SV_m$ is non-singular. Re-arranging the expression inside the brackets in equation \ref{eq:2.28} we have,
+
+\[\left[ t V_m^H S^H S V_m + V_m^H S^H S A V_m \right]^{-1} 
+= \left( V_m^H S^H S V_m \right)^{-1} \left[ t I + V_m^H S^H S A V_m \left( V_m^T S^T S V_m \right)^{-1} \right]^{-1}
+\]
+
+Hence we rewrite the sFOM approximations as,
+\begin{align*}
+    \hat{f}_m &= V_m \int_{\Gamma} \left[ tV_m^H S^H S V_m + V_m^H S^H S A V_m \right]^{-1} \mathrm{d}\mu(t) \ (SV_m)^H (Sb) \\
+            &= V_m (V_m^H S^H S V_m)^{-1} \int_{\Gamma} \left[ tI + V_m^H S^H S A V_m (V_m^H S^H S V_m)^{-1} \right]^{-1} \mathrm{d}\mu(t) \ (SV_m)^H (Sb) \\
+            &= V_m (V_m^H S^H S V_m)^{-1} f \left( V_m^H S^H S A V_m (V_m^H S^H S V_m)^{-1} \right) (SV_m)^H (Sb).
+    \tag{\footnotesize sFOM'}
+\end{align*}
+
+Similar to the standard FOM approximation, the closed formula for the sketched approximation (sFOM'), does not involve any integration. Moreover, sFOM and sFOM' are completely independent of the choice of $V_m$ as long as $span(V_m) = \kappa_m(A, b)$
+
+As elaborated in the paper \cite{41}, a basis whitening condition was used for their analysis without the loss of generality that the sketched basis be orthonormal for a full rank $m$, $SV_m$. The basis whitening condition is given by,
+\begin{equation}
+    (SV_m)^{H}SV_m = I_m
+    \label{eq:2.29}
+\end{equation}
+
+Thus resulting in a simpler expression,
+\[
+    \hat{f_m} = V_mf(V_m^{H}S^{H}SAV_m)V_m^{H}S^{H}Sb
+    \tag{\footnotesize sFOM''}
+\]
+
+If $SV_m = Q_mR_m$ is a thin QR decomposition of the (non-orthonormal) sketched basis $SV_m$, this could be used as a low-cost computational process rather than enforcing the basis whitening condition during the Gram–Schmidt orthonormalization process on sketched vectors. This implies we replace,
+
+\[
+    SV_m \leftarrow Q_m, SAV_m \leftarrow (SAV_m)R_m^{-1}, V_m \leftarrow V_mR_m^{-1} \text{ (only implicitly!)}
+\]
+
+in (sFOM''), resulting in
+
+\[
+    \hat{f_m} = V_m(R_m^{-1}f(Q_m^{H}SAV_mR_m^{-1})Q_m^{H}Sb
+    \tag{\footnotesize sFOM'''}
+\]
+
+Based on the above, a standard algorithm for sketched FOM approximation of $f(A)b$ can be represented as below.
+
+\begin{algorithm}[H]
+    \caption{Sketched FOM approximation of f (A)b\cite{41}}
+    \label{alg: Sketched FOM approximation of f (A)b}
+    \begin{algorithmic}[1]
+        \REQUIRE $A \in \mathbb{C}^{N \times N}$, $b \in \mathbb{C}^{N}$, function $f$, integers $m < s \ll N$
+        \ENSURE $\hat{f}_m \approx f(A)b$
+        \STATE Draw sketching matrix $S \in \mathbb{C}^{s \times N}$
+        \STATE Generate (non-orthogonal) basis $V_m$ of $K_m(A, b)$, as well as $SV_m$ and $SAV_m$
+        \STATE Compute thin QR decomposition $SV_m = Q_m R_m$
+        \COMMENT{basis whitening}
+        \STATE $\hat{f}_m \gets V_m \left(R_m^{-1} f \left(Q_m^H S A V_m R_m^{-1} \right) Q_m^H S b \right)$
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{remark}
+    \label{rem:2.18}
+    \cite{41}If $SV_m$ and hence $R_m$ are extremely ill-conditioned, it is better to utilize the numerical pseudoinverse instead of $R_m^{-1}$ to reduce any numerical instability.
+\end{remark}
+
+\subsection{Adaptive quadrature for sketched FOM}
+\label{sec:adap_sketched_FOM}
+
+% Introducing the main idea of the Adaptive quadrature-based SKetched FOM
+In the paper \cite{41} to evaluate the sketched GMRES approximant (sGMRES), the integral is approximated as no closed form. For approximating the integral one can in principle use any \textit{l}-point quadrature rule,
+\begin{equation}
+    \int_{\Gamma} \left( tSV_m + SAV_m \right)^{\dagger} (Sb) \, \mathrm{d}\mu(t) \approx \sum_{i=1}^{\ell} w_i(t_i, SV_m + SAV_m)^{\dagger} (Sb) =: q_\ell(S, A, V_m, b)
+    \label{eq:2.30}
+\end{equation}
+with weights $w_i$ and quadrature nodes $t_i \in \Gamma (i = 1, 2\dots, l)$. In \cite{41}, the author uses the paper \cite{52} as a reference and introduces a numerical quadrature. They compute the results of two quadrature rules $q_{l_1}(S, A, V_m, b)$ and $q_{l_2}(S, A, V_m, b)$ of orders $l_1 < l_2$ respectively. If,
+\begin{equation}
+    ||q_{l_1}(S, A, V_m, b) - q_{l_2}(S, A, V_m, b)|| < tol
+    \label{eq:2.31}
+\end{equation}
+is the absolute value of the difference between the two quadrature rules for a user-specified tolerance 'tol', we accept the result of the higher-order quadrature rule $q_{l_2}$. If the above equation \ref{eq:2.31} is not satisfied, the order of the quadrature rule is increased by setting $l_1 \leftarrow l_2$ and $l_2 \leftarrow [\sqrt{2} \cdot l_2]$. We repeat this until equation \ref{eq:2.31} is fulfilled.
+
+\flushbottom
+\begin{algorithm}[H]
+    \caption{Sketched GMRES approximation of $f(A)b$ with $k$-truncated Arnoldi\cite{41}}
+    \label{alg:Sketched GMRES approximation of f(A)b}
+    \begin{algorithmic}[1]
+        \REQUIRE $A \in \mathbb{C}^{N \times N}$, $b \in \mathbb{C}^{N}$, function $f$, integers $m, s, \ell_1, \ell_2$, tolerance $\text{tol}$
+        \ENSURE $\tilde{f}_m \approx f(A)b$
+        \STATE Draw sketching matrix $S \in \mathbb{C}^{s \times N}$
+        \STATE Generate (non-orthogonal) basis $V_m$ of $K_m(A, b)$, as well as $SV_m$ and $SAV_m$
+        \STATE Compute thin QR decomposition $SV_m = Q_mR_m$ \COMMENT{basis whitening}
+        \STATE $SV_m \gets Q_m$, $SAV_m \gets (SAV_m)R_m^{-1}$, $V_m \gets V_mR_m^{-1}$ \COMMENT{only implicitly!}
+        \IF{contour $\Gamma$ is not fixed}
+            \STATE Compute solutions $\Lambda$ of generalized rectangular EVP $SAV_m x = -\lambda SV_m x$
+            \STATE Choose $\Gamma$ such that it encircles $\Lambda$
+        \ENDIF
+        \STATE Compute quadrature rules $q_{\ell_1}(S, A, V_m, b)$ and $q_{\ell_2}(S, A, V_m, b)$ \COMMENT{see \ref{eq:2.30}}
+        \WHILE{$|q_{\ell_1}(S, A, V_m, b) - q_{\ell_2}(S, A, V_m, b)| > \text{tol}$}
+            \STATE Set $q_{\ell_1}(S, A, V_m, b) \gets q_{\ell_2}(S, A, V_m, b)$ \COMMENT{reuse previous result}
+            \STATE $\ell_1 \gets \ell_2$, $\ell_2 \gets \ell_2 + \lceil \sqrt{2} \cdot \ell_2 \rceil$ \COMMENT{increase order of quadrature rules}
+            \STATE Compute quadrature rule $q_{\ell_2}(S, A, V_m, b)$
+        \ENDWHILE
+        \STATE $\tilde{f}_m \gets V_m q_{\ell_2}(S, A, V_m, b)$
+    \end{algorithmic}
+\end{algorithm}
+
+
+In Algorithm \ref{alg:Sketched GMRES approximation of f(A)b}, although any quadrature rule could be used, it is necessary to emphasise that the choice of the quadrature rule should depend on $f$ and $\Gamma$. If $f$ is not a Stieltjes function, we are then required to additionally construct a suitable contour $\Gamma$ before the numerical integration.
+
+%% Should we discuss the computational cost? 
+
+\section{Polynomial preconditioning} 
+\label{sec:poly_pre_cond}
+
+% Introduction to polynomial preconditioning and the concept behind the method mentioned in the paper.
+preconditioning is one of the most well-acknowledged techniques for solving linear systems. Such a system is represented with the $f(z) = z^{-1}$ function. Let us consider a non-singular matrix $M$ then,
+
+\begin{equation}
+    A^{-1}b = (M^{-1}A)^{-1}M^{-1}b = M^{-1}(AM^{-1})^{-1}b
+    \label{eq:2.32}
+\end{equation}
+
+The equation \ref{eq:2.32} represents the two possible types of preconditioning. The first equality displays a left preconditioning, where we compute an approximation $x_{m}$ for $A^{-1}b$ from the Krylov subspace $\mathcal{K}_{m}(M^{-1}A, M^{-1}b)$. The second equality leads us to the right preconditioning, where we compute the approximation $x_{m} = M^{-1}y_{m}$. Here $y_{m}$ is the approximation to $(AM^{-1})^{-1}b$ from the Krylov subspace $\mathcal{K}_{m}(AM^{-1}, b)$.
+
+Though we consider preconditioning to be a very useful technique, the challenge faced with this method is that we need to find the most appropriate preconditioner $M$, that leads us to a relatively cheaper computation of $M^{-1}u$, for any vector $u$. Moreover, this matrix $M$ should bring $M^{-1}A$ / $AM^{-1}$ closer to identity such that, this further accelerates the Krylov subspace methods to converge faster in fewer number of iterations.
+
+In the paper \cite{49}, a proposal was introduced that enables us to borrow the idea of polynomial preconditioning of the function $f(z)=z^{-1}$ to any function $f$. The property of interest in the function $f(z) = z^{-1}$ is that,
+\[
+    (z_{1}z_{2})^{-1} = z_{1}^{-1}z_{2}^{-1} = z_{2}^{-1}z_{1}^{-1}
+\]
+If we translate this to matrix functions for any two non-singular matrices $A$ and $B$ we have,
+
+\[
+    (AB)^{-1} =B^{-1}A^{-1} = A^{-1}B^{-1}
+\]
+
+This is what was reflected in the equation \ref{eq:2.32}. This property is representable only if $A$ and $B$ commute, in which $f(A)g(B) = g(B)f(A)$ for any functions $f$ and $g$, thus in particular for $f(z) = g(z) = z^{-1}$. Now to implement this idea the paper \cite{49} suggests identifying the situation where $f(AB)$ can be smoothly interlinked to $f(A)$ and/or $f(B)$. The proposal made in the paper is that, assuming $A \in \mathbb{C}^{n \times n}$ with a polynomial $p$ and a function $z^{\alpha}$ for some $\alpha \in \mathbb{R}$ where, $f(z) = g(z) = z^{\alpha}$. Furthermore, if $\alpha < 0$ an assumption is made such that matrices $A$ and $p(A)$ do not have eigenvalues in $(-\infty, 0]$. Then,
+
+\begin{equation}
+    (Ap(A))^\alpha = A^\alpha (p(A))^\alpha = (p(A))^\alpha A^\alpha
+    \label{eq:2.33}
+\end{equation}
+
+\subsection{Preconditioning for inverse square root}
+\label{sec:pre_cond_inv_sqrt}
+
+% explanation in the area of concern, inverse square root
+The approach introduced in the polynomial preconditioning method for the inverse square root is to,
+\begin{enumerate}
+    \item approximate $p(A)$ as close as possible to $A^{-1}$ such that $Ap(A)$ is very close to identity.
+    \item $(p(A))^{1/2}$ needs to be easily evaluated.
+\end{enumerate}
+
+To achieve these goals, the paper\cite{49} suggests to consider $p(z) = (q(z))^{2}$, where $q$ is chosen as a polynomial that approximates $z^{-1/2}$. Modifying the equation \ref{eq:2.33} for $\alpha = -1/2$ gives,
+\begin{equation}
+    A^{-1/2}b = (A(q(A))^{2})^{-1/2}q(A)b = q(A)(A(q(A))^{2})^{-1/2}b
+    \label{eq:2.34}
+\end{equation}
+where we know,
+\begin{equation}
+    ((q(A))^{2})^{-1/2} = q(A).
+    \label{eq:2.35}
+\end{equation}
+
+Satisfying the equation \ref{eq:2.35} directly correlates to the branch we consider for the square root and the distribution of the eigenvalues of $A$. In paper \cite{49} a further assumption is made where only the principle branch of the square root is considered i.e.,
+\[
+    z = |z| e^{i \text{arg}(z)} \rightarrow ||z|^{1/2}| e^{i\text{arg}(z)/2} \text{, for } \text{arg}(z) \in (-\pi, \pi]
+\]
+i.e., the branch cut is put on the negative real axis. Hence for any polynomial $q$ we have,
+\begin{equation}
+    ((q(A))^{2})^{-1/2} = q(A) \text{ if spec}(q(A)) \in \mathbb{C}^{+}
+    \label{eq:2.36}
+\end{equation}
+where $\mathbb{C}^{+}$ denotes  the open right half-plane.
+
+As a result of the above implications if $q(A)$ approximates $A^{-1/2}$, the matrix $A(q(A))^{2}$ should be close to identity and thus have a small condition number. This signifies we require only fewer iterations for obtaining a more accurate approximation $f_{m}$
+
+\begin{algorithm}[H]
+    \caption{$m$ steps of left polynomially preconditioned Arnoldi for $A^{-1/2}b$ \cite{49}}
+    \label{alg:left_polynomially_preconditioned_Arnoldi}
+    \begin{algorithmic}[1]
+        \REQUIRE Polynomial $q$ such that $q(A)$ approximates $A^{-1/2}$
+        \ENSURE $f_m \gets V_m(H_m^{-1/2} e_1 \|c\|)$
+        \STATE Choose polynomial $q$ such that $q(A)$ approximates $A^{-1/2}$
+        \STATE Put $c \gets q(A)b$, $v_1 \gets c / \|c\|$
+        \FOR{$j = 1, \dots, m$}
+            \STATE \COMMENT{Arnoldi process for preconditioned matrix}
+            \STATE Compute $u \gets Av_j$, $y \gets q(A)u$, $w \gets q(A)y$
+            \FOR{$i = 1, \dots, j$}
+                \STATE $h_{ij} \gets \langle w, v_i \rangle$, $w \gets w - v_i h_{ij}$ \COMMENT{orthogonalize against previous vectors}
+            \ENDFOR
+            \STATE $h_{j+1,j} \gets \|w\|$
+            \STATE $v_{j+1} \gets w / h_{j+1,j}$
+        \ENDFOR
+        \STATE $f_m \gets V_m(H_m^{-1/2} e_1 \|c\|)$, $V = [v_1 \dots v_m]$, $H_m = (h_{ij}) \in \mathbb{C}^{m \times m}$ \COMMENT{upper Hessenberg}
+    \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+    \caption{$m$ steps of right polynomially preconditioned Arnoldi for $A^{-1/2}b$ \cite{49}}
+    \label{alg:right_polynomially_preconditioned_Arnoldi}
+    \begin{algorithmic}[1]
+        \REQUIRE Polynomial $q$ such that $q(A)$ approximates $A^{-1/2}$
+        \ENSURE $f_m \gets Y_m(H_m^{-1/2} e_1 \|b\|)$
+        \STATE Choose polynomial $q$ such that $q(A)$ approximates $A^{-1/2}$
+        \STATE Put $v_1 \gets b / \|b\|$
+        \FOR{$j = 1, \dots, m$}
+            \STATE \COMMENT{Arnoldi process}
+            \STATE Compute $y_j \gets q(A)v_j$, $u \gets q(A)y_j$, $w \gets Au$
+            \FOR{$i = 1, \dots, j$}
+                \STATE $h_{ij} \gets \langle w, v_i \rangle$, $w \gets w - v_i h_{ij}$ \COMMENT{orthogonalize against previous vectors}
+            \ENDFOR
+            \STATE $h_{j+1,j} \gets \|w\|$
+            \STATE $v_{j+1} \gets w / h_{j+1,j}$
+        \ENDFOR
+        \STATE $f_m \gets Y_m(H_m^{-1/2} e_1 \|b\|)$, $Y_m = [y_1 \dots y_m]$, $H_m = (h_{ij}) \in \mathbb{C}^{m \times m}$ \COMMENT{upper Hessenberg}
+    \end{algorithmic}
+\end{algorithm}
+
+
+While comparing both the above two algorithms, with left preconditioning, the norm $||f_{m}||$ can be obtained just from $H^{-1/2}e_{1}||b||$ since $V_{m}$ is orthonormal. But for the right preconditioning, $Y_{m}$ does not have orthonormal columns. Hence when basing a stopping criteria on the size of the difference of consecutive iterates, left preconditioning is usually more appropriate.
+
+Though a proposal has been established for the polynomial preconditioning, another difficult task for using the algorithms is the selection of the polynomial based on the properties of the matrix $A$. The paper \cite{49} elaborates to what extent the equation \ref{eq:2.36} is fulfilled for the polynomial chosen. i.e., $((q(A))^{2})^{1/2}$. Thus a general result has been used for the choice of the polynomial. Assume $\text{spec}(A) \subseteq \mathbb{C}^{+}$ and that $q$ approximates $z^{-1/2}$ on $\text{spec}(A)$ uniformly in a relative sense with accurately $\frac{1}{\sqrt{z}}$. i.e., we have,
+\[
+    |q(\lambda) - \lambda^{-1/2}| \leq \frac{1}{\sqrt{2}} |\lambda^{-1/2}| \quad \text{for} \quad \lambda \in \text{spec}(A)
+\]
+
+Then $((q(A))^{2})^{-1/2} = q(A)$. Based on the above-stated fulfilment criteria, some interesting choices of polynomials studied in the paper were Chebyshev expansions, polynomial interpolation at (harmonic) Ritz values,  and polynomials obtained via error via minimization.
+
+In this thesis we are interested in obtaining polynomial interpolation at Ritz values, utilizing the Arnoldi method. The Ritz values are the eigenvalues of the upper Hessenberg matrix $H_{d}$ arising from $d$ steps of the Arnoldi process. Hence a simple idea to choose the preconditioning polynomial $q$ is as the polynomial of degree $d - 1$ that interpolates $\frac{1}{\sqrt{z}}$ at the $d$ Ritz values. This has the attractive feature that it does not require any prior knowledge about the spectral region of $A$ but rather adapts itself automatically to the spectrum of $A$. For, the Arnoldi process for constructing $H_{d}$ one can start with a randomly drawn vector. Once we have the interpolation points one could use different bases to represent the interpolating polynomial. A very widely used representation is the Newton's representation,
+\begin{equation}
+    P_{m-1}(\alpha) = \sum_{i=1}^{m} a_i \prod_{j=1}^{i-1} (\alpha - \theta_j),
+    \label{eq:2.37}
+\end{equation}
+and to have the polynomial $p$ interpolating on the points ${\theta_{i} }$, we need to use divided differences to obtain the coefficients $a_{i}$ , as follows:
+
+\[
+\begin{aligned}
+    a_1 &= f[\theta_1] = f(\theta_1) \\
+    a_2 &= f[\theta_1, \theta_2] = \frac{f(\theta_2) - f(\theta_1)}{\theta_2 - \theta_1} \\
+    a_3 &= f[\theta_1, \theta_2, \theta_3] = \frac{f[\theta_2, \theta_3] - f[\theta_1, \theta_2]}{\theta_3 - \theta_1} \\
+    &\vdots \\
+    a_m &= f[\theta_1, \theta_2, \theta_3, \ldots, \theta_m] = \frac{f[\theta_2, \theta_3, \ldots, \theta_m] - f[\theta_1, \theta_2, \ldots, \theta_{m-1}]}{\theta_m - \theta_1}
+\end{aligned}
+\]
+where, $f[\theta_2, \theta_3]=\frac{f(\theta_3) - f(\theta_2)}{\theta_3 - \theta_2}$.
+
+\section{Restarted Arnoldi}
+\label{sec:restarted_arnoldi}
+
+% Introduction to various restarted Arnoldi approaches presented in the paper based on error function.
+One of the most useful definitions for the Arnoldi approximation is,
+
+\begin{equation}
+    f_{m} = V_{m}f(H_{m})V_m^{H}b = ||b||V_{m}f(H_{m})e_{1}
+    \label{eq:2.38}
+\end{equation}
+
+This provides a clear understanding of the difference between the Arnoldi approximation and polynomial interpolation. This is exploited in many methods to approximate $f(A)b$. Even though the above relationship is helpful, there are two main problems one encounters. 
+
+The first problem is the computation and the storage of the whole Arnoldi basis $V_{m}$ for the evaluation of \ref{eq:2.38}. This becomes expensive with the growth of $m$ to a large number. The second problem faced is that $f(H_{m})e_{1}$ has to be computed for forming $f_{m}$. This could also get expensive as $m$ grows to a bigger number. For a Hermitian matrix $A$, a simple strategy to overcome the storage problem would be a two-pass Lanczos method \cite{48}. Now in the case of a non-Hermitian matrix $A$, which is of our interest, a suggestible solution to the above problem would be restarted Arnoldi. With this method, the $m$ Arnoldi orthogonalization steps are carried out to form $f_{m}$. The basis $V_{m}$ computed thereafter gets discarded and a second cycle of Arnoldi is undergone. The Arnoldi cycle is restarted to approximate the error $d_{m}=x-f_{m}$ where $x$ denotes the sought solution of the linear system $Ax=b$.
+
+The above restart procedure is possible because the error $d_{m}$ solves the residual equation,
+
+\begin{equation}
+    Ad_{m} = r_{m}
+    \label{eq:2.39}
+\end{equation}
+
+and the residual $r_{m} = b-Af_{m}$.
+
+As mentioned in the paper \cite{52} for the development of a restarted technique for a general function $f$, the challenge faced is directly correlated to the residual equation. However, as cited in the papers\cite{53, 44}, it is possible to introduce the error of the restarted Arnoldi approximations via divided differences. As stated by Eiermann and Ernst in their paper\cite{44}, assuming that we have $A\in\mathbb{C}^{N \times N}$, $b\in\mathbb{C}^{N}$, with Arnoldi-like decomposition, $AV_{m} = V_{m}H_{m}+h_{m+1,m}v_{m+1}e_{m}^{T}$ and $w_{m}(z) = (z-\theta_{1})\dots(z-\theta_{m})$ is the nodal polynomial associated with Ritz values $\theta_{1}\dots\theta_{m}$, are  the eigenvalues of $H_{m}$ then, the error of $f_{m}$ defined in \ref{eq:2.38} is given by,
+
+\begin{equation}
+    f(A)b - f_{m} = ||b|| \gamma_{m} [D_{w_{m}} f](A)v_{m+1} =: e_{m}(A)v_{m+1}
+    \label{eq:2.40}
+\end{equation}
+
+where $[D_{w_m} f]$ denotes the $m$-th divided difference of $f$ with respect to the interpolation nodes $\theta_{1}\dots\theta_{m}$ and $\gamma_m= \prod_{i=1}^{m}h_{i+1,i}$. This helps us represent error after $m$ steps of the Arnoldi method which could be used to perform restarts similar to the linear system. A summarized algorithm for the above form of restart is as given below:
+
+\begin{algorithm}[H]
+    \caption{Restarted Arnoldi method for $f(A)b$ from \cite{52} (generic version).}
+    \label{alg:restarted_arnoldi}
+    \begin{algorithmic}[1]
+    \REQUIRE $A$, $b$, $f$, $m$
+    \STATE Compute the Arnoldi decomposition $AV^{(1)}_m = V^{(1)}_m H^{(1)}_m + h^{(1)}_{m+1,m} v^{(1)}_{m+1} e_m^T$ with respect to $A$ and $b$.
+    \STATE Set $f^{(1)}_m := \|b\|V^{(1)}_m f(H^{(1)}_m) e_1$.
+    \FOR{$k = 2, 3, \dots$ \textbf{until convergence}}
+        \STATE Determine the error function $e^{(k-1)}_m(z)$.
+        \STATE Compute the Arnoldi decomposition $AV^{(k)}_m = V^{(k)}_m H^{(k)}_m + h^{(k)}_{m+1,m} v^{(k)}_{m+1} e_m^T$ with respect to $A$ and $v^{(k-1)}_{m+1}$.
+        \STATE Set $f^{(k)}_m := f^{(k-1)}_m + \|b\|V^{(k)}_m e^{(k-1)}_m (H^{(k)}_m) e_1$.
+    \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+However as shown in the paper, combining the error representation with the above algorithm provides a restarted Arnoldi, but it is not practically feasible due to numerical instabilities. The problem arises since in divided differences,  the evaluation of high-order divided differences is prone to instabilities, due to the interpolation nodes being close to each other, thereby causing subtractive cancellations and very small denominations in the divided difference table. In the case of the Hermitian matrix $A$ a different approach was also investigated as cited in \cite{5}. Here along with the prior mentioned error representation an assumption that $A$ is hermitian is made. Let $w_{m}$ be a unitary matrix whose columns are the eigenvectors of $H_{m}$ and $\alpha_{i}=e_{1}^{T}w_{m}e_{i}$, $(i=1,\dots,m)$. Then an improved error representation can be defined as below:
+\begin{equation}
+    f(A)b - f_m = ||b||h_{m+1,m}g(A)v_{m+1}
+    \label{eq:2.41}
+\end{equation}
+with
+\begin{equation}
+    g(z) = \sum_{i=1}^{m} \alpha_{i} \gamma_{i} D_{w_{i}}(z) \quad \text{where} \quad w_{i}(z) = (z - \theta_{i})
+    \label{eq:2.42}
+\end{equation}
+
+The error representation \ref{eq:2.41} involves only first-order divided differences, thus making it less prone to numerical instabilities. Yet, this method is stable to a limited extent as mentioned in paper\cite{5}.
+
+The original restart method \cite{44} is highly unstable. Hence an alternative approach without the use of an error function needs to be taken into consideration. One way would be to use the same function $f$ throughout all the restart cycles. This is realized because the Arnoldi-like approach approximates from consecutive cycles to satisfy the update,
+\begin{equation}
+    f^{(k)}_{m} = f^{(k-1)}_{m} + ||b||V^{(k)}_{m} \left[ f(H_{km})e_{1} \right]_{(k-1)m+1:km}, \quad k \geq 2
+    \label{eq:2.43}
+\end{equation}
+where $H_{m}$ is the accumulation of all the Hessenberg matrices from the previous rest cycles in a block-Hessenberg matrix form. i.e.,
+
+\begin{equation}
+    H_{km} =
+    \begin{pmatrix}
+        H_{(k-1)m} & O \\
+        h_{m+1,m} e_1 e_{(k-1)m}^T & H^{(k)}_m
+    \end{pmatrix}
+    \label{eq:2.44}
+\end{equation}
+
+In the newly updated form of approximation of $f_{m}$, presented in \ref{eq:2.43}, the stability problems that were raised in the previous implementation have been sorted out. This also resolves the price of storage on the Arnoldi basis. These perks come however at the cost of evaluating $f$ on the Hessenberg matrix that increases its size by $km$ (i.e., the computational cost grows cubically in $km$). The Algorithm for the improved restart methods is as follows:
+
+\begin{algorithm}[H]
+    \caption{Restarted Arnoldi approximation for $f(A)b$ from \cite{59}.}
+    \label{alg:restarted_arnoldi_approximation}
+    \begin{algorithmic}[1]
+    \REQUIRE $A$, $b$, $m$, rational approximation $r \approx f$ of the form \ref{eq:2.45}
+    \STATE Set $f^{(0)}_m = 0$ and $v^{(0)}_{m+1} = b$.
+    \FOR{$k = 1, 2, \dots$ \textbf{until convergence}}
+        \STATE Compute the Arnoldi decomposition $AV^{(k)}_m = V^{(k)}_m H^{(k)}_m + h^{(k)}_{m+1,m} v^{(k)}_{m+1} e_m^T$ with respect to $A$ and $v^{(k-1)}_{m+1}$.
+        \IF{$k = 1$}
+            \FOR{$i = 1, \dots, \ell$}
+                \STATE Solve $(t_i I - H^{(k)}_m) r_{i,1} = e_1$.
+            \ENDFOR
+        \ELSE
+            \FOR{$i = 1, \dots, \ell$}
+                \STATE Solve $(t_i I - H^{(k)}_m) r_{i,k} = h^{(k-1)}_{m+1,m} (e_m^T r_{i,k-1}) e_1$.
+            \ENDFOR
+        \ENDIF
+        \STATE $h^{(k)}_m = \sum_{i=1}^{\ell} \alpha_i r_{i,k}$.
+        \STATE Set $f^{(k)}_m := f^{(k-1)}_m + \|b\|V^{(k)}_m h^{(k)}_m$.
+    \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+The rational function in the above algorithm is given by,
+
+\begin{equation}
+    r(z) = \sum_{i=1}^{l} \frac{\alpha_{i}}{t_{i} - z}
+    \label{eq:2.45}
+\end{equation}
+
+Then it can be seen that the evaluation of \ref{eq:2.43} with $f=r$ is possible at a constant work per restart cycle. Evaluating $(t_{i} I - H_{km})^{-1} e_{1}$ via sequential solution of $k$ shifted linear system,
+
+\begin{equation}
+    (t_{i} I - H^{(1)}_{m}) r_{i,1} = e_{1}, 
+    \label{eq:2.46}
+\end{equation}
+
+\begin{equation}
+    (t_{i} I - H^{(j)}_{m}) r_{i,j} = h^{(j-1)}_{m+1,m} (e_{m}^{T} r_{i,j-1}) e_{1}, \quad j = 2, \ldots, k
+    \label{eq:2.47}
+\end{equation}
+
+It can be observed that the exploitation of the last block of $r(H_{km})e_{1}$ is only required. Thus allowing an efficient restarting for general functions $f$ with the closure that sufficiently accurate rational approximation $r$ (with $r(A)b \approx f(A)$ is available.
+
+\subsection{Error function in integral form}
+\label{sec:error_func_int_form}
+
+% Explanation and introduction on the usage of integral form for error functions and its application to algorithm 2 in the restarted Arnoldi.
+The main problem with the algorithm \ref{alg:restarted_arnoldi} was the divided difference. The paper \cite{52} introduces a new proposal where the error functions are evaluated using their corresponding integral representation rather than applying the divided differences along with conditions to be fulfilled to do so. The paper introduces a formula for the interpolating polynomials of functions that are representable as a Cauchy type integral i.e.,
+\begin{equation}
+    f(z) = \int_{\Gamma} \frac{g(t)}{t - z} \, dt, \quad z \in \Omega
+    \label{eq:2.48}
+\end{equation}
+where $\Omega \subset \mathbb{C}$ is a region, $f : \Omega \to \mathbb{C}$ is analytic with the path $\Gamma \subset \mathbb{C} \setminus \Omega$ and $g : \Gamma \to \mathbb{C}$. If the integral exists then we can write the interpolation polynomial $p_{m-1}$ of $f$ with the interpolation nodes $\theta_{1},\dots,\theta_{m} \subset \Omega$ as,
+\begin{equation}
+    p_{m-1}(z) = \int_{\Gamma} \left(1 - \frac{w_{m}(z)}{w_{m}(t)}\right) \frac{g(t)}{t - z}dt
+    \label{eq:2.49}
+\end{equation}
+where $w_{m}(z)=(z-\theta_{1})\dots(z-\theta_{m})$. With the above as the foundation, \cite{52} further investigates two important scenarios:
+
+\begin{enumerate}
+    \item $f$ is holomorphic on a region $\Omega' \supset \Omega$.
+    \item $f$ is a Stieltjes function.
+\end{enumerate}
+
+\begin{theorem}
+\label{the:2.19}
+    \cite{52} Let $f$ have an integral representation \ref{eq:2.48} and let $A \in \mathbb{C}^{N \times N}$ with $spec(A) \subset \Omega$ and $b \in \mathbb{C}^{N}$ be given. Denote by $f_{m}$ the $m$-th Arnoldi approximation \ref{eq:2.38} to $f(A)b$ with $spec(H_{m}) = \{\theta_{1},\dots,\theta_{m}\} \subset \Omega$. Then provided that the integral \ref{eq:2.48} with $ w_m (t) = (t - \theta_1 ) ··· (t - \theta_m )$ exists,
+    \begin{equation}
+        f(A)b - f_{m} = \gamma_{m} \int_{\Gamma} \frac{g(t)}{w_{m}(t)} (tI - A)^{-1} v_{m+1} \, dt =: e_{m}(A) v_{m+1}
+        \label{eq:2.50}
+    \end{equation}
+    where $\gamma_{m}=\prod_{i=1}^{m}h_{i+1,i}$.    
+\end{theorem}
+
+The above theorem is very useful as it shows how to interpret the error of the Arnoldi approximation $f_{m}$ to the error of $f(A)b$ approximation represented by $e_{m}(A)$ applied to a vector. This could be used as a substitute to divide differences in different algorithms which had numerical instabilities. Hence we can extend further the integral representation to subsequent restart cycles due to the general form of the Cauchy-type integral being adopted. i.e., the error of $f_{m}^{(k)}$ satisfies,
+\begin{equation}
+    f(A)b - f_{m}^{(k)} = \gamma_{m}^{(1)} \cdots \gamma_{m}^{(k)} \int_{\Gamma} \frac{g(t)}{w_{m}^{(1)}(t) \cdots w_{m}^{(k)}} (tI-A)^{-1}v_{m+1}^{(k)} dt =: e_{m}^{(k)}(A)v_{m+1}^{(k)}
+    \label{eq:2.51}
+\end{equation}
+provided that the integral \ref{eq:2.48} with $w_{m}(t) = (w_{m}^{(1)}(t)\dots_{m}^{(k)}(t))$ exists.
+
+Here we are more interested in Stieltjes functions as they suit our requirement with the sign function. Moreover, Stieltjes functions ensure the existence of the integral which is a vital part of the integral representation of the error functions. The path these functions have, $\Gamma=(-\infty, 0]$ is fixed and does not depend on the spectrum of $A$. An example of Stieltjes function that is also of interest to us is,
+
+\begin{equation}
+    f(z) = z^{-\alpha} = \frac{\sin((\alpha-1)\pi)}{\pi} \int_{-\infty}^{0} \frac{(-t)^{-\alpha}}{t-z} dt \quad \text{for } \alpha \in (0,1)
+    \label{eq:2.52}
+\end{equation}
+
+Since the path of the Stieltjes function $\Gamma$ is in the real interval, one can find an elegant integral transformation to approximate the infinite integral with a numerical quadrature method.
+
+\subsection{Evaluation of the error function by numerical quadrature}
+\label{sec:eval_error_func_by_num_quad}
+
+% The so-constructed integral representation of the error function is now elaborated on how to solve using numerical quadrature.
+The paper \cite{52}, exploits the ability to approximate the action of the error function $e_{m}(A)b$, which is used in restarting the Arnoldi process, adopting numerical quadrature to approximate the integral \ref{eq:2.50}. A typical choice of a suitable form of quadrature formula is,
+\begin{equation}
+    \hat{e}_{m}(z) = \gamma_{m} \sum_{i=1}^{l} w_{i}\frac{ g(t_i)}{w_{m}(t_{i})} \frac{1}{t_{i} - z}
+    \label{eq:2.53}
+\end{equation}
+with quadrature nodes $l_{i}\in\Gamma$ and weights $w_{i}$. From equation \ref{eq:2.53} it is observed that it is a rational approximation. Thus the approach is very similar to Algorithm \ref{alg:restarted_arnoldi_approximation}. Assume that the quadrature nodes and the weights in \ref{eq:2.53} are fixed throughout every restart cycle in Algorithm \ref{alg:restarted_arnoldi}. Also if Algorithm \ref{alg:restarted_arnoldi_approximation} utilizes a rational approximation of the form \ref{eq:2.45} with poles $t_{i}$ and weights $\alpha_{i}=w_{i}g(t_{i})$. Let the quadrature formula be used to evaluate $f$ in the first restart cycle of Algorithm \ref{alg:restarted_arnoldi}. These assumptions make both the algorithms mathematically equivalent at each restart for $k\geq 1$.
+
+The newly introduced quadrature-based restart approach has several perks over the other two restart methods.
+
+\begin{enumerate}
+    \item For constructing a fixed rational approximant $r$ where $r(A)b \approx f(A)b$ in Algorithm \ref{alg:restarted_arnoldi_approximation}, an a-prior information on the spectrum of $A$ is necessary. In the integral approach, error \ref{eq:2.51} allows the automated construction of rational approximations without any spectral data (given the path $\Gamma$ does not depend on the spectrum of $A$). Thus providing an option to apply over a broader range of applications.
+
+    \item The same rational approximations are used by Algorithm \ref{alg:right_polynomially_preconditioned_Arnoldi}  for every restart cycle. The vector $r_{i,k}$ in \ref{eq:2.46} and \ref{eq:2.47} are hence needed to be stored and updated separately for each elementary shifted linear system. On the other hand, the integral representation approach does not require a fixed quadrature rule \ref{eq:2.53}). It can be dynamically adapted in each restart cycle to evaluate $e_{m}^{(k-1)}(H_{m}^{k})e_{1}$ with the required accuracy.
+
+    \item The quadrature allows adaptivity and error control inherently.
+    
+\end{enumerate}
+
+The generic way of implementing an algorithm is as below:
+
+\begin{algorithm}[H]
+    \caption{Quadrature-based restarted Arnoldi approximation for $f(A)b$ \cite{52}}
+    \label{alg:quadrature_based_arnoldi}
+    \textbf{Given:} $A$, $b$, $f$, $m$, $tol$.
+    \begin{algorithmic}[1]
+        \STATE Compute the Arnoldi decomposition $AV^{(1)}_m = V^{(1)}_m H^{(1)}_m + h^{(1)}_{m+1,m}v^{(1)}_{m+1}e_m^T$ with respect to $A$ and $b$.
+        \STATE Set $f_m^{(1)} := \|b\|V^{(1)}_m f(H_m^{(1)}) e_1$.
+        \STATE Set $\tilde{\ell} := 8$ and $\ell := \text{round}(\sqrt{2} \cdot \ell)$.
+        \FOR{$k = 2, 3, \dots$ until convergence}
+            \STATE Compute the Arnoldi decomposition $AV^{(k)}_m = V^{(k)}_m H^{(k)}_m + h^{(k)}_{m+1,m}v^{(k)}_{m+1}e_m^T$ with respect to $A$ and $v^{(k-1)}_{m+1}$.
+            \STATE Choose sets $(t_i, \omega_i)_{i=1,\dots,\tilde{\ell}}$ and $(t_i, \omega_i)_{i=1,\dots,\ell}$ of quadrature nodes/weights.
+            \STATE Set \texttt{accurate} := \texttt{false} and \texttt{refined} := \texttt{false}.
+            \WHILE{\texttt{accurate} = \texttt{false}}
+                \STATE Compute $\tilde{h}_m^{(k)} = (e_m^{(k-1)})^T f(H_m^{(k)}) e_1$ by quadrature of order $\tilde{\ell}$.
+                \STATE Compute $h_m^{(k)} = (e_m^{(k-1)})^T f(H_m^{(k)}) e_1$ by quadrature of order $\ell$.
+                \IF{$\|h_m^{(k)} - \tilde{h}_m^{(k)}\| < tol$}
+                    \STATE \texttt{accurate} := \texttt{true}.
+                \ELSE
+                    \STATE Set $\tilde{\ell} := \ell$ and $\ell := \text{round}(\sqrt{2} \cdot \tilde{\ell})$.
+                    \STATE Set \texttt{refined} := \texttt{true}.
+                \ENDIF
+            \ENDWHILE
+            \STATE Set $f_m^{(k)} := f_m^{(k-1)} + \|b\|\|V_m^{(k)} h_m^{(k)}\|$.
+            \IF{\texttt{refined} = \texttt{false}}
+                \STATE Set $\tilde{\ell} := \ell$ and $\ell := \text{round}(\ell / \sqrt{2})$.
+            \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+Here the use of adaptive quadrature is seen. At each restart, the integral of the error function is approximated with a different number of quadrature nodes $\Tilde{l}$ and $l (\Tilde{l} < l)$.Moreover, the paper \cite{52} suggests the possibility of introducing deflation to the above Algorithm \ref{alg:quadrature_based_arnoldi} presented in \cite{56}. To achieve this, after every restart cycle $k$, reordering of the Schur decomposition of $H_{m}^{(k)}$ is done to restart the Arnoldi process with a set of $d$ target Ritz vectors. The paper also presents some examples of functions that implement Algorithm \ref{alg:quadrature_based_arnoldi}, where insights were discussed on the integral transformation function and the suitable selection of quadrature rules based on the function under consideration.
+
+The inverse fractional powers of $f(z) = z^{-\alpha}$ for $\alpha \in(0,1)$, the function of importance in this thesis, are Stieltjes functions. This provides the advantage that the path $\Gamma$ is always explicitly known and is independent of the spectrum of $A$. However, this comes with a demerit of dealing with infinite integration intervals. As per the paper \cite{57}, one approach to overcome this hurdle would be the introduction of Gaussian quadrature rules for infinite integration intervals. Another approach would be the application of variable substitution and transforming the infinite integral to a finite integral based on \cite{58} working with integral representation for the matrix $p$-th root.
+
+\begin{lemma}
+    \label{rem:2.20}
+    \cite{52}Let $z \in \mathbb{C} \setminus \mathbb{R}^{-}$. Then for all $\beta > 0$
+
+    \begin{equation}
+        z^{-\alpha} = \frac{2 \sin((\alpha-1)\pi) \beta^{1-\alpha}}{\pi} \int_{-1}^{1} \frac{(1-x)^{-\alpha}(x+1)^{\alpha-1}}{-\beta(1-x) - z(1+x)}dx
+        \label{eq:2.54}
+    \end{equation}
+\end{lemma}
+
+\begin{lemma}
+    \label{rem:2.21}
+    \cite{52}Let $\beta > 0$ and let $x_{i}$ and $\omega_{i} (i=1,...,l)$ be the nodes and weights of the $l$-node Gauss-Jacobi quadrature rule on $[-1,1]$. Then
+
+    \begin{equation}
+        r_{l-1,l}(z) = \frac{2 \sin((\alpha-1)\pi) \beta^{1-\alpha}}{\pi} \sum_{i=1}^{l} \frac{\omega_{i}}{-\beta(1-x_{i}) - z(1+x_{i})}
+        \label{eq:2.55}
+    \end{equation}
+
+    is the $(l-1,l)$-Padé approximant for $z^{-\alpha}$ with expansion point $\beta$.
+\end{lemma}
+
+The above lemma suggests that if the spectrum of $A$ is clustered around $\beta$, then the rational approximation \ref{eq:2.55} is well suited for $A^{-\alpha}$. A reasonable choice of transformation parameter, $\beta = \frac{trace(A)}{n}$, the arithmetic mean of eigenvalues of $A$. The numerical experiments presented in the paper \cite{52}, suggest that the method is not very sensitive to the choice of $\beta$. The disadvantage of random choice of $\beta$ is the increase in the number of quadrature nodes $l$ required for the computation, which shoots up the computational cost.
+
+The discussion done until now of using the quadrature rule was on the original function $f(z)=z^{-\alpha}$. However, the application of the same on the error function $e_{m}(z)$ is more appealing in terms of the algorithm \ref{alg:quadrature_based_arnoldi}. In this situation, the insertion of Cayley transforms $t= -\beta \frac{1-x}{1+x}$ to \ref{eq:2.51} and the integral representation \ref{eq:2.52} of $z^{-\alpha}$ leads to the error function,
+\begin{equation}
+    \frac{2 \sin((\alpha - 1)\pi) \beta^{1 - \alpha} \gamma_{m}}{\pi} \int_{-1}^{1} \frac{1}{w_{m}\left( -\beta \frac{1 - x}{1 + x} \right)}\frac{(1 - x)^{-\alpha} (x + 1)^{\alpha - 1}}{- \beta (1 - x) - z(1 + x)}dx
+    \label{eq:2.56}
+\end{equation}
+
+The Gauss-Jacobi quadrature can handle the singularities at the endpoints of the interval $[-1,1]$. But the term, $\frac{1}{w_{m}}(-\beta\frac{1-x}{1+x})$ introduces $m$ additional singularities in the integrated; see the prior definition of $w_{m}(z)=(z-\theta_{1})\dots(z-\theta_{m})$ of the nodal polynomial. This means that the singularities of the non-transformed integrand are the Ritz values. They could lie anywhere in the field of values of $A$, in or out of the integration. Thus one can only guarantee that there are no singularities on the interval of integration if the field of values of $A$ is disjoint from the negative real axis.
