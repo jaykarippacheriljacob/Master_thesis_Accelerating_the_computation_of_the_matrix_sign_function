@@ -2,7 +2,7 @@
 \label{sec:QCD_sim_and_non_herm_challenges}
 
 % Intro. into QCD
-One of the most demanding applications for supercomputers currently is Lattice QCD simulation, where a significant amount of resources are allocated. Quantum chromodynamics (QCD) is a quantum field theory for the strong interaction of the quarks via gluons\cite{30}. This theory is applied to make predictions on masses and resonance spectra on hadrons\cite{29}.
+One of the most demanding applications for supercomputers currently is Lattice QCD simulation, where a significant amount of resources are allocated. Quantum chromodynamics (QCD) is a quantum field theory for the strong interaction of the quarks via gluons \cite{30}. This theory is applied to make predictions on masses and resonance spectra on hadrons \cite{29}.
 
 \section{The Wilson-Dirac and the overlap operator in lattice QCD}
 \label{sec:wil_dirac_overlap}
@@ -11,45 +11,45 @@ One of the most demanding applications for supercomputers currently is Lattice Q
 The governing equation that determines the dynamics of the quarks and the interaction of quarks and gluons is the Dirac equation.
 
 \begin{equation}
-    D\psi + m \cdot \psi = \eta
+    D\psi + m \cdot \psi = \eta.
     \label{eq:2.20}
 \end{equation}
 
 In the above equation the quark fields are represented by $\psi = \psi(x)$ and $\eta = \eta(x)$, where $x$ denotes the points in space-time,
-$x = (x_{0}, x_{1}, x_{2}, x_{3})$\cite{31}. The Dirac operator $D$ in the equation \ref{eq:2.20} represents the gluons and sets the mass of the quarks in the QCD theory. The parameter $m$ is a scalar mass. The Dirac operator can be written as:
+$x = (x_{0}, x_{1}, x_{2}, x_{3})$ \cite{31}. The Dirac operator $D$ in the equation \eqref{eq:2.20} represents the gluons and sets the mass of the quarks in the QCD theory. The parameter $m$ is a scalar mass. The Dirac operator can be written as:
 
 \begin{equation}
-    D = \sum_{\mu=0}^{3} \gamma_{\mu} \otimes (\partial_\mu + A_\mu)
+    D = \sum_{\mu=0}^{3} \gamma_{\mu} \otimes (\partial_\mu + A_\mu),
     \label{eq:2.21}
 \end{equation}
-where, $\partial_\mu = \partial / \partial x_{\mu}$ and $A$ is the gluon gauge field with the anti-hermitian traceless matrices $A_{\mu}(x)$. The $\gamma$-matrices represent the generators of the Clifford algebra\cite{32}. At a given point $x$, the quark field $\psi$ is expressed by a twelve-component column vector. These column vectors correspond to three colours and four spins, acted upon by $A_{\mu}(x)$ and $\gamma_{\mu}$ respectively.
+where $\partial_\mu = \partial / \partial x_{\mu}$ and $A$ is the gluon gauge field with the anti-hermitian traceless matrices $A_{\mu}(x)$. The $\gamma$-matrices represent the generators of the Clifford algebra \cite{32}. At a given point $x$, the quark field $\psi$ is expressed by a twelve-component column vector. These column vectors correspond to three colours and four spins, acted upon by $A_{\mu}(x)$ and $\gamma_{\mu}$ respectively.
 
-To align with our study, we rewrite the massless overlap Dirac operator with a non-zero chemical potential ($\mu$) as follows\cite{33}:
+To align with our study, we rewrite the massless overlap Dirac operator with a non-zero chemical potential $\mu$ as follows\cite{33}:
 
 \begin{equation}
-    D_{ov}(\mu) = 1+\gamma_{5}sgn(H_{w}(\mu))
+    D_{ov}(\mu) = 1+\gamma_{5}sgn(H_{w}(\mu)),
     \label{eq:2.22}
 \end{equation}
-where,$H_{w}(\mu) = \gamma_{5}D_{w}(\mu)$, $D_{w}(\mu)$ is the Wilson-Dirac operator at nonzero chemical potential\cite{34, 35} with negative Wilson mass $m_{w} \in (-2, 0)$, $\gamma_{5} = \gamma_{1}\gamma_{2}\gamma_{3}\gamma_{4}$. The Wilson-Dirac operator is a discretization of the Dirac operator on a four-dimensioned lattice given as,
+where $H_{w}(\mu) = \gamma_{5}D_{w}(\mu)$, $D_{w}(\mu)$ is the Wilson-Dirac operator at nonzero chemical potential \cite{34, 35} with negative Wilson mass $m_{w} \in (-2, 0)$, $\gamma_{5} = \gamma_{1}\gamma_{2}\gamma_{3}\gamma_{4}$. The Wilson-Dirac operator is a discretization of the Dirac operator on a four-dimensioned lattice given as,
 
 \begin{equation}
     \begin{aligned}
         \relax [D_w (\mu)]_{nm} = \delta_{n,m} \\ 
         &- \kappa \sum_{j=1}^{3} (1 + \gamma_j) U_{n,j} \delta_{n+\hat{j},m}- \kappa \sum_{j=1}^{3} (1 - \gamma_j) U_{n-\hat{j},j}^{\dagger} \delta_{n-\hat{j},m} \\
-        &- \kappa (1 + \gamma_4) e^\mu U_{n,4} \delta_{n+\hat{4},m}- \kappa (1 - \gamma_4) e^{-\mu} U_{n-\hat{4},4}^{\dagger} \delta_{n-\hat{4},m}
+        &- \kappa (1 + \gamma_4) e^\mu U_{n,4} \delta_{n+\hat{4},m}- \kappa (1 - \gamma_4) e^{-\mu} U_{n-\hat{4},4}^{\dagger} \delta_{n-\hat{4},m},
     \end{aligned}
     \label{eq:2.23}
 \end{equation}
 where $\kappa = 1/(8+2m_{w})$ and $U_{n,v}$ is the \textit{SU}(3)-matrix associated with the link connecting the lattice site $n$ to $n + \hat{v}$. One of the most important highlights of the Wilson-Dirac operator is that compared to the naive discretization of the derivative operator, it avoids the replication of the fermion species for the continuum Dirac operator.
 
-In the discretized formula \ref{eq:2.23} the non-Hermiticity of the operator arises due to the term $e^{\pm \mu}$. The quark field at each lattice site corresponds to 12 variables: 3 \textit{SU}(3) colour components $\times$ 4 Dirac spinor components. This depicts that the matrix $H_{w}(\mu)$ inside the sign function shifts its properties from Hermitian to non-Hermitian when $\mu \neq 0$. This means we have a new case to be addressed.
+In the discretized formula \eqref{eq:2.23} the non-Hermiticity of the operator arises due to the term $e^{\pm \mu}$. The quark field at each lattice site corresponds to 12 variables: 3 \textit{SU}(3) colour components $\times$ 4 Dirac spinor components. This depicts that the matrix $H_{w}(\mu)$ inside the sign function shifts its properties from Hermitian to non-Hermitian when $\mu \neq 0$. This means we have a new case to be addressed.
 
-The challenge with non-Hermitian matrices lies in the fact that they typically have complex eigenvalues, which complicates the evaluation of the sign function. Therefore, the application of Definition \ref{def:2.8} to Equation \ref{eq:2.22} necessitates the evaluation of the sign of a complex number. Moreover, Definition \ref{def:2.12} offers a clear understanding of the properties that the sign function must satisfy.
+The challenge with non-Hermitian matrices lies in the fact that they typically have complex eigenvalues, which complicates the evaluation of the sign function. Therefore, the application of Definition \ref{def:2.8} to equation \eqref{eq:2.22} necessitates the evaluation of the sign of a complex number. Moreover, Definition \ref{def:2.12} offers a clear understanding of the properties that the sign function must satisfy.
 
-We know that for a square matrix $A$, $[\sgn(A)]^2 = I$ needs to concur for a sign function. A short calculation based on the Jordan block canonical form shows that for the above reason the overlap operator $D_{ov}(\mu)$ as defined in Equation \ref{eq:2.22} satisfies the GinspargWilson relation\cite{36}.
+We know that for a square matrix $A$, $[\sgn(A)]^2 = I$ needs to concur for a sign function. A short calculation based on the Jordan block canonical form shows that for the above reason the overlap operator $D_{ov}(\mu)$ as defined in equation \eqref{eq:2.22} satisfies the GinspargWilson relation \cite{16}.
 
 \begin{equation}
-    {D_{ov},\gamma_{5}}=D_{ov}\gamma_{5}D_{ov}
+    {D_{ov},\gamma_{5}}=D_{ov}\gamma_{5}D_{ov}.
     \label{eq:2.24}
 \end{equation}
-For $A$ Hermitian, the polar factor $\text{pol}(A)=A(A^{\dagger}A)^{-1/2}$ of $A$ coincides with $\sgn(A)$.Building upon the above, significant advancements have been made in developing efficient and faster iterative methods for computing the action of the matrix sign function on a vector.  However, for $A$ non-Hermitian, $\sgn(A) \neq pol(A)$ and $pol(A)^{2}\neq I$. Thus, for $\mu \neq 0$, replacing $\sgn(H_w)$ with $\text{pol}(H_w)$ in the definition of the overlap operator in Eq. (1) not only alters the operator but also violates the Ginsparg-Wilson relation, as demonstrated in numerical experiments. We conclude that the definition provided in Equation \ref{eq:2.22} is the correct formulation of the overlap operator for $\mu \neq 0$. This, in turn, generates the motivation for us to explore further iterative methods of sign function of non-Hermitian matrices.
+For $A$ Hermitian, the polar factor $\text{pol}(A)=A(A^{\dagger}A)^{-1/2}$ of $A$ coincides with $\sgn(A)$.Building upon the above, significant advancements have been made in developing efficient and faster iterative methods for computing the action of the matrix sign function on a vector.  However, for $A$ non-Hermitian, $\sgn(A) \neq pol(A)$ and $pol(A)^{2}\neq I$. Thus, for $\mu \neq 0$, replacing $\sgn(H_w)$ with $\text{pol}(H_w)$ in the definition of the overlap operator in equatiion \eqref{eq:2.22} not only alters the operator but also violates the Ginsparg-Wilson relation, as demonstrated in numerical experiments. We conclude that the definition provided in Equation \eqref{eq:2.22} is the correct formulation of the overlap operator for $\mu \neq 0$. This, in turn, generates the motivation for us to explore further iterative methods of sign function of non-Hermitian matrices.

@@ -1,0 +1,6 @@
+\chapter{Outlook}
+\label{sec:outlook}
+
+For future research, several possibilities emerge from the findings of this thesis. One numerical experiment of interest would be the implementation of the C code and the investigation of its performance and actual computational timings. As discussed in the conclusion, with the added advantage of polynomial preconditioning in identifying the critical eigenvalues and eigenvectors, it would be intriguing to explore the combination of LR-deflation with polynomial preconditioning. Instead of directly finding the critical eigenvalues and eigenvectors of matrix $A$, the focus could shift to evaluating the preconditioned matrix $Q^2(q(Q^2))^2$ and optimizing the method.
+
+Another promising direction for future research would be the combination of the quadrature-based sketched Arnoldi method with polynomial preconditioning. This combination could be an interesting area of investigation, as the drawbacks of polynomial preconditioning—such as the higher number of mvms and inner products required for orthogonalization—might be mitigated by the advantages of quadrature-based sketched Arnoldi. This synergy could potentially result in faster, steeper, and more stable convergence rates.

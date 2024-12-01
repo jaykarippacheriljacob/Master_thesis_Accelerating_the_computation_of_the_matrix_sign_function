@@ -1,0 +1,36 @@
+The matrix sign function plays a crucial role in computations arising in lattice Quantum Chromodynamics (QCD), particularly for the action $\sgn(Q)x$ of a matrix $Q$ on a vector $x$. Here, $Q$ denotes the symmetrized Wilson-Dirac operator, which is Hermitian when the chemical potential is zero but becomes non-Hermitian otherwise. Evaluating this function is computationally expensive, and efficient approximation methods are essential. 
+
+A standard approach for approximating the matrix sign function is based on Arnoldi Krylov subspace methods. In this work, we investigate strategies to accelerate the convergence of these methods, focusing on their application to lattice QCD computations. Specifically, we explore combinations of several techniques, including:
+\begin{enumerate}
+    \item Restarts,
+    \item Implicit and explicit deflation,
+    \item Polynomial preconditioning, and
+    \item Sketching.
+\end{enumerate}
+
+Our study aims to provide insights into the interplay of these techniques and their potential to reduce computational costs while maintaining accuracy. Framework for the combination of these algorithms along with numerical experiments and their results are presented to demonstrate the effectiveness of the proposed methods.
+
+
+The matrix sign function arises in computations in lattice QCD. We look at the computation of the action $\text{sign}(Q)x$ of the sign function of the matrix $Q$ on a vector $x$. In our application, $Q$ is the symmetrized Wilson-Dirac operator. This is a Hermitian matrix if the chemical potential is 0; otherwise, it is non-Hermitian. Actually, we will always consider the inverse square root function, since $\text{sign}(Q)x = (Q^2)^{-1/2}Qx$.
+
+The Arnoldi Krylov subspace approximation is the basis method to approximate $\text{sign}(Q)x$. There are several ways to accelerate the convergence of this basic scheme:
+\begin{enumerate}
+    \item \textbf{Restarts} (in the non-Hermitian case). This avoids having too many inner products in the Arnoldi orthogonalization.
+    \item \textbf{Deflation} (explicit and implicit). This makes the matrix better conditioned and thus reduces the number of iterations. Explicit deflation uses the smallest left and right eigenvectors; implicit deflation is present in the thick restart approach of Eiermann and Güttel; see also the \texttt{funm} Matlab code.
+    \item \textbf{Polynomial preconditioning.} This also makes the matrix better conditioned and thus reduces the number of iterations. A recent paper on this was published along with the numerical results for QCD on a parallel machine.
+    \item \textbf{Sketching.} This is a randomized approach where we save orthogonalizations and sketch the Arnoldi matrix. The relevant paper is by Güttel and Schweitzer.
+\end{enumerate}
+
+\textbf{The purpose of the thesis} is to consider the following combination of the above approaches:
+\begin{itemize}
+    \item $2 + 1$ (as is already done in \texttt{funm})
+    \item $2 + 3$ (building on existing work and code of Gustavo)
+    \item $2 + 4$ (this is new, but Stefan Güttel just gave a talk on it at a conference in Paris)
+\end{itemize}
+
+\textbf{Tasks:}
+\begin{enumerate}
+    \item Understand and describe the individual methods (1--4).
+    \item Describe, formulate algorithmically, and discuss the combined methods ($2+1$, $2+3$, $2+4$).
+    \item Test the combined methods, in Matlab on small configurations.
+\end{enumerate}

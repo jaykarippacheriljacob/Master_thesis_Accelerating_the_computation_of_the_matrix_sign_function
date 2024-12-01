@@ -40,7 +40,7 @@ Applying the spectral definition of the matrix function, we obtain:
 \]
 where, $\lambda_m$ is the diagonal eigenvalue matrix for $m$ critical eigenvalues.
 
-Our primary interest in creating new combinations lies in evaluating $f(A)x_{\ominus}$. As discussed in the paper \cite{11}, $f(A)x_{\ominus}$ can be computed efficiently using appropriate Krylov subspace methods depending on the application. However, the study presented in the paper\cite{11} was limited to just the implementation of Arnoldi iteration combined with LR-deflation.
+Our primary interest in creating new combinations lies in evaluating $f(A)x_{\ominus}$. As discussed in the paper \cite{11}, $f(A)x_{\ominus}$ can be computed efficiently using appropriate Krylov subspace methods depending on the application. However, the study presented in the paper \cite{11} was limited to just the implementation of Arnoldi iteration combined with LR-deflation.
 
 A general algorithm for combining Krylov methods with LR-deflation can be outlined as follows:
 
@@ -54,7 +54,7 @@ A general algorithm for combining Krylov methods with LR-deflation can be outlin
         \STATE Compute $f(\lambda_i)$ for $i = 1, \dots, m$ for the critical eigenvalues.
         \STATE Compute $x_{\Theta} = \left(1 - R_m L_m^{\dagger} \right) x$.
         \STATE Approximant for $f(A)x_{\ominus}$ is computed using Krylov subspace method of your interest.
-        \STATE Compute the approximation to $f(A)x$ using \ref{eq:2.60}.
+        \STATE Compute the approximation to $f(A)x$ using \eqref{eq:2.60}.
     \end{algorithmic}
 \end{algorithm}
 
@@ -63,7 +63,7 @@ The choice of LR-deflation over other methods in our study is motivated by the f
     \item Unlike other deflation methods such as the Schur deflation, the absence of coupling between subspaces.
     \item Krylov subspace methods do not require the deflated directions to be (obliquely) projected out of the Krylov subspace, as the subspaces remain distinct.
     \begin{equation}
-        A(I-R_mL_m^{\dagger})=(I-R_mL_m^{\dagger})A
+        A(I-R_mL_m^{\dagger})=(I-R_mL_m^{\dagger})A.
     \end{equation}
 \end{enumerate}
 
@@ -76,7 +76,7 @@ However, no method is without its limitations. While LR-deflation offers the abo
 From the perspective of our application, specifically, the QCD lattice problem involving non-Hermitian matrices, several Krylov methods could benefit from acceleration through LR-deflation. After reviewing various approaches, we identified a few methods that are particularly well-suited to the problem at hand. These include:
 \begin{enumerate}
     \item Quadrature-based restarted Arnoldi method,
-    \item Polynomial preconditioning method,
+    \item Polynomial preconditioning method, and
     \item Quadrature-based sketched FOM.
 \end{enumerate}
 
