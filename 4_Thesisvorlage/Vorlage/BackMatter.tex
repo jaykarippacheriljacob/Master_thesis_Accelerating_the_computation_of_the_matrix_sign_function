@@ -37,12 +37,12 @@
 	}{}%
 %
 %
-	\ifbool{quellcodeverzeichnis}{%
-		\clearpage%
-		\verzeichnisEintrag{\lstlistlistingname}{listings}
+	%\ifbool{quellcodeverzeichnis}{%
+		%\clearpage%
+		%\verzeichnisEintrag{\lstlistlistingname}{listings}
 		% indent wird in Präambel entfernt
-		\lstlistoflistings%
-	}{}%
+		%\lstlistoflistings%
+	%}{}%
 %
 %
 \clearpage
@@ -100,19 +100,19 @@
 		\printnoidxglossary[type=acronym,		style=mcolindex,nogroupskip]
 		\vspace{-1em}
 	}{}%
-	\ifbool{glossar}{%
-		\verzeichnisEintrag{\glossaryname}{glossary}
-		\printnoidxglossary[type=main,			style=altlist,nogroupskip]
+	%\ifbool{glossar}{%
+		%\verzeichnisEintrag{\glossaryname}{glossary}
+		%\printnoidxglossary[type=main,			style=altlist,nogroupskip]
 %		\par
-	}{}%
+	%}{}%
 	%	
 	%%Literaturverzeichnis
 	\ifbool{weiterfuehrendeLiteratur}{%
 		\verzeichnisEintrag{\GetTranslation{Bibliography}}{literature}
 		\printbibliography[title={\GetTranslation{Bibliography}},category=cited]%
 		
-		\SaveTranslation{\furtherreadingsaved}{FurtherReading}% Umweg, da ggf. Umlaute enthalten sind und das sonst direkt nicht klappt
-		\verzeichnisEintragX{\GetTranslation{FurtherReading}}{\furtherreadingsaved}{furtherreading}
+		%\SaveTranslation{\furtherreadingsaved}{FurtherReading}% Umweg, da ggf. Umlaute enthalten sind und das sonst direkt nicht klappt
+		%\verzeichnisEintragX{\GetTranslation{FurtherReading}}{\furtherreadingsaved}{furtherreading}
 		\printbibliography[title={\GetTranslation{FurtherReading}},notcategory=cited]%
 	}{%
 		\verzeichnisEintrag{\GetTranslation{Bibliography}}{literature}
